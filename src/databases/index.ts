@@ -37,7 +37,6 @@ const sequelize = new Sequelize.Sequelize(DB_DATABASE, DB_USER, DB_PASSWORD, {
 sequelize.authenticate();
 
 const DB: any = {
-  // Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 };
@@ -49,7 +48,6 @@ fs.readdirSync(path.resolve(__dirname, "../models/"))
       path.resolve(__dirname, "../models/"),
       file
     ));
-    console.log("fghhjjjjjjjjjjjjjjjjjjj", model);
 
     const tempModel = model(sequelize, Sequelize.DataTypes);
     DB[tempModel.name] = tempModel;
