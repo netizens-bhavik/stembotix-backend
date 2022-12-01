@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
-const PROTECTED_ATTRIBUTES = ["password"];
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define(
     "User",
@@ -43,36 +42,38 @@ module.exports = (sequelize, Sequelize) => {
           },
         },
       },
-      // password: {
-      //   type: Sequelize.STRING,
-      //   set(value) {
-      //     const hashPassword = hashSync(value, genSaltSync(8));
-      //     this.setDataValue('password', hashPassword);
-      //   },
-      // },
+      password: {
+        type: Sequelize.STRING,
+        set(value) {
+          const hashPassword = hashSync(value, genSaltSync(8));
+          this.setDataValue("password", hashPassword);
+        },
+      },
+      date_of_birth: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "",
+      },
     },
     {
       paranoid: true,
-      // scopes: {
-      //   withoutPassword: {
-      //     attributes: { exclude: ['password'] },
-      //   },
-      // },
     }
   );
 
   User.associate = (models) => {
-    // User.hasOne(models.Token);
-    // User.hasMany(models.UserGroupMap);
-    // User.belongsToMany(models.GroupMessages, { through: "SeenByUsers" });
-    // User.hasMany(models.DirectMessages, { foreignKey: "sender_id" });
-    // User.hasMany(models.DirectMessages, { foreignKey: "reciever_id" });
-    // User.hasMany(models.User);
+    User.hasOne(models.RefreshToken, {
+      foreignKey: "userId",
+      targetKey: "id",
+    });
   };
 
-  // User.prototype.validPassword = (password) => {
-  //   return compareSync(password, User.password);
-  // };
+  User.prototype.validPassword = (password) => {
+    return compareSync(password, User.password);
+  };
 
   return User;
 };

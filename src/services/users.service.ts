@@ -1,12 +1,12 @@
-import { hash } from 'bcrypt';
-import DB from '@databases';
-import { CreateUserDto } from '@dtos/users.dto';
-import { HttpException } from '@exceptions/HttpException';
-import { User } from '@interfaces/users.interface';
-import { isEmpty } from '@utils/util';
+import { hash } from "bcrypt";
+import DB from "@databases";
+import { RegisterUserDto, LoginUserDto } from "@dtos/users.dto";
+import { HttpException } from "@exceptions/HttpException";
+import { User } from "@interfaces/users.interface";
+import { isEmpty } from "@utils/util";
 
 class UserService {
-  public users = DB.Users;
+  public users = DB.User;
 
   public async findAllUser(): Promise<User[]> {
     const allUser: User[] = await this.users.findAll();
@@ -22,25 +22,40 @@ class UserService {
     return findUser;
   }
 
-  public async createUser(userData: CreateUserDto): Promise<User> {
+  public async createUser(userData: RegisterUserDto): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
 
-    const findUser: User = await this.users.findOne({ where: { email: userData.email } });
-    if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
+    const findUser: User = await this.users.findOne({
+      where: { email: userData.email },
+    });
+    if (findUser)
+      throw new HttpException(
+        409,
+        `This email ${userData.email} already exists`
+      );
 
     const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
+    const createUserData: User = await this.users.create({
+      ...userData,
+      password: hashedPassword,
+    });
     return createUserData;
   }
 
-  public async updateUser(userId: number, userData: CreateUserDto): Promise<User> {
+  public async updateUser(
+    userId: number,
+    userData: RegisterUserDto
+  ): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
 
     const findUser: User = await this.users.findByPk(userId);
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     const hashedPassword = await hash(userData.password, 10);
-    await this.users.update({ ...userData, password: hashedPassword }, { where: { id: userId } });
+    await this.users.update(
+      { ...userData, password: hashedPassword },
+      { where: { id: userId } }
+    );
 
     const updateUser: User = await this.users.findByPk(userId);
     return updateUser;
