@@ -27,20 +27,22 @@ class AuthService {
     const createUserData: User = await this.users.create(userData);
 
     return {
-      user: {
-        id: createUserData.id,
-        fullName: createUserData.fullName,
-        firstName: createUserData.firstName,
-        lastName: createUserData.lastName,
-        email: createUserData.email,
-        isEmailVerified: createUserData.isEmailVerified,
-        date_of_birth: createUserData.date_of_birth,
-        role: createUserData.role,
-      },
+      id: createUserData.id,
+      fullName: createUserData.fullName,
+      firstName: createUserData.firstName,
+      lastName: createUserData.lastName,
+      email: createUserData.email,
+      isEmailVerified: createUserData.isEmailVerified,
+      date_of_birth: createUserData.date_of_birth,
+      role: createUserData.role,
     };
   }
 
-  public async login(userData): Promise<{ cookie: string; findUser: User }> {
+  public async login(userData): Promise<{
+    cookie: string;
+    accessToke: string;
+    findUser: User;
+  }> {
     let refreshTokenData = userData?.cookie || null;
 
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
@@ -86,7 +88,7 @@ class AuthService {
     return findUser;
   }
 
-  public createCookie(tokenData: TokenData): string {
+  public createCookie(tokenData: string) {
     return tokenData;
   }
 }

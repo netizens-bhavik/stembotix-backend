@@ -58,6 +58,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "",
       },
+      role_id: {
+        type: Sequelize.UUID,
+        allowNull: false,
+      },
     },
     {
       paranoid: true,
@@ -68,6 +72,10 @@ module.exports = (sequelize, Sequelize) => {
     User.hasOne(models.RefreshToken, {
       foreignKey: "userId",
       targetKey: "id",
+    });
+    User.belongsTo(models.Role, {
+      foreignKey: "role_id",
+      sourceKey: "id",
     });
   };
 
