@@ -31,7 +31,7 @@ export default class TokenService {
     let code = 200;
     let response = {};
     if (this.refreshToken.verifyExpiration(token)) {
-      this.refreshToken.destroy({ where: { id: token } });
+      this.refreshToken.destroy({ where: { id: token.token } });
       code = 403;
       response = {
         messages: "Refresh token was expired. Please make a new signin request",
