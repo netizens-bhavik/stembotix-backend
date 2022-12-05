@@ -13,17 +13,10 @@ class AuthController {
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: RegisterUserDto = req.body;
-      const signUpUserData: User = await this.authService.signup(userData);
-      const data = {
-        id: signUpUserData.id,
-        firstName: signUpUserData.firstName,
-        lastName: signUpUserData.lastName,
-        fullName: signUpUserData.fullName,
-        email: signUpUserData.email,
-      };
+      const { accessToken, user } = await this.authService.signup(userData);
       res
         .status(200)
-        .send({ data: signUpUserData, message: "Signed Up successfully." });
+        .send({ accessToken, user, message: "Signed Up successfully." });
     } catch (error) {
       next(error);
     }
@@ -100,6 +93,28 @@ class AuthController {
       const logOutUserData: { message: string } =
         await this.authService.verifyEmail(hash);
       res.status(200).json({ message: logOutUserData.message });
+    } catch (error) {
+      next(error);
+    }
+  };
+  public resendMail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    // @ts-ignore
+    const { id } = req.user;
+    const data = await this.authService.resendMail(id);
+    res.status(200).send(data);
+  };
+  public getUserData = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const data = req.user;
+      res.status(200).send(data);
     } catch (error) {
       next(error);
     }

@@ -16,8 +16,6 @@ class CreateUser {
 
       let userInstance: RegisterUserDto;
 
-      const hashPassword = hashSync(userData.password, genSaltSync(8));
-      userData.password = hashPassword;
       userInstance = await this.users.findOne({
         where: { email: userData.email },
       });

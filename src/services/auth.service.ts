@@ -1,7 +1,7 @@
 import { compare } from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { SECRET_KEY } from "@config";
+import { SECRET_KEY, CLIENT_URL } from "@config";
 import DB from "@databases";
 import { RegisterUserDto, LoginUserDto } from "@dtos/users.dto";
 import { HttpException } from "@exceptions/HttpException";
@@ -15,9 +15,13 @@ class AuthService {
   public roles = DB.Role;
   public refreshToken = DB.RefreshToken;
   public accountHash = DB.AccountVerification;
+  public trainers = DB.Trainer;
   public emailService = new EmailService();
+  private accessTokenExpiry: number = 60;
 
-  public async signup(userData: RegisterUserDto): Promise<User> {
+  public async signup(
+    userData: RegisterUserDto
+  ): Promise<{ accessToken: string; user: User }> {
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
 
     const findUser: User = await this.users.findOne({
@@ -36,7 +40,11 @@ class AuthService {
       ...userData,
       role_id: roleData.id,
     });
-
+    if (userData.role.match(/trainer/i)) {
+      await this.trainers.create({
+        user_id: createUserData.id,
+      });
+    }
     const token = crypto.randomBytes(20).toString("hex");
     await this.accountHash.create({
       hash: token,
@@ -45,23 +53,30 @@ class AuthService {
     const mailData: MailPayload = {
       templateData: {
         firstName: createUserData.firstName,
-        link: `http://192.168.1.14:3000/verify/${token}`,
+        link: `${CLIENT_URL}/verifyRegisters/${token}`,
       },
       mailerData: {
         to: createUserData.email,
       },
     };
     this.emailService.accountVerification(mailData);
+
+    const accessToken = jwt.sign({ id: createUserData.id }, SECRET_KEY, {
+      expiresIn: this.accessTokenExpiry,
+    });
     return {
-      id: createUserData.id,
-      fullName: createUserData.fullName,
-      firstName: createUserData.firstName,
-      lastName: createUserData.lastName,
-      email: createUserData.email,
-      isEmailVerified: createUserData.isEmailVerified,
-      date_of_birth: createUserData.date_of_birth,
-      role: createUserData.role,
-      role_id: createUserData.role_id,
+      accessToken,
+      user: {
+        id: createUserData.id,
+        fullName: createUserData.fullName,
+        firstName: createUserData.firstName,
+        lastName: createUserData.lastName,
+        email: createUserData.email,
+        isEmailVerified: createUserData.isEmailVerified,
+        date_of_birth: createUserData.date_of_birth,
+        role: createUserData.role,
+        role_id: createUserData.role_id,
+      },
     };
   }
 
@@ -90,7 +105,7 @@ class AuthService {
     if (!isPasswordMatching) throw new HttpException(409, "Wrong Password");
 
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
-      expiresIn: 60,
+      expiresIn: this.accessTokenExpiry,
     });
     if (!refreshToken) {
       refreshToken = await this.refreshToken.createToken(findUser);
@@ -123,7 +138,34 @@ class AuthService {
       message: "Email verified successfully",
     };
   }
+  public async resendMail(id: string): Promise<{ message: string }> {
+    let user = await this.users.findOne({ where: { id: id } });
+    if (!user) throw new HttpException(404, "User not found");
+    let token = await this.accountHash.findOne({
+      where: {
+        user_id: id,
+      },
+    });
+    if (!token) {
+      token = crypto.randomBytes(20).toString("hex");
+      await this.accountHash.create({
+        hash: token,
+        user_id: id,
+      });
+    }
+    const mailData: MailPayload = {
+      templateData: {
+        firstName: user.firstName,
+        link: `${CLIENT_URL}/verifyRegisters/${token}`,
+      },
+      mailerData: {
+        to: user.email,
+      },
+    };
+    this.emailService.accountVerification(mailData);
 
+    return { message: "Email sent successfully" };
+  }
   public createCookie(tokenData: string) {
     return tokenData;
   }

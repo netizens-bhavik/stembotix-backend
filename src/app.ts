@@ -14,7 +14,7 @@ import errorMiddleware from "@middlewares/error.middleware";
 import { logger, stream } from "@utils/logger";
 import BootFiles from "./boot";
 import passport from "passport";
-
+import path from "path";
 class App {
   public app: express.Application;
   public env: string;
@@ -25,12 +25,13 @@ class App {
     this.app = express();
     this.env = NODE_ENV || "development";
     this.port = PORT || 3000;
-
+    this.app.set("view engine", "ejs");
+    this.app.set("views", path.join(__dirname, "/view"));
     this.connectToDatabase();
+    this.initializeSwagger();
     this.initializeMiddlewares();
     this.bootFiles.init();
     this.initializeRoutes(routes);
-    this.initializeSwagger();
     this.initializeErrorHandling();
   }
 
@@ -66,23 +67,31 @@ class App {
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
       this.app.use("/api", route.router);
+      this.app.use("/api", route.router);
     });
   }
 
   private initializeSwagger() {
     const options = {
       swaggerDefinition: {
+        openapi: "3.0.0",
+        components: {},
         info: {
-          title: "REST API",
+          title: "Stembotix API",
           version: "1.0.0",
-          description: "Example docs",
+          description:
+            "Base URL: \n1. https://192.168.1.106:3000/api \n2. https://192.168.1.14:3000/api",
         },
       },
       apis: ["swagger.yaml"],
     };
 
-    const specs = swaggerJSDoc(options);
-    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+    try {
+      const specs = swaggerJSDoc(options);
+      this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   private initializeErrorHandling() {
