@@ -1,9 +1,10 @@
 const userData = {
-  firstName: "Shubham",
-  lastName: "Damania",
-  email: "shubham@yopmail.com",
-  password: "test@123",
+  firstName: "Admin",
+  lastName: "Admin",
+  email: "admin@yopmail.com",
+  password: "admin@123",
   date_of_birth: "2000-01-01",
-  role: "user",
+  isEmailVerified: true,
+  role: "admin",
 };
-module.exports = userData;
+export default userData;

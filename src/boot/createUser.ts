@@ -6,10 +6,14 @@ import { RegisterUserDto } from "@dtos/users.dto";
 
 class CreateUser {
   public users = DB.User;
+  public roles = DB.Role;
   public UserService = new UserService();
 
   public init = async () => {
     try {
+      const res = await this.users.count();
+      if (res !== 0) return;
+
       let userInstance: RegisterUserDto;
 
       const hashPassword = hashSync(userData.password, genSaltSync(8));
@@ -18,10 +22,16 @@ class CreateUser {
         where: { email: userData.email },
       });
       if (!userInstance) {
-        userInstance = await this.users.create(userData);
+        const roleRes = await this.roles.findOne({
+          where: { roleName: userData.role },
+        });
+        userInstance = await this.users.create({
+          ...userData,
+          role_id: roleRes.id,
+        });
       }
     } catch (error) {
-      return error;
+      console.log(error);
     }
   };
 }

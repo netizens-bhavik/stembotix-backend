@@ -1,15 +1,16 @@
-import { compare, hash } from "bcrypt";
+import { compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "@config";
 import DB from "@databases";
-import { RegisterUserDto } from "@dtos/users.dto";
+import { RegisterUserDto, LoginUserDto } from "@dtos/users.dto";
 import { HttpException } from "@exceptions/HttpException";
-import { TokenData } from "@interfaces/auth.interface";
 import { User } from "@interfaces/users.interface";
+import { Role } from "@/interfaces/role.instance";
 import { isEmpty } from "@utils/util";
 
 class AuthService {
   public users = DB.User;
+  public roles = DB.Role;
   public refreshToken = DB.RefreshToken;
 
   public async signup(userData: RegisterUserDto): Promise<User> {
@@ -24,7 +25,13 @@ class AuthService {
         `This email ${userData.email} already exists`
       );
 
-    const createUserData: User = await this.users.create(userData);
+    const roleData: Role = await this.roles.findOne({
+      where: { role_name: userData.role },
+    });
+    const createUserData: User = await this.users.create({
+      ...userData,
+      role_id: roleData.id,
+    });
 
     return {
       id: createUserData.id,
@@ -35,15 +42,16 @@ class AuthService {
       isEmailVerified: createUserData.isEmailVerified,
       date_of_birth: createUserData.date_of_birth,
       role: createUserData.role,
+      role_id: createUserData.role_id,
     };
   }
 
-  public async login(userData): Promise<{
-    cookie: string;
-    accessToke: string;
-    findUser: User;
+  public async login(userData: LoginUserDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: User;
   }> {
-    let refreshTokenData = userData?.cookie || null;
+    let refreshToken = userData?.cookie || null;
 
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
 
@@ -60,20 +68,19 @@ class AuthService {
       userData.password,
       findUser.password
     );
-    if (!isPasswordMatching)
-      throw new HttpException(409, "Password not matching");
+    if (!isPasswordMatching) throw new HttpException(409, "Wrong Password");
+
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
       expiresIn: 3600,
     });
-    if (!refreshTokenData) {
-      refreshTokenData = await this.refreshToken.createToken(findUser);
+    if (!refreshToken) {
+      refreshToken = await this.refreshToken.createToken(findUser);
     }
 
     return {
-      accessToke: token,
-      refreshTokenData,
-      refreshTokenData,
-      findUser,
+      accessToken: token,
+      refreshToken,
+      user: findUser,
     };
   }
 

@@ -8,4 +8,5 @@ export interface User {
   isEmailVerified: boolean;
   date_of_birth: Date;
   role: string;
+  role_id: string;
 }

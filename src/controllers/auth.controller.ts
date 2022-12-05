@@ -4,6 +4,7 @@ import { User } from "@interfaces/users.interface";
 import { RequestWithUser } from "@interfaces/auth.interface";
 import AuthService from "@services/auth.service";
 import TokenService from "@/services/token.service";
+import { RefreshToken } from "@/interfaces/refreshToken.interface";
 
 class AuthController {
   public authService = new AuthService();
@@ -20,7 +21,9 @@ class AuthController {
         fullName: signUpUserData.fullName,
         email: signUpUserData.email,
       };
-      res.status(200).send({ data: signUpUserData, message: "signup" });
+      res
+        .status(200)
+        .send({ data: signUpUserData, message: "Signed Up successfully." });
     } catch (error) {
       next(error);
     }
@@ -28,18 +31,20 @@ class AuthController {
 
   public logIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { cookie } = req.cookies;
-      const { email, password } = req.body;
+      const { email, password, cookie } = req.body;
 
-      const { accessToke, ...findUser } = await this.authService.login({
+      const { refreshToken, accessToken, user } = await this.authService.login({
         email,
         password,
         cookie,
       });
 
-      res.cookie("refreshToken", accessToke);
-
-      res.status(200).json({ data: findUser, message: `login` });
+      res.status(200).json({
+        accessToken,
+        refreshToken,
+        user,
+        message: `Logged in Successfully`,
+      });
     } catch (error) {
       next(error);
     }
@@ -59,20 +64,26 @@ class AuthController {
           message: "Refresh Token is required!",
         });
       }
-      let refreshTokenData = await this.tokenService.findToken(requestToken);
-
-      if (!refreshTokenData) {
+      let refreshTokenData: RefreshToken = await this.tokenService.findToken(
+        requestToken
+      );
+      if (!refreshTokenData)
         res.status(403).json({
-          redirectToLogin: true,
-          message: "Refresh token is not in database!",
+          message: "Invalid Token!",
         });
+      let refreshTokenInvalid = await this.tokenService.verifyToken(
+        refreshTokenData
+      );
+      if (refreshTokenInvalid) {
+        res.status(403).json({
+          message: "Expired Token!",
+        });
+        return;
       }
-
-      const [statusCode, { accessToken, ...response }] =
+      const { accessToken, refreshToken, user } =
         await this.tokenService.refreshTokenUser(refreshTokenData);
 
-      res.cookie("refreshToken", accessToken);
-      return res.status(statusCode).json({ accessToken, ...response });
+      return res.status(200).json({ accessToken, refreshToken, user });
     } catch (error) {
       next(error);
     }

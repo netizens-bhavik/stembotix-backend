@@ -1,4 +1,10 @@
-import { IsString, IsEmail, IsDate, IsDateString } from "class-validator";
+import {
+  IsString,
+  IsEmail,
+  IsDate,
+  IsDateString,
+  ValidateIf,
+} from "class-validator";
 
 export class RegisterUserDto {
   @IsString()
@@ -26,4 +32,8 @@ export class LoginUserDto {
 
   @IsString()
   public password: string;
+
+  @IsString()
+  @ValidateIf((object, value) => value !== undefined)
+  public cookie?: string;
 }
