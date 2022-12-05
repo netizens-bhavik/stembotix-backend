@@ -17,4 +17,7 @@ export const {
   LOG_FORMAT,
   LOG_DIR,
   ORIGIN,
+  SMTP_USERNAME,
+  SMTP_PASSWORD,
+  SMTP_EMAIL_FROM,
 } = process.env;
