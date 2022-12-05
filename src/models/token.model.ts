@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { User } from "@interfaces/users.interface";
 module.exports = (sequelize, Sequelize) => {
   const RefreshToken = sequelize.define(
     "RefreshToken",
@@ -14,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
       paranoid: true,
     }
   );
-  RefreshToken.createToken = async function (user) {
+  RefreshToken.createToken = async function (user: User) {
     let expiredAt = new Date();
     expiredAt.setSeconds(expiredAt.getSeconds() + 86400 * 2);
 

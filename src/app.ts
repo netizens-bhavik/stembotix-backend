@@ -13,6 +13,7 @@ import { Routes } from "@interfaces/routes.interface";
 import errorMiddleware from "@middlewares/error.middleware";
 import { logger, stream } from "@utils/logger";
 import BootFiles from "./boot";
+import passport from "passport";
 
 class App {
   public app: express.Application;
@@ -59,11 +60,12 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
+    this.app.use(passport.initialize());
   }
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
-      this.app.use("/", route.router);
+      this.app.use("/api", route.router);
     });
   }
 
