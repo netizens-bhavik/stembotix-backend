@@ -1,115 +1,120 @@
 tags:
-- name: users
-  description: users API
+  - name: auth
+    description: Auth API
+
+servers:
+  - url: "http://192.168.1.106:5000/api/"
 
 paths:
-# [GET] users
-  /users:
-    get:
-      tags:
-      - users
-      summary: Find All Users
-      responses:
-        200:
-          description: 'OK'
-        500:
-          description: 'Server Error'
-
-# [POST] users
+  # Authentications Endpoints
+  /auth/signup:
     post:
       tags:
-      - users
-      summary: Add User
-      parameters:
-      - name: body
-        in: body
-        description: user Data
+        - auth
+      summary: Register a new student user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserReq"
         required: true
-        schema:
-          $ref: '#/definitions/users'
       responses:
-        201:
-          description: 'Created'
-        400:
-          description: 'Bad Request'
-        409:
-          description: 'Conflict'
+        200:
+          description: "Succcess Registration"
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/RegisterUserRes"
         500:
-          description: 'Server Error'
-
-# [GET] users/id
-  /users/{id}:
+          description: "Server Error"
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Logs student user into the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserReq"
+        required: true
+      responses:
+        200:
+          description: "Succcess Registration"
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/LoginUserRes"
+        500:
+          description: "Server Error"
+  /auth/refresh-token:
+    post:
+      tags:
+        - auth
+      summary: Generates new Access Token for expired Login session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenReq"
+        required: true
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenRes"
+        500:
+          description: "Server Error"
+  /auth/verify-email/{token}:
+    post:
+      tags:
+        - auth
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Verify user email account
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified successfully
+        500: "Server Error"
+  /auth/get-user-data:
     get:
       tags:
-      - users
-      summary: Find User By Id
-      parameters:
-      - name: id
-        in: path
-        description: User Id
-        required: true
-        type: integer
+        - auth
+      summary: Get user data using Auth Bearer token
       responses:
         200:
-          description: 'OK'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
-
-# [PUT] users/id
-    put:
-      tags:
-      - users
-      summary: Update User By Id
-      parameters:
-      - name: id
-        in: path
-        description: user Id
-        required: true
-        type: integer
-      - name: body
-        in: body
-        description: user Data
-        required: true
-        schema:
-          $ref: '#/definitions/users'
-      responses:
-        200:
-          description: 'OK'
-        400:
-          description: 'Bad Request'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
-
-# [DELETE] users/id
-    delete:
-      tags:
-      - users
-      summary: Delete User By Id
-      parameters:
-      - name: id
-        in: path
-        description: user Id
-        required: true
-        type: integer
-      responses:
-        200:
-          description: 'OK'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
-
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginUserRes"
+        401:
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
 # definitions
 definitions:
   users:
     type: object
     required:
-        - email
-        - password
+      - email
+      - password
     properties:
       email:
         type: string
@@ -118,6 +123,121 @@ definitions:
         type: string
         description: user Password
 
+components:
+  schemas:
+    # auth
+    RegisterUserReq:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: johndoe@yopmail.com
+        password:
+          type: string
+          example: user@123
+        date_of_birth:
+          type: string
+          example: 2000-10-10
+        role:
+          type: string
+          example: student
+    RegisterUserRes:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNjYWE5ODAwLTcwYzUtNDY3ZS1hODkxLWZmMmQ5M2NhMzVmNCIsImlhdCI6MTY2OTk1NDQ4NCwiZXhwIjoxNjY5OTU4MDg0fQ.U94JmI_yXISQfizFXCGYfxT0asG9nSsq8osovmanGEE
+        user:
+          $ref: "#/components/schemas/UserData"
+        message:
+          type: string
+          example: Signed up successfully.
+    LoginUserReq:
+      type: object
+      properties:
+        email:
+          type: string
+          example: user@yopmail.com
+        password:
+          type: string
+          example: user@123
+    LoginUserRes:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNjYWE5ODAwLTcwYzUtNDY3ZS1hODkxLWZmMmQ5M2NhMzVmNCIsImlhdCI6MTY2OTk1NDQ4NCwiZXhwIjoxNjY5OTU4MDg0fQ.U94JmI_yXISQfizFXCGYfxT0asG9nSsq8osovmanGEE
+        refreshToken:
+          type: string
+          example: 1e3c9a16-6580-4523-a5e7-6401dbd6abc2
+        user:
+          $ref: "#/components/schemas/UserData"
+    RefreshTokenReq:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          example: fcb50213-a89f-4e28-94d3-1adb2dbcf186
+    RefreshTokenRes:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNjYWE5ODAwLTcwYzUtNDY3ZS1hODkxLWZmMmQ5M2NhMzVmNCIsImlhdCI6MTY2OTk1NDQ4NCwiZXhwIjoxNjY5OTU4MDg0fQ.U94JmI_yXISQfizFXCGYfxT0asG9nSsq8osovmanGEE
+        refreshToken:
+          type: string
+          example: 1e3c9a16-6580-4523-a5e7-6401dbd6abc2
+        user:
+          $ref: "#/components/schemas/UserData"
+
+    #generic
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a4007575-0b46-44d1-828b-fe105194ce1f
+        fullName:
+          type: string
+          example: John Doe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: johndoe@yopmail.com
+        isEmailVerified:
+          type: boolean
+          example: false
+        date_of_birth:
+          type: string
+          example: 2000-10-10T00:00:00.000Z
+        role:
+          type: string
+          example: student
+        role_id:
+          type: string
+          example: e29d1afb-e3a0-41cb-a473-0549228de148
+    Error400:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Email field is required
+    Error404:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Requested Resource is not available
 schemes:
- - https
- - http
+  - http
