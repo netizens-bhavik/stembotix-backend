@@ -89,17 +89,17 @@ class AuthController {
     }
   };
 
-  public logOut = async (
+  public verifyEmail = async (
     req: RequestWithUser,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const userData: User = req.user;
-      const logOutUserData: User = await this.authService.logout(userData);
-
-      res.setHeader("Set-Cookie", ["Authorization=; Max-age=0"]);
-      res.status(200).json({ data: logOutUserData, message: "logout" });
+      const { hash } = req.params;
+      if (!hash) res.status(400).send({ message: "Invalid Request" });
+      const logOutUserData: { message: string } =
+        await this.authService.verifyEmail(hash);
+      res.status(200).json({ message: logOutUserData.message });
     } catch (error) {
       next(error);
     }

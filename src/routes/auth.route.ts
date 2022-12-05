@@ -30,9 +30,8 @@ class AuthRoute implements Routes {
       this.authController.refreshTokenUser
     );
     this.router.post(
-      `${this.path}/logout`,
-      authMiddleware,
-      this.authController.logOut
+      `${this.path}/verify-email/:hash`,
+      this.authController.verifyEmail
     );
   }
 }
