@@ -15,6 +15,7 @@ import { logger, stream } from "@utils/logger";
 import BootFiles from "./boot";
 import passport from "passport";
 import path from "path";
+import { runInThisContext } from "vm";
 class App {
   public app: express.Application;
   public env: string;
@@ -22,17 +23,21 @@ class App {
   public bootFiles = new BootFiles();
 
   constructor(routes: Routes[]) {
-    this.app = express();
-    this.env = NODE_ENV || "development";
-    this.port = PORT || 3000;
-    this.app.set("view engine", "ejs");
-    this.app.set("views", path.join(__dirname, "/view"));
-    this.connectToDatabase();
-    this.initializeSwagger();
-    this.initializeMiddlewares();
-    this.bootFiles.init();
-    this.initializeRoutes(routes);
-    this.initializeErrorHandling();
+    try {
+      this.app = express();
+      this.env = NODE_ENV || "development";
+      this.port = PORT || 3000;
+      this.app.set("view engine", "ejs");
+      this.app.set("views", path.join(__dirname, "/view"));
+      this.connectToDatabase();
+      this.initializeSwagger();
+      this.initializeMiddlewares();
+      this.bootFiles.init();
+      this.initializeRoutes(routes);
+      this.initializeErrorHandling();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   public listen() {
@@ -49,7 +54,7 @@ class App {
   }
 
   private connectToDatabase() {
-    DB.sequelize.sync({ force: false });
+    DB.sequelize.sync({ force: false }).catch((err) => console.log(err));
   }
 
   private initializeMiddlewares() {
@@ -67,7 +72,7 @@ class App {
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
       this.app.use("/api", route.router);
-      this.app.use("/api", route.router);
+      this.app.use("/media", express.static(path.join(__dirname, "/public")));
     });
   }
 

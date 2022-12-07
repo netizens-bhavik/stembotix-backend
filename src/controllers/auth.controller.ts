@@ -13,10 +13,17 @@ class AuthController {
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: RegisterUserDto = req.body;
-      const { accessToken, user } = await this.authService.signup(userData);
+      const { accessToken, refreshToken, user } = await this.authService.signup(
+        userData
+      );
       res
         .status(200)
-        .send({ accessToken, user, message: "Signed Up successfully." });
+        .send({
+          accessToken,
+          refreshToken,
+          user,
+          message: "Signed Up successfully.",
+        });
     } catch (error) {
       next(error);
     }
@@ -115,6 +122,21 @@ class AuthController {
     try {
       const data = req.user;
       res.status(200).send(data);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public loginAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const data = req.user;
+      console.log(data);
+
+      const adminData = await this.tokenService.createUserToken(data);
+      res.status(200).send(adminData);
     } catch (error) {
       next(error);
     }

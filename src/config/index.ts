@@ -9,6 +9,7 @@ export const {
   NODE_ENV,
   PORT,
   CLIENT_URL,
+  API_BASE,
   DB_HOST,
   DB_PORT,
   DB_USER,

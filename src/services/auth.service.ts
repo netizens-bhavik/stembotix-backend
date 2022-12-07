@@ -17,11 +17,11 @@ class AuthService {
   public accountHash = DB.AccountVerification;
   public trainers = DB.Trainer;
   public emailService = new EmailService();
-  private accessTokenExpiry: number = 60;
+  private accessTokenExpiry: number = 60 * 60 * 24;
 
   public async signup(
     userData: RegisterUserDto
-  ): Promise<{ accessToken: string; user: User }> {
+  ): Promise<{ accessToken: string; refreshToken; user: User }> {
     if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
 
     const findUser: User = await this.users.findOne({
@@ -64,8 +64,10 @@ class AuthService {
     const accessToken = jwt.sign({ id: createUserData.id }, SECRET_KEY, {
       expiresIn: this.accessTokenExpiry,
     });
+    const refreshToken = await this.refreshToken.createToken(createUserData);
     return {
       accessToken,
+      refreshToken,
       user: {
         id: createUserData.id,
         fullName: createUserData.fullName,
@@ -166,6 +168,7 @@ class AuthService {
 
     return { message: "Email sent successfully" };
   }
+
   public createCookie(tokenData: string) {
     return tokenData;
   }
