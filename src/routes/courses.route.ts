@@ -20,7 +20,17 @@ class CourseRoute implements Routes {
   private initializeRoutes() {
     // view all courses with pagination (without bearer)
     this.router.get(`${this.path}`, this.courseController.viewCourses);
-
+    // view own courses
+    this.router.get(
+      `${this.path}/list/`,
+      passport.authenticate("jwt", { session: false }),
+      this.courseController.listCourses
+    );
+    // view single course details
+    this.router.get(
+      `${this.path}/:courseId`,
+      this.courseController.getCourseById
+    );
     // add course (by trainer only)
     this.router.post(
       `${this.path}`,
@@ -34,12 +44,6 @@ class CourseRoute implements Routes {
         validationMiddleware(AddCourseDTO, "body"),
       ],
       this.courseController.addCourse
-    );
-
-    // view single course details
-    this.router.get(
-      `${this.path}/:courseId`,
-      this.courseController.getCourseById
     );
     // edit own course details
     this.router.put(
@@ -55,11 +59,18 @@ class CourseRoute implements Routes {
       ],
       this.courseController.updateCourse
     );
-
-    // // delete own course (only when unpublished)
-    // this.router.delete("/:courseId");
-    // // view own courses
-    // this.router.get("list/:trainerId");
+    // toggle course visibility
+    this.router.put(
+      `${this.path}/toggle-publish/:courseId`,
+      passport.authenticate("jwt", { session: false }),
+      this.courseController.togglePublish
+    );
+    // delete own course (only when unpublished)
+    this.router.delete(
+      `${this.path}/:courseId`,
+      passport.authenticate("jwt", { session: false }),
+      this.courseController.deleteCourse
+    );
   }
 }
 export default CourseRoute;

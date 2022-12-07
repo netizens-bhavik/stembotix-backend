@@ -1,8 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { Course } from "@/interfaces/course.interface";
-import CourseService from "@/services/courses.service";
-import { HttpException } from "@/exceptions/HttpException";
-import { nextTick } from "process";
+import { NextFunction, Request, Response } from 'express';
+import { Course } from '@/interfaces/course.interface';
+import CourseService from '@/services/courses.service';
 
 class CourseController {
   public courseService = new CourseService();
@@ -13,8 +11,15 @@ class CourseController {
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const coursesData: (Course | undefined)[] =
-        await this.courseService.viewCourses();
+        await this.courseService.viewCourses({
+          search,
+          pageRecord,
+          pageNo,
+          sortBy,
+          order,
+        });
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);
@@ -52,7 +57,6 @@ class CourseController {
       next(error);
     }
   };
-
   public updateCourse = async (
     req: Request,
     res: Response,
@@ -64,12 +68,65 @@ class CourseController {
       console.log(req.body);
       const file = req.file;
       const trainer = req.user;
-      courseDetails["id"] = courseId;
+      courseDetails['id'] = courseId;
       const response = await this.courseService.updateCourse({
         courseDetails,
         file,
         trainer,
       });
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public deleteCourse = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const trainerData = req.user;
+      const { courseId } = req.params;
+      const response: { count: number } = await this.courseService.deleteCourse(
+        {
+          trainer: trainerData,
+          courseId,
+        }
+      );
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public listCourses = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const trainer = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: (Course | undefined)[] =
+        await this.courseService.listCourses({ trainer, queryObject });
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public togglePublish = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { courseId } = req.params;
+      const trainer = req.user;
+      const response: { count: number } =
+        await this.courseService.togglePublish({
+          trainer,
+          courseId,
+        });
       res.status(200).send(response);
     } catch (error) {
       next(error);

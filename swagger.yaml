@@ -4,7 +4,7 @@ tags:
   - name: courses
     description: Courses API
 servers:
-  - url: "http://192.168.1.106:5000/api/"
+  - url: 'http://192.168.1.106:5000/api/'
 
 paths:
   # Authentications Endpoints
@@ -17,17 +17,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterUserReq"
+              $ref: '#/components/schemas/RegisterUserReq'
         required: true
       responses:
         200:
-          description: "Succcess Registration"
+          description: 'Succcess Registration'
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/RegisterUserRes"
+                $ref: '#components/schemas/RegisterUserRes'
         500:
-          description: "Server Error"
+          description: 'Server Error'
   /auth/login:
     post:
       tags:
@@ -37,17 +37,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginUserReq"
+              $ref: '#/components/schemas/LoginUserReq'
         required: true
       responses:
         200:
-          description: "Succcess Registration"
+          description: 'Succcess Registration'
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/LoginUserRes"
+                $ref: '#components/schemas/LoginUserRes'
         500:
-          description: "Server Error"
+          description: 'Server Error'
   /auth/refresh-token:
     post:
       tags:
@@ -57,17 +57,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefreshTokenReq"
+              $ref: '#/components/schemas/RefreshTokenReq'
         required: true
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RefreshTokenRes"
+                $ref: '#/components/schemas/RefreshTokenRes'
         500:
-          description: "Server Error"
+          description: 'Server Error'
   /auth/verify-email/{token}:
     post:
       tags:
@@ -81,7 +81,7 @@ paths:
       summary: Verify user email account
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -90,7 +90,7 @@ paths:
                   message:
                     type: string
                     example: Email verified successfully
-        500: "Server Error"
+        500: 'Server Error'
   /auth/resend-verification:
     post:
       tags:
@@ -98,7 +98,7 @@ paths:
       summary: Resends Account verification email using Bearer Token
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             text/plain:
               schema:
@@ -108,14 +108,14 @@ paths:
                     type: string
                     example: Email sent successfully
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
           content:
             text/plain:
               schema:
                 type: string
                 example: Unauthorized
         500:
-          description: "Server Error"
+          description: 'Server Error'
   /auth/get-user-data:
     get:
       tags:
@@ -123,11 +123,11 @@ paths:
       summary: Get user data using Auth Bearer token
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LoginUserRes"
+                $ref: '#/components/schemas/LoginUserRes'
         401:
           content:
             text/plain:
@@ -141,17 +141,38 @@ paths:
       tags:
         - courses
       summary: View all courses
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level, language]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Course"
+                  $ref: '#/components/schemas/Course'
         500:
-          description: "Server Error"
+          description: 'Server Error'
     post:
       consumes:
         - multipart/form-data
@@ -162,16 +183,54 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddCourseReq"
+              $ref: '#/components/schemas/AddCourseReq'
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AddCourseRes"
+                $ref: '#/components/schemas/AddCourseRes'
         500:
-          description: "Server Error"
+          description: 'Server Error'
+  /courses/list:
+    get:
+      tags:
+        - courses
+      summary: List all courses of Trainer
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        500:
+          description: 'OK'
+
   /courses/{course_id}:
     get:
       tags:
@@ -185,13 +244,13 @@ paths:
       summary: View details about single Course
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Course"
+                $ref: '#/components/schemas/Course'
         500:
-          description: "Server Error"
+          description: 'Server Error'
     put:
       tags:
         - courses
@@ -206,16 +265,63 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddCourseReq"
+              $ref: '#/components/schemas/AddCourseReq'
       responses:
         200:
-          description: "OK"
+          description: 'OK'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EditCourseRes"
+                $ref: '#/components/schemas/EditCourseRes'
         500:
-          description: "Server Error"
+          description: 'Server Error'
+    delete:
+      tags:
+        - courses
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: Remove a course only if it is unpublished
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
+  /courses/toggle-publish/{:courseId}:
+    put:
+      tags:
+        - courses
+      summary: Toggles published status of a course
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
 
 # definitions
 definitions:
@@ -263,7 +369,7 @@ components:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNjYWE5ODAwLTcwYzUtNDY3ZS1hODkxLWZmMmQ5M2NhMzVmNCIsImlhdCI6MTY2OTk1NDQ4NCwiZXhwIjoxNjY5OTU4MDg0fQ.U94JmI_yXISQfizFXCGYfxT0asG9nSsq8osovmanGEE
         user:
-          $ref: "#/components/schemas/UserData"
+          $ref: '#/components/schemas/UserData'
         message:
           type: string
           example: Signed up successfully.
@@ -286,7 +392,7 @@ components:
           type: string
           example: 1e3c9a16-6580-4523-a5e7-6401dbd6abc2
         user:
-          $ref: "#/components/schemas/UserData"
+          $ref: '#/components/schemas/UserData'
     RefreshTokenReq:
       type: object
       properties:
@@ -303,7 +409,7 @@ components:
           type: string
           example: 1e3c9a16-6580-4523-a5e7-6401dbd6abc2
         user:
-          $ref: "#/components/schemas/UserData"
+          $ref: '#/components/schemas/UserData'
     # courses
     AddCourseReq:
       type: object
@@ -371,7 +477,7 @@ components:
         rows:
           type: array
           items:
-            $ref: "#/components/schemas/AddCourseRes"
+            $ref: '#/components/schemas/AddCourseRes'
 
     #generic
     Course:
@@ -413,7 +519,7 @@ components:
         Trainers:
           type: array
           items:
-            $ref: "#/components/schemas/Trainer"
+            $ref: '#/components/schemas/Trainer'
     Trainer:
       type: object
       properties:
@@ -433,7 +539,7 @@ components:
           type: [string | null]
           example: null
         User:
-          $ref: "#/components/schemas/UserData"
+          $ref: '#/components/schemas/UserData'
     UserData:
       type: object
       properties:
