@@ -166,6 +166,7 @@ class AuthService {
 
     return { message: "Email sent successfully" };
   }
+
   public createCookie(tokenData: string) {
     return tokenData;
   }

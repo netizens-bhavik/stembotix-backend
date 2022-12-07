@@ -119,6 +119,21 @@ class AuthController {
       next(error);
     }
   };
+  public loginAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const data = req.user;
+      console.log(data);
+
+      const adminData = await this.tokenService.createUserToken(data);
+      res.status(200).send(adminData);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default AuthController;

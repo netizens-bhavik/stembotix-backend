@@ -11,10 +11,11 @@ const fileStorage = multer.diskStorage({
   destination: publicFs,
   filename: (req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
     req.file = {
-      name: filePath,
+      name: file.originalname,
     };
 
     var uploadFile: any = "";
+    console.log(filePath);
 
     if (filePath === "uploadProfile") {
       uploadFile = "profile";
@@ -28,6 +29,7 @@ const fileStorage = multer.diskStorage({
         file.originalname
       )}`
     );
+    console.log(`${uploadFile}`);
   },
 });
 
@@ -37,6 +39,7 @@ const uploadFiles = multer({
     fileSize: 50 * 1024 * 1024,
   },
   fileFilter(req: Request, file: Express.Multer.File, cb: FileNameCallback) {
+    filePath = req.url.slice(1);
     if (
       !file.originalname.match(
         /\.(png|jpg|jpeg|xlsx|xlx|doc|txt|xls|pdf|docx|ppt|pptx|csv|svg|mp4)$/

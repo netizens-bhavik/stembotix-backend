@@ -45,7 +45,14 @@ export default class TokenService {
       user: user,
     };
   }
-
+  public async createUserToken(user: User): Promise<{ refreshToken: string }> {
+    console.log(user);
+    const userData = await this.users.findOne({
+      where: { email: user.email },
+    });
+    const refreshToken = await this.refreshToken.createToken(userData);
+    return { refreshToken: refreshToken };
+  }
   public async verifyToken(token: RefreshToken): Promise<Boolean> {
     const isInvalid: boolean = await this.refreshToken.verifyExpiration(token);
     return isInvalid;
