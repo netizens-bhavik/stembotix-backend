@@ -3,6 +3,8 @@ tags:
     description: Auth API
   - name: courses
     description: Courses API
+  - name: products
+    description: Products API
 servers:
   - url: 'http://192.168.1.106:5000/api/'
 
@@ -323,6 +325,85 @@ paths:
         500:
           description: 'Server Error'
 
+  # Product Endpoints
+  /product:
+    get:
+      tags:
+        - products
+      summary: View all product
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: 'Server Error'
+    post:
+      tags:
+        - products
+      summary: Add new Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddProductReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddProductRes'
+        500:
+          description: 'Server Error'
+  /product/{product_id}:
+    get:
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: Product ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: View details about single Course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        500:
+          description: 'Server Error'
+    put:
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: Product ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: Edit course details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddProductReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditProductRes'
+        500:
+          description: 'Server Error'
 # definitions
 definitions:
   users:
@@ -478,7 +559,74 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AddCourseRes'
-
+    # products
+    AddProductReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: DIY BOT
+        price:
+          type: number
+          example: 899
+        category:
+          type: string
+          example: Uncategorized
+        sku:
+          type: string
+          example: STMBOT-001
+        description:
+          type: string
+          example: (Sample Product Description) – Try to put as much as info like features and wow factors.
+        thumbnail:
+          type: file
+          example: file
+        weight:
+          type: string
+          example: 1 kg
+        dimension:
+          type: string
+          example: 12 × 10 × 20 cm
+    AddProductRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 2e8bd131-eb6a-4753-91b7-e7a61e43ab94
+        title:
+          type: string
+          example: DIY BOT
+        price:
+          type: number
+          example: 899
+        category:
+          type: string
+          example: Uncategorized
+        sku:
+          type: string
+          example: STMBOT-001
+        description:
+          type: string
+          example: (Sample Product Description) – Try to put as much as info like features and wow factors.
+        thumbnail:
+          type: string
+          example: http://192.168.1.14:5000/media/productImg/productImg_1670406128427.png
+        weight:
+          type: string
+          example: 1 kg
+        dimension:
+          type: string
+          example: 12 × 10 × 20 cm
+    EditProductRes:
+      type: object
+      properties:
+        count:
+          type: number
+          example: 1
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddCourseRes'
     #generic
     Course:
       type: object
@@ -540,6 +688,36 @@ components:
           example: null
         User:
           $ref: '#/components/schemas/UserData'
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
+        title:
+          type: string
+          example: DIY BOT
+        price:
+          type: number
+          example: 899
+        category:
+          type: string
+          example: Uncategorized
+        sku:
+          type: string
+          example: STMBOT-001
+        description:
+          type: string
+          example: (Sample Product Description) – Try to put as much as info like features and wow factors.
+        thumbnail:
+          type: string
+          example: http://192.168.1.14:5000/media/productImg/productImg_1670406128427.png
+        weight:
+          type: string
+          example: 1 kg
+        dimension:
+          type: string
+          example: 12 × 10 × 20 cm
     UserData:
       type: object
       properties:

@@ -1,12 +1,13 @@
-import App from "@/app";
-import AuthRoute from "@routes/auth.route";
-import IndexRoute from "@routes/index.route";
-import UsersRoute from "@routes/users.route";
-import validateEnv from "@utils/validateEnv";
-import CourseRoute from "./routes/courses.route";
-import FileUploadRoute from "./routes/fileUploads.route";
+import App from '@/app'
+import AuthRoute from '@routes/auth.route'
+import IndexRoute from '@routes/index.route'
+import UsersRoute from '@routes/users.route'
+import validateEnv from '@utils/validateEnv'
+import CourseRoute from './routes/courses.route'
+import FileUploadRoute from './routes/fileUploads.route'
+import ProductRoute from './routes/product.route'
 
-validateEnv();
+validateEnv()
 
 const app = new App([
   new IndexRoute(),
@@ -14,5 +15,6 @@ const app = new App([
   new AuthRoute(),
   new FileUploadRoute(),
   new CourseRoute(),
-]);
-app.listen();
+  new ProductRoute(),
+])
+app.listen()
