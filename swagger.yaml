@@ -1,7 +1,8 @@
 tags:
   - name: auth
     description: Auth API
-
+  - name: courses
+    description: Courses API
 servers:
   - url: "http://192.168.1.106:5000/api/"
 
@@ -90,6 +91,31 @@ paths:
                     type: string
                     example: Email verified successfully
         500: "Server Error"
+  /auth/resend-verification:
+    post:
+      tags:
+        - auth
+      summary: Resends Account verification email using Bearer Token
+      responses:
+        200:
+          description: "OK"
+          content:
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email sent successfully
+        401:
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+        500:
+          description: "Server Error"
   /auth/get-user-data:
     get:
       tags:
@@ -108,6 +134,89 @@ paths:
               schema:
                 type: string
                 example: Unauthorized
+
+  # Courses Endpoints
+  /courses:
+    get:
+      tags:
+        - courses
+      summary: View all courses
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        500:
+          description: "Server Error"
+    post:
+      consumes:
+        - multipart/form-data
+      tags:
+        - courses
+      summary: Add new Course
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCourseReq"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddCourseRes"
+        500:
+          description: "Server Error"
+  /courses/{course_id}:
+    get:
+      tags:
+        - courses
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: View details about single Course
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        500:
+          description: "Server Error"
+    put:
+      tags:
+        - courses
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: Edit course details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCourseReq"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditCourseRes"
+        500:
+          description: "Server Error"
+
 # definitions
 definitions:
   users:
@@ -195,8 +304,136 @@ components:
           example: 1e3c9a16-6580-4523-a5e7-6401dbd6abc2
         user:
           $ref: "#/components/schemas/UserData"
+    # courses
+    AddCourseReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Learn NodeJS with typescript
+        level:
+          type: string
+          example: Beginner
+        price:
+          type: number
+          example: 849
+        language:
+          type: string
+          example: Hindi
+        description:
+          type: string
+          example: Best course ever!
+        thumbnail:
+          type: file
+          example: file
+    AddCourseRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d2db6924-d326-4d43-af09-ced253109ff5
+        title:
+          type: string
+          example: Learn NodeJS with typescript
+        level:
+          type: string
+          example: Beginner
+        price:
+          type: number
+          example: 849
+        language:
+          type: string
+          example: Hindi
+        description:
+          type: string
+          example: Best course ever!
+        thumbnail:
+          type: string
+          example: http://192.168.1.106:5000/api/media/thumbnail/thumbnail_1670323749164.png
+        status:
+          type: string
+          example: Drafted
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    EditCourseRes:
+      type: object
+      properties:
+        count:
+          type: number
+          example: 1
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddCourseRes"
 
     #generic
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 2e8bd131-eb6a-4753-91b7-e7a61e43ab94
+        title:
+          type: string
+          example: Learn ReactTs
+        price:
+          type: number
+          example: 899
+        level:
+          type: string
+          example: Begginer
+        language:
+          type: string
+          example: English
+        status:
+          type: string
+          example: Drafted
+        description:
+          type: string
+          example: It covers all features from latest React Technology
+        thumbnail:
+          type: string
+          example: http://192.168.1.106:5000/media/thumbnail/thumbnail_1670323749164.png
+        createdAt:
+          type: string
+          example: 2022-12-06T07:51:52.765Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T07:51:52.765Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        Trainers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Trainer"
+    Trainer:
+      type: object
+      properties:
+        trainer_id:
+          type: string
+          example: ba05400d-fc39-4789-bbb0-dd46287a9953
+        user_id:
+          type: string
+          example: a4007575-0b46-44d1-828b-fe105194ce1f
+        createAt:
+          type: string
+          example: 2022-12-05T07:46:25.751Z
+        updatedAt:
+          type: string
+          example: 2022-12-05T07:46:25.751Z
+        deletedAt:
+          type: [string | null]
+          example: null
+        User:
+          $ref: "#/components/schemas/UserData"
     UserData:
       type: object
       properties:
