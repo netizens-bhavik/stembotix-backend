@@ -28,6 +28,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      status: {
+        type: Sequelize.ENUM(['Drafted', 'Published']),
+        defaultValue: 'Drafted',
+      },
       description: {
         type: Sequelize.TEXT,
         afllowNull: false,
@@ -36,21 +40,21 @@ module.exports = (sequelize, Sequelize) => {
     {
       paranoid: true,
     }
-  )
+  );
   Product.associate = (models) => {
     Product.hasMany(models.ProductTagMap, {
       foreignKey: 'product_id',
       sourceKey: 'id',
-    })
+    });
     Product.hasOne(models.ProductDimensionMap, {
       foreignKey: 'product_id',
       sourceKey: 'id',
-    })
+    });
     Product.belongsToMany(models.User, {
       through: 'ProductUser',
       foreignKey: 'product_id',
       otherKey: 'userId',
-    })
-  }
-  return Product
-}
+    });
+  };
+  return Product;
+};
