@@ -331,6 +331,27 @@ paths:
       tags:
         - products
       summary: View all product
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
       responses:
         200:
           description: 'OK'
@@ -360,6 +381,43 @@ paths:
                 $ref: '#/components/schemas/AddProductRes'
         500:
           description: 'Server Error'
+  /product/list:
+    get:
+      tags:
+        - products
+      summary: View all product
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: 'Server Error'
   /product/{product_id}:
     get:
       tags:
@@ -370,7 +428,7 @@ paths:
           type: string
           required: true
           description: Unique ID associated with a course
-      summary: View details about single Course
+      summary: View details about single Product
       responses:
         200:
           description: 'OK'
@@ -388,8 +446,8 @@ paths:
           name: Product ID
           type: string
           required: true
-          description: Unique ID associated with a course
-      summary: Edit course details
+          description: Unique ID associated with a product
+      summary: Edit product details
       requestBody:
         content:
           application/json:
@@ -402,6 +460,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EditProductRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: Product ID
+          type: string
+          required: true
+          description: Unique ID associated with a product
+      summary: Remove a product only if it is unpublished
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
+  /product/toggle-publish/{:productId}:
+    put:
+      tags:
+        - products
+      summary: Toggles published status of a product
+      parameters:
+        - in: path
+          name: Product ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
         500:
           description: 'Server Error'
 # definitions
@@ -718,6 +823,37 @@ components:
         dimension:
           type: string
           example: 12 × 10 × 20 cm
+        Users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserData'
+        ProductDimensionMap:
+          $ref: '#/components/schemas/ProductDimensionMapData'
+    ProductDimensionMapData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 0d6391a6-8928-4965-a3f6-156899119f95
+        weight:
+          type: string
+          example: 1 kg
+        dimension:
+          type: string
+          example: 1 x 1 cm
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        deletedAt:
+          type: string
+          example: NULL
+        product_id:
+          type: string
+          example: 6faf1d08-ecd2-4d3e-bd8a-ebb87391f220
+
     UserData:
       type: object
       properties:
@@ -748,6 +884,23 @@ components:
         role_id:
           type: string
           example: e29d1afb-e3a0-41cb-a473-0549228de148
+        ProductUser:
+          $ref: '#/components/schemas/ProductUser'
+    ProductUser:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        product_id:
+          type: string
+          example: 6faf1d08-ecd2-4d3e-bd8a-ebb87391f220
+        userId:
+          type: string
+          example: 04e1c75c-b239-4d45-b129-1b8136f4b184
     Error400:
       type: object
       properties:

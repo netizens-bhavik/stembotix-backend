@@ -5,10 +5,10 @@ import { Course } from '@/interfaces/course.interface';
 import { API_BASE } from '@config';
 
 class CourseService {
-  public course = DB.Course
-  public trainer = DB.Trainer
-  public user = DB.User
-  public coursesTrainers = DB.CoursesTrainers
+  public course = DB.Course;
+  public trainer = DB.Trainer;
+  public user = DB.User;
+  public coursesTrainers = DB.CoursesTrainers;
 
   public isTrainer(user): boolean {
     return user.role === 'trainer';
@@ -61,7 +61,7 @@ class CourseService {
       where: {
         user_id: trainer.id,
       },
-    })
+    });
 
     if (!trainerRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
@@ -74,8 +74,8 @@ class CourseService {
     const newCourse = await this.course.create({
       ...courseDetails,
       thumbnail: filePath,
-    })
-    newCourse.addTrainer(trainerRecord)
+    });
+    newCourse.addTrainer(trainerRecord);
     return {
       id: newCourse.id,
       status: newCourse.status,
@@ -89,7 +89,7 @@ class CourseService {
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
       deletedAt: newCourse.deletedAt,
-    }
+    };
   }
   public async getCourseById(courseId: string): Promise<Course> {
     const response: Course = await this.course.findOne({
@@ -107,8 +107,8 @@ class CourseService {
           ],
         },
       ],
-    })
-    return response
+    });
+    return response;
   }
   public async updateCourse({
     courseDetails,
@@ -236,4 +236,4 @@ class CourseService {
     return { count: 1 };
   }
 }
-export default CourseService
+export default CourseService;
