@@ -114,7 +114,10 @@ class ProductService {
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
 
-    const filePath = file.path.split('/').splice(-2).join('/');
+    const filePath = `${API_BASE}/media/${file.path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
 
     const newProduct = await this.product.create({
       ...productDetails,
@@ -178,7 +181,10 @@ class ProductService {
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
-    const filePath = file?.path.split('/').splice(-2).join('/');
+    const filePath = `${API_BASE}/media/${file.path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
     if (filePath) productDetails.productImg = `${API_BASE}/media/${filePath}`;
     const updateProduct = await this.product.update(
       {
