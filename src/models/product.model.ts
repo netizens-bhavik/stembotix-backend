@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       category: {
-        type: Sequelize.ENUM(['Uncategorized']),
+        type: Sequelize.ENUM(['Uncategorized', 'Mechanical']),
         defaultValue: 'Uncategorized',
       },
       sku: {
@@ -55,6 +55,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'product_id',
       otherKey: 'userId',
     });
+    Product.hasOne(models.CartItem);
   };
   return Product;
 };
