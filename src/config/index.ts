@@ -1,15 +1,16 @@
-import { config, DotenvConfigOptions } from "dotenv";
+import { config, DotenvConfigOptions } from 'dotenv';
 const options: DotenvConfigOptions = {
-  path: `.env.${process.env.NODE_ENV || "development"}.local`,
+  path: `.env.${process.env.NODE_ENV || 'development'}.local`,
 };
 config();
 
-export const CREDENTIALS = process.env.CREDENTIALS === "true";
+export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const {
   NODE_ENV,
   PORT,
   CLIENT_URL,
   API_BASE,
+  API_SECURE_BASE,
   DB_HOST,
   DB_PORT,
   DB_USER,

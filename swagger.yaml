@@ -618,6 +618,9 @@ components:
         thumbnail:
           type: file
           example: file
+        trailer:
+          type: file
+          example: file
     AddCourseRes:
       type: object
       properties:
@@ -642,6 +645,9 @@ components:
         thumbnail:
           type: string
           example: http://192.168.1.106:5000/api/media/thumbnail/thumbnail_1670323749164.png
+        trailer:
+          type: string
+          example: http://192.168.1.106:5000/media/trailer/trailer_1670323749164.png
         status:
           type: string
           example: Drafted
@@ -760,6 +766,9 @@ components:
         thumbnail:
           type: string
           example: http://192.168.1.106:5000/media/thumbnail/thumbnail_1670323749164.png
+        trailer:
+          type: string
+          example: http://192.168.1.106:5000/media/trailer/trailer_1670323749164.png
         createdAt:
           type: string
           example: 2022-12-06T07:51:52.765Z
