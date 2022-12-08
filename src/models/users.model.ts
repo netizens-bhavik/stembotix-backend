@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { hashSync, genSaltSync, compareSync } from 'bcrypt'
+import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define(
     'User',
@@ -26,10 +26,10 @@ module.exports = (sequelize, Sequelize) => {
       fullName: {
         type: Sequelize.VIRTUAL,
         get() {
-          return `${this.firstName} ${this.lastName}`
+          return `${this.firstName} ${this.lastName}`;
         },
         set(value) {
-          throw new Error('Do not try to set the `fullName` value!')
+          throw new Error('Do not try to set the `fullName` value!');
         },
       },
       email: {
@@ -45,8 +45,8 @@ module.exports = (sequelize, Sequelize) => {
       password: {
         type: Sequelize.STRING,
         set(value) {
-          const hashPassword = hashSync(value, genSaltSync(8))
-          this.setDataValue('password', hashPassword)
+          const hashPassword = hashSync(value, genSaltSync(8));
+          this.setDataValue('password', hashPassword);
         },
       },
       date_of_birth: {
@@ -66,27 +66,31 @@ module.exports = (sequelize, Sequelize) => {
     {
       paranoid: true,
     }
-  )
+  );
 
   User.associate = (models) => {
     User.hasOne(models.RefreshToken, {
       foreignKey: 'userId',
       targetKey: 'id',
-    })
+    });
     User.belongsTo(models.Role, {
       foreignKey: 'role_id',
       sourceKey: 'id',
-    })
+    });
     User.belongsToMany(models.Product, {
       through: 'ProductUser',
       foreignKey: 'userId',
       otherKey: 'product_id',
-    })
-  }
+    });
+    User.hasOne(models.Cart, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+  };
 
   User.prototype.validPassword = (password) => {
-    return compareSync(password, User.password)
-  }
+    return compareSync(password, User.password);
+  };
 
-  return User
-}
+  return User;
+};
