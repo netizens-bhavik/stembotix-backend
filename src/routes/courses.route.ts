@@ -36,7 +36,10 @@ class CourseRoute implements Routes {
       `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
-        uploadFiles.single('thumbnail'),
+        uploadFiles.fields([
+          { name: 'trailer', maxCount: 1 },
+          { name: 'thumbnail', maxCount: 1 },
+        ]),
         (req, res, next) => {
           req.body.price = Number(req.body.price);
           next();
@@ -50,7 +53,7 @@ class CourseRoute implements Routes {
       `${this.path}/:courseId`,
       [
         passport.authenticate('jwt', { session: false }),
-        uploadFiles.single('thumbnail'),
+        uploadFiles.fields([{ name: 'thumbnail' }, { name: 'trailer' }]),
         (req, res, next) => {
           req.body.price = Number(req.body.price);
           next();

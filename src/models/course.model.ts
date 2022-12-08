@@ -38,6 +38,9 @@ module.exports = (sequelize, Sequelize) => {
       thumbnail: {
         type: Sequelize.STRING,
       },
+      trailer: {
+        type: Sequelize.STRING,
+      },
     },
     {
       paranoid: true,
