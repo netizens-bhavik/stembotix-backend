@@ -33,7 +33,7 @@ class CourseController {
     try {
       const courseDetails: Request = req.body;
       const trainer = req.user;
-      const file = req.file;
+      const file = req.files;
       const response: Course = await this.courseService.addCourse({
         courseDetails,
         file,
@@ -66,7 +66,7 @@ class CourseController {
       const { courseId } = req.params;
       const courseDetails = req.body;
       console.log(req.body);
-      const file = req.file;
+      const file = req.files;
       const trainer = req.user;
       courseDetails['id'] = courseId;
       const response = await this.courseService.updateCourse({

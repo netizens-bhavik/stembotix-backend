@@ -2,7 +2,8 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
-import { API_BASE } from '@config';
+import { API_BASE, API_SECURE_BASE } from '@config';
+import { makeValidator } from 'envalid';
 
 class CourseService {
   public course = DB.Course;
@@ -66,14 +67,20 @@ class CourseService {
     if (!trainerRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
 
-    const filePath = `${API_BASE}/media/${file.path
+    const { trailer, thumbnail } = file;
+    const trailerPath = `${API_SECURE_BASE}/media/${trailer[0].path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
+    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
 
     const newCourse = await this.course.create({
       ...courseDetails,
-      thumbnail: filePath,
+      trailer: trailerPath,
+      thumbnail: thumbnailPath,
     });
     newCourse.addTrainer(trainerRecord);
     return {
@@ -86,6 +93,7 @@ class CourseService {
       description: newCourse.description,
       thumbnail: `${API_BASE}/media/${newCourse.thumbnail}`,
       // @ts-ignore
+      trailer: `${API_SECURE_BASE}/media/${newCourse.trailer}`,
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
       deletedAt: newCourse.deletedAt,
@@ -130,11 +138,20 @@ class CourseService {
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
-    const filePath = file?.path.split('/').splice(-2).join('/');
-    if (filePath) courseDetails.thumbnail = `${API_BASE}/media/${filePath}`;
+    const { trailer, thumbnail } = file;
+    const trailerPath = `${API_SECURE_BASE}/media/${trailer[0].path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
+    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
+        trailer: trailerPath,
+        thumbnail: thumbnailPath,
       },
       {
         where: {
