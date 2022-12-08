@@ -48,6 +48,10 @@ module.exports = (sequelize, Sequelize) => {
   );
 
   Course.associate = (models) => {
+    Course.hasMany(models.CurriculumSection, {
+      foreignKey: 'course_id',
+      targetKey: 'id',
+    });
     Course.belongsToMany(models.Trainer, {
       through: 'CoursesTrainers',
       foreignKey: 'course_id',

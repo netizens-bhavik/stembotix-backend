@@ -88,7 +88,6 @@ class ProductController {
     try {
       const { productId } = req.params;
       const productDetails = req.body;
-      console.log(req.body);
       const file = req.file;
       const user = req.user;
       productDetails['id'] = productId;
