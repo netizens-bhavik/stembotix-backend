@@ -53,7 +53,7 @@ class CourseService {
     return data;
   }
   public async addCourse({ courseDetails, file, trainer }): Promise<Course> {
-    if (!this.isTrainer(trainer) || !trainer.isEmailVerified) {
+    if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
@@ -75,7 +75,9 @@ class CourseService {
       ...courseDetails,
       thumbnail: filePath,
     });
+
     newCourse.addTrainer(trainerRecord);
+
     return {
       id: newCourse.id,
       status: newCourse.status,

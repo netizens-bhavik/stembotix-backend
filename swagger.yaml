@@ -3,6 +3,10 @@ tags:
     description: Auth API
   - name: courses
     description: Courses API
+  - name: courses curriculum
+    description: Curriculum API
+  - name: course curriculum tutorials
+    description: Curriculum API
   - name: products
     description: Products API
 servers:
@@ -324,7 +328,161 @@ paths:
                     example: 1
         500:
           description: 'Server Error'
-
+  # Courses Curriculum
+  /courses/{course_id}/section:
+    get:
+      tags:
+        - courses curriculum
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: View details about curriculum section
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Section'
+        500:
+          description: 'Server Error'
+  /courses/section:
+    post:
+      tags:
+        - courses curriculum
+      summary: Add new curriculum section
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddSectionReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddSectionRes'
+        500:
+          description: 'Server Error'
+  /courses/section/{curriculum_id}:
+    put:
+      tags:
+        - courses curriculum
+      parameters:
+        - in: path
+          name: Curriculum ID
+          type: string
+          required: true
+          description: Unique ID associated with a curriculum
+      summary: Edit curriculum section
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditSectionReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditResSection'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - courses curriculum
+      parameters:
+        - in: path
+          name: Curriculum ID
+          type: string
+          required: true
+          description: Unique ID associated with a section
+      summary: Removes a curriculum section
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
+  # Curriculum Tutorials
+  /courses/section/video:
+    get:
+      tags:
+        - course curriculum tutorials
+      summary: View details about curriculum section tutorials
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CurriCulumVideosData'
+        500:
+          description: 'Server Error'
+  /courses/section/{curriculum_id}/video:
+    post:
+      tags:
+        - course curriculum tutorials
+      parameters:
+        - in: path
+          name: Curriculum ID
+          type: string
+          required: true
+          description: Unique ID associated with a curriculum
+      summary: Add new tutorials to curriculum
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTutorialReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddTutorialRes'
+        500:
+          description: 'Server Error'
+  /courses/section/video/{video_id}:
+    put:
+      tags:
+        - course curriculum tutorials
+      parameters:
+        - in: path
+          name: Tutorial video ID
+          type: string
+          required: true
+          description: Unique ID associated with a curriculum
+      summary: Edit curriculum tutorial video
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTutorialReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditTutorialRes'
+        500:
+          description: 'Server Error'
   # Product Endpoints
   /product:
     get:
@@ -402,7 +560,7 @@ paths:
         - in: query
           name: sortBy
           type: string
-          example: [title, price, level]
+          example: [title, price]
         - in: query
           name: order
           type: string
@@ -664,6 +822,99 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AddCourseRes'
+    # curriculum
+    AddSectionReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: section 1
+        objective:
+          type: string
+          example: Test Section
+        course_id:
+          type: string
+          example: 242ced70-24bd-4423-8411-d81bd0877cc4
+    AddSectionRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3c760f5c-f00f-4801-92c8-69e63ab46ec3
+        title:
+          type: string
+          example: section 1
+        objective:
+          type: string
+          example: Test Section
+        course_id:
+          type: string
+          example: 242ced70-24bd-4423-8411-d81bd0877cc4
+    EditSectionReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: section main
+        objective:
+          type: string
+          example: Testing section editing
+    EditResSection:
+      type: object
+      properties:
+        count:
+          type: number
+          example: 1
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/EditRes'
+    EditRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3c760f5c-f00f-4801-92c8-69e63ab46ec3
+        title:
+          type: string
+          example: section 1
+        objective:
+          type: string
+          example: Test Section
+        course_id:
+          type: string
+          example: 242ced70-24bd-4423-8411-d81bd0877cc4
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        deletedAt:
+          type: string
+          example: NULL
+    # curriculum tutorial
+    AddTutorialReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: test123
+        tutorial:
+          type: file
+          example: file
+    AddTutorialRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8fdafe05-5b18-4b9f-b09f-d2acd79b8aa0
+        title:
+          type: string
+          example: test123
+        video_url:
+          type: string
+          example: http://192.168.1.106:5000/media/http://192.168.1.106:5000/media/tutorial/tutorial_1670498175618.mp4
     # products
     AddProductReq:
       type: object
@@ -683,7 +934,7 @@ components:
         description:
           type: string
           example: (Sample Product Description) – Try to put as much as info like features and wow factors.
-        thumbnail:
+        productImg:
           type: file
           example: file
         weight:
@@ -853,7 +1104,82 @@ components:
         product_id:
           type: string
           example: 6faf1d08-ecd2-4d3e-bd8a-ebb87391f220
-
+    Section:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 97ecd3bb-1a23-499c-bb80-3f246fce87a6
+        title:
+          type: string
+          example: section 2
+        objective:
+          type: string
+          example: For test purpose
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        deletedAt:
+          type: string
+          example: NULL
+        course_id:
+          type: string
+          example: 242ced70-24bd-4423-8411-d81bd0877cc4
+        CurriCulumVideos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurriCulumVideosData'
+    CurriCulumVideosData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 97ecd3bb-1a23-499c-bb80-3f246fce87a6
+        title:
+          type: string
+          example: Test video
+        video_url:
+          type: string
+          example: http://192.168.1.106:5000/media/tutorial/tutorial_1670490931689.mp4
+        createdAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        updatedAt:
+          type: string
+          example: 2022-12-06T10:49:09.176Z
+        deletedAt:
+          type: string
+          example: NULL
+        curriculum_id:
+          type: string
+          example: 97ecd3bb-1a23-499c-bb80-3f246fce87a6
+        CurriculumSection:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 97ecd3bb-1a23-499c-bb80-3f246fce87a6
+            title:
+              type: string
+              example: section 2
+            objective:
+              type: string
+              example: For test purpose
+            createdAt:
+              type: string
+              example: 2022-12-06T10:49:09.176Z
+            updatedAt:
+              type: string
+              example: 2022-12-06T10:49:09.176Z
+            deletedAt:
+              type: string
+              example: NULL
+            course_id:
+              type: string
+              example: 242ced70-24bd-4423-8411-d81bd0877cc4
     UserData:
       type: object
       properties:

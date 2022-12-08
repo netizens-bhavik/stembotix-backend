@@ -1,14 +1,14 @@
-import { Router } from "express";
-import CourseController from "@/controllers/courses.controller";
-import validationMiddleware from "@middlewares/validation.middleware";
-import { Routes } from "@interfaces/routes.interface";
-import passport from "passport";
-import passportConfig from "@/config/passportConfig";
-import { AddCourseDTO } from "@/dtos/course.dto";
-import uploadFiles from "@/rest/fileUpload";
+import { Router } from 'express';
+import CourseController from '@/controllers/courses.controller';
+import validationMiddleware from '@middlewares/validation.middleware';
+import { Routes } from '@interfaces/routes.interface';
+import passport from 'passport';
+import passportConfig from '@/config/passportConfig';
+import { AddCourseDTO } from '@/dtos/course.dto';
+import uploadFiles from '@/rest/fileUpload';
 
 class CourseRoute implements Routes {
-  public path = "/courses";
+  public path = '/courses';
   public router = Router();
   public courseController = new CourseController();
   public passport = passportConfig(passport);
@@ -23,7 +23,7 @@ class CourseRoute implements Routes {
     // view own courses
     this.router.get(
       `${this.path}/list/`,
-      passport.authenticate("jwt", { session: false }),
+      passport.authenticate('jwt', { session: false }),
       this.courseController.listCourses
     );
     // view single course details
@@ -35,13 +35,13 @@ class CourseRoute implements Routes {
     this.router.post(
       `${this.path}`,
       [
-        passport.authenticate("jwt", { session: false }),
-        uploadFiles.single("thumbnail"),
+        passport.authenticate('jwt', { session: false }),
+        uploadFiles.single('thumbnail'),
         (req, res, next) => {
           req.body.price = Number(req.body.price);
           next();
         },
-        validationMiddleware(AddCourseDTO, "body"),
+        validationMiddleware(AddCourseDTO, 'body'),
       ],
       this.courseController.addCourse
     );
@@ -49,26 +49,26 @@ class CourseRoute implements Routes {
     this.router.put(
       `${this.path}/:courseId`,
       [
-        passport.authenticate("jwt", { session: false }),
-        uploadFiles.single("thumbnail"),
+        passport.authenticate('jwt', { session: false }),
+        uploadFiles.single('thumbnail'),
         (req, res, next) => {
           req.body.price = Number(req.body.price);
           next();
         },
-        validationMiddleware(AddCourseDTO, "body"),
+        validationMiddleware(AddCourseDTO, 'body'),
       ],
       this.courseController.updateCourse
     );
     // toggle course visibility
     this.router.put(
       `${this.path}/toggle-publish/:courseId`,
-      passport.authenticate("jwt", { session: false }),
+      passport.authenticate('jwt', { session: false }),
       this.courseController.togglePublish
     );
     // delete own course (only when unpublished)
     this.router.delete(
       `${this.path}/:courseId`,
-      passport.authenticate("jwt", { session: false }),
+      passport.authenticate('jwt', { session: false }),
       this.courseController.deleteCourse
     );
   }

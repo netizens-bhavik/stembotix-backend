@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Course = sequelize.define(
-    "Course",
+    'Course',
     {
       id: {
         type: Sequelize.UUID,
@@ -17,19 +17,19 @@ module.exports = (sequelize, Sequelize) => {
       },
       level: {
         type: Sequelize.ENUM([
-          "Beginner",
-          "Intermediate",
-          "Advanced",
-          "All levels",
+          'Beginner',
+          'Intermediate',
+          'Advanced',
+          'All levels',
         ]),
-        defaultValue: "All levels",
+        defaultValue: 'All levels',
       },
       language: {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM(["Drafted", "Published"]),
-        defaultValue: "Drafted",
+        type: Sequelize.ENUM(['Drafted', 'Published']),
+        defaultValue: 'Drafted',
       },
       description: {
         type: Sequelize.TEXT,
@@ -45,10 +45,14 @@ module.exports = (sequelize, Sequelize) => {
   );
 
   Course.associate = (models) => {
+    Course.hasMany(models.CurriculumSection, {
+      foreignKey: 'course_id',
+      targetKey: 'id',
+    });
     Course.belongsToMany(models.Trainer, {
-      through: "CoursesTrainers",
-      foreignKey: "course_id",
-      otherKey: "trainer_id",
+      through: 'CoursesTrainers',
+      foreignKey: 'course_id',
+      otherKey: 'trainer_id',
     });
   };
   return Course;

@@ -65,7 +65,6 @@ class CourseController {
     try {
       const { courseId } = req.params;
       const courseDetails = req.body;
-      console.log(req.body);
       const file = req.file;
       const trainer = req.user;
       courseDetails['id'] = courseId;
