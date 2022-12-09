@@ -57,6 +57,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       otherKey: 'trainer_id',
     });
+    Course.hasOne(models.CartItem);
   };
   return Course;
 };

@@ -13,8 +13,6 @@ class CurriculumSectionController {
   ) => {
     try {
       const curriculumDetails = req.body;
-      console.log(req.body);
-
       const response = await this.curriculumSectionService.addSection({
         curriculumDetails,
       });
