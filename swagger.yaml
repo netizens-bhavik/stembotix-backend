@@ -9,6 +9,8 @@ tags:
     description: Curriculum API
   - name: products
     description: Products API
+  - name: cart
+    description: Handle cart and cartitems of User
 servers:
   - url: 'http://192.168.1.106:5000/api/'
 
@@ -667,6 +669,139 @@ paths:
                     example: 1
         500:
           description: 'Server Error'
+  # Cart Endpoints
+  /cart:
+    get:
+      tags:
+        - cart
+      summary: View User's cart
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - cart
+      summary: Clears out entire cart
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cart cleared successfully
+        500:
+          description: 'Server Error'
+  /cart/add-product:
+    post:
+      tags:
+        - cart
+      summary: Adds a product to cart
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Product added to cart successfully.
+                  data:
+                    $ref: '#/components/schemas/CartItemShort'
+        500:
+          description: 'Server Error'
+  /cart/add-course:
+    post:
+      tags:
+        - cart
+      summary: Adds a product to cart
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Course added to cart successfully.
+                  data:
+                    $ref: '#/components/schemas/CartItemShort'
+        500:
+          description: 'Server Error'
+  /cart/quantity:
+    put:
+      tags:
+        - cart
+      summary: Increase or Decrease Cart Item Quantity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartItemId:
+                  type: string
+                  example: 9557f1f7-2a0e-4a42-a799-15005a57bb4b
+                operation:
+                  anyOf:
+                    - type: string
+                      example: INC
+                    - type: string
+                      example: DEC
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    anyOf:
+                      - type: string
+                        example: Cart Item quantity increased successfully.
+                      - type: string
+                        example: Cart Item quantity decreased successfully.
+        500:
+          description: 'Server Error'
+  /cart/{:cartItemId}:
+    delete:
+      tags:
+        - cart
+      summary: Remove single Cart Item
+      parameters:
+        - in: path
+          name: cartItemId
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cart Item removed successfully.
+        500:
+          description: 'Server Error'
+
 # definitions
 definitions:
   users:
@@ -1236,6 +1371,141 @@ components:
         userId:
           type: string
           example: 04e1c75c-b239-4d45-b129-1b8136f4b184
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f560b959-af06-4e9c-859b-f621092b12fc
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        user_id:
+          type: string
+          example: 5ed57d77-5aca-4f94-9c23-6e51ceca0b42
+        CartItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f2d2040d-4f9e-4013-ac40-37c63428a32c
+        item_type:
+          type: string
+          example: Product
+        quantity:
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        CartId:
+          type: string
+          example: f560b959-af06-4e9c-859b-f621092b12fc
+        course_id:
+          type: string | null
+          example: null
+        product_id:
+          type: string|null
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
+        CourseId:
+          type: string | null
+          example: null
+        ProductId:
+          type: string|null
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
+        Course:
+          type: object | null
+          example: null
+        Product:
+          $ref: '#/components/schemas/ProductShort'
+    ProductShort:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
+        title:
+          type: string
+          example: DIY BOT
+        price:
+          type: number
+          example: 899
+        category:
+          type: string
+          example: Uncategorized
+        sku:
+          type: string
+          example: STMBOT-001
+        description:
+          type: string
+          example: (Sample Product Description) – Try to put as much as info like features and wow factors.
+        thumbnail:
+          type: string
+          example: http://192.168.1.14:5000/media/productImg/productImg_1670406128427.png
+        status:
+          type: string
+          example: Published
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    CartItemShort:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f2d2040d-4f9e-4013-ac40-37c63428a32c
+        item_type:
+          type: string
+          example: Product
+        quantity:
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        CartId:
+          type: string
+          example: f560b959-af06-4e9c-859b-f621092b12fc
+        course_id:
+          type: string | null
+          example: null
+        product_id:
+          type: string|null
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
+        CourseId:
+          type: string | null
+          example: null
+        ProductId:
+          type: string|null
+          example: 54ea619b-21d7-40bb-bfc9-069aab53ab85
     Error400:
       type: object
       properties:
