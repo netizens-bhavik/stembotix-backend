@@ -47,6 +47,18 @@ class CartRoute implements Routes {
       validationMiddleware(QuantityDTO, 'body'),
       this.cartController.itemQuantity,
     ]);
+    // empty cart
+    this.router.delete(
+      `${this.path}`,
+      [passport.authenticate('jwt', { session: false })],
+      this.cartController.emptyCart
+    );
+    // remove cart item
+    this.router.delete(
+      `${this.path}/:cartItemId`,
+      [passport.authenticate('jwt', { session: false })],
+      this.cartController.removeItem
+    );
   }
 }
 export default CartRoute;
