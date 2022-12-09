@@ -123,7 +123,31 @@ class CartService {
         ],
       },
     });
+    if (!cart) return { message: 'Empty Cart' };
     return cart;
+  }
+  public async emptyCart(userId: string) {
+    const cartRecord = await this.cart.findOne({
+      where: { user_id: userId },
+    });
+    if (!cartRecord) throw new HttpException(404, 'Record not found!');
+    await this.cartItem.destroy({ where: { cart_id: cartRecord.id } });
+    await cartRecord.destroy();
+    return { message: 'Cart cleared successfully' };
+  }
+  public async removeItem(userId: string, cartItemId: string) {
+    const cartItemRecord = await this.cartItem.findOne({
+      where: { id: cartItemId },
+      include: {
+        model: this.cart,
+        where: {
+          user_id: userId,
+        },
+      },
+    });
+    if (!cartItemRecord) throw new HttpException(404, 'Record not found');
+    await cartItemRecord.destroy();
+    return { message: 'Item removed successfully' };
   }
 }
 export default CartService;

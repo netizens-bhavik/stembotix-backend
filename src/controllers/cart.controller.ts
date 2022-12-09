@@ -68,7 +68,34 @@ class CartController {
       next(error);
     }
   };
-
-  // public addToProduct = async(req:Request, res: Response, next: NextFunction) => {}
+  public emptyCart = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      // @ts-ignore
+      const { id } = req.user;
+      const response = await this.cartService.emptyCart(id);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public removeItem = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      // @ts-ignore
+      const { id: userId } = req.user;
+      const { cartItemId } = req.params;
+      const response = await this.cartService.removeItem(userId, cartItemId);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default CartController;
