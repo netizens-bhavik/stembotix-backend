@@ -6,4 +6,7 @@ export class CurriculumSectionDto {
 
   @IsString()
   public objective: string;
+
+  @IsString()
+  public course_id: string;
 }

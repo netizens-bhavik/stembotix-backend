@@ -19,7 +19,10 @@ class CurriculumSectionRoute implements Routes {
   private initializeRoutes() {
     this.router.post(
       `${this.path}/section`,
-      passport.authenticate('jwt', { session: false }),
+      [
+        passport.authenticate('jwt', { session: false }),
+        validationMiddleware(CurriculumSectionDto, 'body'),
+      ],
       this.curriculumSectionController.addCurriculum
     );
 
