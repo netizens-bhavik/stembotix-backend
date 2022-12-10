@@ -8,6 +8,7 @@ import CourseRoute from './routes/courses.route';
 import CurriculumSectionRoute from './routes/curriculumSection.route';
 import CurriculumVideoRoute from './routes/curriculumVideo.route';
 import FileUploadRoute from './routes/fileUploads.route';
+import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 
 validateEnv();
@@ -22,5 +23,6 @@ const app = new App([
   new ProductRoute(),
   new CurriculumSectionRoute(),
   new CurriculumVideoRoute(),
+  new OrderRoute(),
 ]);
 app.listen();
