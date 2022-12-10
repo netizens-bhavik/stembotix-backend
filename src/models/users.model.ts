@@ -86,6 +86,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.Order);
   };
 
   User.prototype.validPassword = (password) => {
