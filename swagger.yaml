@@ -142,7 +142,91 @@ paths:
               schema:
                 type: string
                 example: Unauthorized
+  /auth/forgot-password:
+    post:
+      tags:
+        - auth
+      summary: Sends Email for reset password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: trainer@yopmail.com
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reset password mail sent successfully.
+        500:
+          description: 'Server Error'
+  /auth/verify-reset-token/{:token}:
+    post:
+      tags:
+        - auth
+      summary: Verifies the validity of reset password token
+      parameters:
+        - in: path
+          name: token
+          type: string
+          required: true
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Valid Token
+        500:
+          description: 'Server Error'
+  /auth/reset-password:
+    post:
+      tags:
+        - auth
+      summary: Resets Password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: 795445021885eb906f1142dab3a9aec86fc8f8a1
+                newPassword:
+                  type: string
+                  example: 8eyCc859
+                confirmPassword:
+                  type: string
+                  example: 8eyCc859
 
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successfully.
+
+        500:
+          description: 'Server Error'
   # Courses Endpoints
   /courses:
     get:

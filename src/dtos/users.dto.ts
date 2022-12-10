@@ -4,7 +4,8 @@ import {
   IsDate,
   IsDateString,
   ValidateIf,
-} from "class-validator";
+  IsAlphanumeric,
+} from 'class-validator';
 
 export class RegisterUserDto {
   @IsString()
@@ -36,4 +37,18 @@ export class LoginUserDto {
   @IsString()
   @ValidateIf((object, value) => value !== undefined)
   public cookie?: string;
+}
+
+export class ForgotPasswordDTO {
+  @IsEmail()
+  public email: string;
+}
+
+export class ResetPasswordDTO {
+  @IsString()
+  public token: string;
+  @IsAlphanumeric()
+  public newPassword: string;
+  @IsAlphanumeric()
+  public confirmPassword: string;
 }
