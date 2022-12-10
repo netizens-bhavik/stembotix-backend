@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { RegisterUserDto } from "@dtos/users.dto";
-import { User } from "@interfaces/users.interface";
-import { RequestWithUser } from "@interfaces/auth.interface";
-import AuthService from "@services/auth.service";
-import TokenService from "@/services/token.service";
-import { RefreshToken } from "@/interfaces/refreshToken.interface";
+import { NextFunction, Request, Response } from 'express';
+import { RegisterUserDto, ResetPasswordDTO } from '@dtos/users.dto';
+import { User } from '@interfaces/users.interface';
+import { RequestWithUser } from '@interfaces/auth.interface';
+import AuthService from '@services/auth.service';
+import TokenService from '@/services/token.service';
+import { RefreshToken } from '@/interfaces/refreshToken.interface';
 
 class AuthController {
   public authService = new AuthService();
@@ -16,14 +16,12 @@ class AuthController {
       const { accessToken, refreshToken, user } = await this.authService.signup(
         userData
       );
-      res
-        .status(200)
-        .send({
-          accessToken,
-          refreshToken,
-          user,
-          message: "Signed Up successfully.",
-        });
+      res.status(200).send({
+        accessToken,
+        refreshToken,
+        user,
+        message: 'Signed Up successfully.',
+      });
     } catch (error) {
       next(error);
     }
@@ -61,7 +59,7 @@ class AuthController {
       if (requestToken === null) {
         return res.status(403).json({
           redirectToLogin: true,
-          message: "Refresh Token is required!",
+          message: 'Refresh Token is required!',
         });
       }
       let refreshTokenData: RefreshToken = await this.tokenService.findToken(
@@ -69,14 +67,14 @@ class AuthController {
       );
       if (!refreshTokenData)
         res.status(403).json({
-          message: "Invalid Token!",
+          message: 'Invalid Token!',
         });
       let refreshTokenInvalid = await this.tokenService.verifyToken(
         refreshTokenData
       );
       if (refreshTokenInvalid) {
         res.status(403).json({
-          message: "Expired Token!",
+          message: 'Expired Token!',
         });
         return;
       }
@@ -96,7 +94,7 @@ class AuthController {
   ) => {
     try {
       const { hash } = req.params;
-      if (!hash) res.status(400).send({ message: "Invalid Request" });
+      if (!hash) res.status(400).send({ message: 'Invalid Request' });
       const logOutUserData: { message: string } =
         await this.authService.verifyEmail(hash);
       res.status(200).json({ message: logOutUserData.message });
@@ -137,6 +135,50 @@ class AuthController {
 
       const adminData = await this.tokenService.createUserToken(data);
       res.status(200).send(adminData);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { email } = req.body;
+      const response = await this.authService.forgotPassword(email);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public verifyPasswordToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { token } = req.params;
+      const response = await this.authService.verifyPasswordtoken(token);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { token, newPassword, confirmPassword }: ResetPasswordDTO =
+        req.body;
+      const response = await this.authService.resetPassword(
+        token,
+        newPassword,
+        confirmPassword
+      );
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }

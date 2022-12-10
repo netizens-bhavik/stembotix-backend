@@ -1,15 +1,15 @@
-import { compare } from "bcrypt";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
-import { SECRET_KEY, CLIENT_URL } from "@config";
-import DB from "@databases";
-import { RegisterUserDto, LoginUserDto } from "@dtos/users.dto";
-import { HttpException } from "@exceptions/HttpException";
-import { User } from "@interfaces/users.interface";
-import { Role } from "@/interfaces/role.instance";
-import { isEmpty } from "@utils/util";
-import EmailService from "./email.service";
-import { MailPayload } from "@/interfaces/mailPayload.interface";
+import { compare } from 'bcrypt';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { SECRET_KEY, CLIENT_URL } from '@config';
+import DB from '@databases';
+import { RegisterUserDto, LoginUserDto } from '@dtos/users.dto';
+import { HttpException } from '@exceptions/HttpException';
+import { User } from '@interfaces/users.interface';
+import { Role } from '@/interfaces/role.instance';
+import { isEmpty } from '@utils/util';
+import EmailService from './email.service';
+import { MailPayload } from '@/interfaces/mailPayload.interface';
 class AuthService {
   public users = DB.User;
   public roles = DB.Role;
@@ -18,11 +18,12 @@ class AuthService {
   public trainers = DB.Trainer;
   public emailService = new EmailService();
   private accessTokenExpiry: number = 60 * 60 * 24;
+  public passwordToken = DB.ResetPasswordToken;
 
   public async signup(
     userData: RegisterUserDto
   ): Promise<{ accessToken: string; refreshToken; user: User }> {
-    if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
+    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUser: User = await this.users.findOne({
       where: { email: userData.email },
@@ -45,7 +46,7 @@ class AuthService {
         user_id: createUserData.id,
       });
     }
-    const token = crypto.randomBytes(20).toString("hex");
+    const token = crypto.randomBytes(20).toString('hex');
     await this.accountHash.create({
       hash: token,
       user_id: createUserData.id,
@@ -89,7 +90,7 @@ class AuthService {
   }> {
     let refreshToken = userData?.cookie || null;
 
-    if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
+    if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUser: User = await this.users.findOne({
       where: { email: userData.email },
@@ -104,7 +105,7 @@ class AuthService {
       userData.password,
       findUser.password
     );
-    if (!isPasswordMatching) throw new HttpException(409, "Wrong Password");
+    if (!isPasswordMatching) throw new HttpException(409, 'Wrong Password');
 
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
       expiresIn: this.accessTokenExpiry,
@@ -127,29 +128,29 @@ class AuthService {
       where: { hash },
     });
     if (!findRecord) {
-      throw new HttpException(404, "Token Expired");
+      throw new HttpException(404, 'Token Expired');
     }
     const userUpdate = await this.users.update(
       { isEmailVerified: true },
       { where: { id: findRecord.user_id } }
     );
-    if (!userUpdate) throw new HttpException(500, "Please try again");
+    if (!userUpdate) throw new HttpException(500, 'Please try again');
     await this.accountHash.destroy({ where: { hash } });
 
     return {
-      message: "Email verified successfully",
+      message: 'Email verified successfully',
     };
   }
   public async resendMail(id: string): Promise<{ message: string }> {
     let user = await this.users.findOne({ where: { id: id } });
-    if (!user) throw new HttpException(404, "User not found");
+    if (!user) throw new HttpException(404, 'User not found');
     let token = await this.accountHash.findOne({
       where: {
         user_id: id,
       },
     });
     if (!token) {
-      token = crypto.randomBytes(20).toString("hex");
+      token = crypto.randomBytes(20).toString('hex');
       await this.accountHash.create({
         hash: token,
         user_id: id,
@@ -166,11 +167,56 @@ class AuthService {
     };
     this.emailService.accountVerification(mailData);
 
-    return { message: "Email sent successfully" };
+    return { message: 'Email sent successfully' };
   }
 
-  public createCookie(tokenData: string) {
-    return tokenData;
+  public async forgotPassword(email: string) {
+    const emailRecord = await this.users.findOne({
+      where: { email },
+    });
+    if (!emailRecord) throw new HttpException(400, 'Account not found');
+    const token = crypto.randomBytes(20).toString('hex');
+    await this.passwordToken.createToken(token, emailRecord);
+
+    const mailData: MailPayload = {
+      templateData: {
+        firstName: emailRecord.firstName,
+        link: `${CLIENT_URL}/verify-password/${token}`,
+      },
+      mailerData: {
+        to: email,
+      },
+    };
+    await this.emailService.forgotPassword(mailData);
+    return { message: 'Reset password mail sent successfully.' };
+  }
+  public async verifyPasswordtoken(token: string) {
+    const record = await this.passwordToken.findOne({
+      where: { hash: token },
+    });
+    if (!record) throw new HttpException(404, 'Invalid token');
+    const isInvalid = await this.passwordToken.verifyToken(record);
+    if (isInvalid) throw new HttpException(400, 'Token is Expired');
+    return { message: 'Valid Token' };
+  }
+  public async resetPassword(
+    token: string,
+    newPassword: string,
+    confirmPassword: string
+  ) {
+    const record = await this.passwordToken.findOne({
+      where: { hash: token },
+    });
+    if (!record) throw new HttpException(404, 'Invalid token');
+    if (newPassword !== confirmPassword)
+      throw new HttpException(400, 'Passwords do not match');
+    const userRecord = await this.users.update(
+      { password: newPassword },
+      { where: { id: record.user_id } }
+    );
+    if (!userRecord) throw new HttpException(500, 'Error occurred try again');
+    record.destroy();
+    return { message: 'Password reset successfully' };
   }
 }
 

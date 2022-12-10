@@ -1,12 +1,12 @@
-import nodemailer from "nodemailer";
-import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from "@config";
-import { Options, MailOptions } from "nodemailer/lib/smtp-transport";
-import path from "path";
-import * as ejs from "ejs";
-import { MailPayload } from "@/interfaces/mailPayload.interface";
+import nodemailer from 'nodemailer';
+import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from '@config';
+import { Options, MailOptions } from 'nodemailer/lib/smtp-transport';
+import path from 'path';
+import * as ejs from 'ejs';
+import { MailPayload } from '@/interfaces/mailPayload.interface';
 
 const transporterOptions: Options = {
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: SMTP_USERNAME,
     pass: SMTP_PASSWORD,
@@ -34,7 +34,7 @@ class EmailService {
       // Mailing Data assignment
       const pathToView = path.resolve(
         __dirname,
-        "../view/userVerificationmail.ejs"
+        '../view/userVerificationmail.ejs'
       );
       const { templateData, mailerData } = payload;
 
@@ -44,7 +44,32 @@ class EmailService {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
             to: mailerData.to,
-            subject: "Account verification",
+            subject: 'Account verification',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async forgotPassword(payload: MailPayload) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/forgotPassword.ejs');
+      const { templateData, mailerData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) console.log(err);
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailerData.to,
+            subject: 'Passwrod Reset',
             html: data,
           });
           this.terminateConnection();
