@@ -31,7 +31,7 @@ class UsersRoute implements Routes {
       `${this.path}/:id`,
       [
         passport.authenticate('jwt', { session: false }),
-        validationMiddleware(RegisterUserDto, 'body', true),
+        // validationMiddleware(RegisterUserDto, 'body', true),
       ],
       this.usersController.updateUser
     );
