@@ -13,7 +13,11 @@ class CartService {
   public cart = DB.Cart;
   public cartItem = DB.CartItem;
   public itemType = {};
-  public async addProductToCart(userId: string, productId: string) {
+  public async addProductToCart(
+    userId: string,
+    productId: string,
+    quantity: number = 1
+  ) {
     const cartRecord = await this.cart.findOrCreate({
       where: { userId: userId },
     });
@@ -29,6 +33,7 @@ class CartService {
         CartId: cartID,
         item_type: ItemTypes.Product,
         product_id: productId,
+        quantity,
       },
     });
 

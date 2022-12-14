@@ -1,4 +1,4 @@
-import { IsString, IsEnum } from 'class-validator';
+import { IsString, IsEnum, IsNumber, Min, Max } from 'class-validator';
 export enum QuantityOperation {
   INC = 'INC',
   DEC = 'DEC',
@@ -6,6 +6,11 @@ export enum QuantityOperation {
 export class AddProductDTO {
   @IsString()
   public productId: string;
+
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  public quantity?: number;
 }
 
 export class AddCourseDTO {

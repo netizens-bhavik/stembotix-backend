@@ -46,7 +46,7 @@ class UsersController {
     try {
       const loggedUser = req.user;
       const userId = req.params.id;
-      const userData: CreateUserDto = req.body;
+      const userData = req.body;
       const updateUserData: User = await this.userService.updateUser(
         loggedUser,
         userId,

@@ -14,9 +14,9 @@ class CartController {
     try {
       // @ts-ignore
       const { id: userId } = req.user;
-      const { productId }: AddProductDTO = req.body;
+      const { productId, quantity }: AddProductDTO = req.body;
       const response: { message: string; data?: CartItem | {} } =
-        await this.cartService.addProductToCart(userId, productId);
+        await this.cartService.addProductToCart(userId, productId, quantity);
       res.status(200).send(response);
     } catch (error) {
       next(error);

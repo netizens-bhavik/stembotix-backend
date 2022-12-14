@@ -116,6 +116,12 @@ class CourseService {
             },
           ],
         },
+        {
+          model: DB.CurriculumSection,
+          include: {
+            model: DB.CurriCulumVideo,
+          },
+        },
       ],
     });
     return response;
