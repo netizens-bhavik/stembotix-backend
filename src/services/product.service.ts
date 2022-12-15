@@ -19,7 +19,7 @@ class ProductService {
 
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
@@ -72,7 +72,7 @@ class ProductService {
 
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const creatorRecord = await this.user.findOne({

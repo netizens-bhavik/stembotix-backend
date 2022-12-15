@@ -3,7 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { CurriCulumVideoDto } from '@/dtos/curriculumVideo.dto';
 import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
-import { API_BASE } from '@/config';
+import { API_BASE, API_SECURE_BASE } from '@/config';
 
 class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
@@ -28,7 +28,7 @@ class CurriculumVideoService {
     if (!fetchSection) {
       throw new HttpException(403, 'No section found');
     }
-    const filePath = `${API_BASE}/media/${file.path
+    const filePath = `${API_SECURE_BASE}/media/${file.path
       .split('/')
       .splice(-2)
       .join('/')}`;
