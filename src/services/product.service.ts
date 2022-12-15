@@ -218,7 +218,7 @@ class ProductService {
     if (courseRecord.status === 'Published')
       throw new HttpException(
         400,
-        'This course is published and can not be deleted. First unpublish this course and then delete it.'
+        'This product is published and can not be deleted. First unpublish this product and then delete it.'
       );
     const res: number = await this.product.destroy({
       where: {

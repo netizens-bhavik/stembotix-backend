@@ -187,7 +187,7 @@ class CourseService {
     if (courseRecord.status === 'Published')
       throw new HttpException(
         400,
-        'This course is published and can not be deleted. First unpublish this course and then delete it.'
+        'This course is published and can not be deleted. First unpublish this course and then delete it'
       );
     const res: number = await this.course.destroy({
       where: {

@@ -123,6 +123,8 @@ class AuthService {
 
   public async verifyEmail(hash: string): Promise<{
     message: string;
+    accessToken: string;
+    refreshToken: string;
   }> {
     const findRecord = await this.accountHash.findOne({
       where: { hash },
@@ -132,14 +134,23 @@ class AuthService {
     }
     const userUpdate = await this.users.update(
       { isEmailVerified: true },
-      { where: { id: findRecord.user_id } }
+      { where: { id: findRecord.user_id }, returning: true }
     );
     if (!userUpdate) throw new HttpException(500, 'Please try again');
     await this.accountHash.destroy({ where: { hash } });
 
-    return {
+    const user = userUpdate[1][0];
+    const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+      expiresIn: this.accessTokenExpiry,
+    });
+    const refreshToken = await this.refreshToken.createToken(user);
+    const response = {
       message: 'Email verified successfully',
+      accessToken: token,
+      refreshToken: refreshToken,
     };
+    console.log(response);
+    return response;
   }
   public async resendMail(id: string): Promise<{ message: string }> {
     let user = await this.users.findOne({ where: { id: id } });
@@ -159,7 +170,7 @@ class AuthService {
     const mailData: MailPayload = {
       templateData: {
         firstName: user.firstName,
-        link: `${CLIENT_URL}/verifyRegisters/${token}`,
+        link: `${CLIENT_URL}/verifyRegisters/${token.hash}`,
       },
       mailerData: {
         to: user.email,
@@ -188,7 +199,7 @@ class AuthService {
       },
     };
     await this.emailService.forgotPassword(mailData);
-    return { message: 'Reset password mail sent successfully.' };
+    return { message: 'Reset password mail sent successfully' };
   }
   public async verifyPasswordtoken(token: string) {
     const record = await this.passwordToken.findOne({

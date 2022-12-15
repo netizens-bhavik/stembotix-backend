@@ -95,9 +95,8 @@ class AuthController {
     try {
       const { hash } = req.params;
       if (!hash) res.status(400).send({ message: 'Invalid Request' });
-      const logOutUserData: { message: string } =
-        await this.authService.verifyEmail(hash);
-      res.status(200).json({ message: logOutUserData.message });
+      const logOutUserData = await this.authService.verifyEmail(hash);
+      res.status(200).json(logOutUserData);
     } catch (error) {
       next(error);
     }

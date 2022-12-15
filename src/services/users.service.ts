@@ -12,9 +12,26 @@ class UserService {
     return userData.role === 'admin';
   }
 
-  public async findAllUser(loggedUser): Promise<User[]> {
+  public async findAllUser(loggedUser, queryObject): Promise<User[]> {
     if (!this.isAdmin(loggedUser)) throw new HttpException(401, 'Unauthorized');
-    const allUser: User[] = await this.users.findAll();
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      : ['', DB.Sequelize.Op.ne];
+
+    const allUser: User[] = await this.users.findAll({
+      where: { title: { [searchCondition]: search } },
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
     return allUser;
   }
 
@@ -40,10 +57,7 @@ class UserService {
     const findUser: User = await this.users.findByPk(userId);
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
-    await this.users.update(
-      userData,
-      { where: { id: userId } }
-    );
+    await this.users.update(userData, { where: { id: userId } });
 
     const updateUser: User = await this.users.findByPk(userId);
     return updateUser;

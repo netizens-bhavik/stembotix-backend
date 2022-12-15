@@ -9,8 +9,11 @@ class UsersController {
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const findAllUsersData: User[] = await this.userService.findAllUser(
-        loggedUser
+        loggedUser,
+        queryObject
       );
 
       res.status(200).json({ data: findAllUsersData, message: 'findAll' });
