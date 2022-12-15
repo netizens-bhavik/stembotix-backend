@@ -96,18 +96,18 @@ class CartService {
 
     let message = '';
     if (operation === QuantityOperation.INC) {
-      message = 'Upper limit reached.';
+      message = 'Upper limit reached';
       if (itemRecord.quantity < 10) {
         await itemRecord.update({ quantity: itemRecord.quantity + 1 });
-        message = 'Cart Item quantity increased successfully.';
+        message = 'Cart Item quantity increased successfully';
       }
     } else {
       if (itemRecord.quantity === 1) {
         await itemRecord.destroy();
-        message = 'Cart Item removed successfully.';
+        message = 'Cart Item removed successfully';
       } else {
         await itemRecord.update({ quantity: itemRecord.quantity - 1 });
-        message = 'Cart Item quantity decreased successfully.';
+        message = 'Cart Item quantity decreased successfully';
       }
     }
     return { message };
@@ -135,7 +135,7 @@ class CartService {
     const cartRecord = await this.cart.findOne({
       where: { user_id: userId },
     });
-    if (!cartRecord) throw new HttpException(404, 'Record not found!');
+    if (!cartRecord) throw new HttpException(404, 'Record not found');
     await this.cartItem.destroy({ where: { cart_id: cartRecord.id } });
     await cartRecord.destroy();
     return { message: 'Cart cleared successfully' };
