@@ -24,6 +24,12 @@ class OrderService {
           },
           {
             model: DB.Course,
+            include: [
+              {
+                model: DB.Trainer,
+                include: { model: DB.User },
+              },
+            ],
           },
         ],
       },

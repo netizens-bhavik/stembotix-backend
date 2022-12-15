@@ -24,7 +24,7 @@ class CourseService {
 
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const data: (Course | undefined)[] = await this.course.findAll({
@@ -213,7 +213,7 @@ class CourseService {
 
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const trainerRecord = await this.trainer.findOne({
