@@ -14,19 +14,22 @@ class CourseService {
   public isTrainer(user): boolean {
     return user.role === 'trainer';
   }
-  public async viewCourses(queryObject): Promise<(Course | undefined)[]> {
+  public async viewCourses(
+    queryObject
+  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const courseData = await this.course.findAndCountAll({
+      where: { status: 'Published' },
+    });
     const data: (Course | undefined)[] = await this.course.findAll({
       where: DB.Sequelize.and(
         { status: 'Published' },
@@ -51,7 +54,7 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return data;
+    return { totalCount: courseData.count, records: data };
   }
   public async addCourse({ courseDetails, file, trainer }): Promise<Course> {
     if (!this.isTrainer(trainer)) {
@@ -200,7 +203,7 @@ class CourseService {
   public async listCourses({
     trainer,
     queryObject,
-  }): Promise<(Course | undefined)[]> {
+  }): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     if (isEmpty(trainer) || !this.isTrainer(trainer))
       throw new HttpException(401, 'Unauthorized');
 
@@ -210,7 +213,6 @@ class CourseService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
@@ -220,7 +222,17 @@ class CourseService {
       where: { user_id: trainer.id },
     });
     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
-    const courses = this.course.findAll({
+    const coursesCount = await this.course.findAndCountAll({
+      include: [
+        {
+          model: this.trainer,
+          where: {
+            trainer_id: trainerRecord.trainer_id,
+          },
+        },
+      ],
+    });
+    const courses = await this.course.findAll({
       where: { title: { [searchCondition]: search } },
       limit: pageSize,
       offset: pageNo,
@@ -235,7 +247,7 @@ class CourseService {
         },
       ],
     });
-    return courses;
+    return { totalCount: coursesCount.count, records: courses };
   }
   public async togglePublish({
     trainer,

@@ -27,6 +27,7 @@ module.exports = (sequelize, Sequelize) => {
       thumbnail: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       status: {
         type: Sequelize.ENUM(['Drafted', 'Published']),

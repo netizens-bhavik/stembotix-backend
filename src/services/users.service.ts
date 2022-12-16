@@ -12,7 +12,10 @@ class UserService {
     return userData.role === 'admin';
   }
 
-  public async findAllUser(loggedUser, queryObject): Promise<User[]> {
+  public async findAllUser(
+    loggedUser,
+    queryObject
+  ): Promise<{ totalCount: number; records: User[] }> {
     if (!this.isAdmin(loggedUser)) throw new HttpException(401, 'Unauthorized');
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
@@ -20,19 +23,32 @@ class UserService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
       : ['', DB.Sequelize.Op.ne];
+    // role filter
+    const [role, roleCondition] = queryObject.role
+      ? [`%${queryObject.role}%`, DB.Sequelize.Op.like]
+      : ['', DB.Sequelize.Op.ne];
 
+    const userCount = await this.users.findAndCountAll({
+      where: { role: { [roleCondition]: role } },
+    });
     const allUser: User[] = await this.users.findAll({
-      where: { title: { [searchCondition]: search } },
+      where: DB.Sequelize.and(
+        DB.Sequelize.or(
+          { firstName: { [searchCondition]: search } },
+          { lastName: { [searchCondition]: search } },
+          { email: { [searchCondition]: search } }
+        ),
+        { role: { [roleCondition]: role } }
+      ),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return allUser;
+    return { totalCount: userCount.count, records: allUser };
   }
 
   public async findUserById(loggedUser, userId: string): Promise<User> {
