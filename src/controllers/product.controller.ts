@@ -12,14 +12,16 @@ class ProductController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const coursesData: (Product | undefined)[] =
-        await this.productService.viewProducts({
-          search,
-          pageRecord,
-          pageNo,
-          sortBy,
-          order,
-        });
+      const coursesData: {
+        totalCount: number;
+        records: (Product | undefined)[];
+      } = await this.productService.viewProducts({
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+      });
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);
@@ -35,7 +37,7 @@ class ProductController {
       const user = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: (Product | undefined)[] =
+      const response: { totalCount: number; records: (Product | undefined)[] } =
         await this.productService.listProduct({ user, queryObject });
       res.status(200).send(response);
     } catch (error) {

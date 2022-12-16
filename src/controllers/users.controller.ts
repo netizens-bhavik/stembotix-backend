@@ -10,12 +10,10 @@ class UsersController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order, role } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order, role };
-      const findAllUsersData: User[] = await this.userService.findAllUser(
-        loggedUser,
-        queryObject
-      );
+      const findAllUsersData: { totalCount: number; records: User[] } =
+        await this.userService.findAllUser(loggedUser, queryObject);
 
-      res.status(200).json({ data: findAllUsersData, message: 'findAll' });
+      res.status(200).json(findAllUsersData);
     } catch (error) {
       next(error);
     }
@@ -68,7 +66,7 @@ class UsersController {
   ) => {
     try {
       const loggedUser = req.user;
-      const userId = req.params.id;
+      const { id: userId } = req.params;
       const deleteUserData: User = await this.userService.deleteUser(
         loggedUser,
         userId

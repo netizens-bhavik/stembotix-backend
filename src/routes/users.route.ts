@@ -35,7 +35,14 @@ class UsersRoute implements Routes {
       ],
       this.usersController.updateUser
     );
-    this.router.delete(`${this.path}/:id`, this.usersController.deleteUser);
+    this.router.delete(
+      `${this.path}/:id`,
+      [
+        passport.authenticate('jwt', { session: false }),
+        // validationMiddleware(RegisterUserDto, 'body', true),
+      ],
+      this.usersController.deleteUser
+    );
   }
 }
 

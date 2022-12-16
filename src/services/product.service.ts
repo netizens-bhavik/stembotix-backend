@@ -9,18 +9,23 @@ class ProductService {
   public productTag = DB.ProductTagMap;
   public productDimension = DB.ProductDimensionMap;
 
-  public async viewProducts(queryObject): Promise<(Product | undefined)[]> {
+  public async viewProducts(
+    queryObject
+  ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const productsRecord = await this.product.findAndCountAll({
+      where: { status: 'Published' },
+    });
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
         { status: 'Published' },
@@ -53,13 +58,13 @@ class ProductService {
         },
       ],
     });
-    return data;
+    return { totalCount: productsRecord.count, records: data };
   }
 
   public async listProduct({
     user,
     queryObject,
-  }): Promise<(Product | undefined)[]> {
+  }): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     if (user.Role.roleName === 'student' || !user.isEmailVerified)
       throw new HttpException(401, 'Unauthorized');
 
@@ -79,7 +84,17 @@ class ProductService {
       where: { id: user.id },
     });
     if (!creatorRecord) throw new HttpException(404, 'Invalid Request');
-    const courses = this.product.findAll({
+    const { count } = await this.product.findAndCountAll({
+      include: [
+        {
+          model: this.user,
+          where: {
+            id: creatorRecord.id,
+          },
+        },
+      ],
+    });
+    const courses = await this.product.findAll({
       where: { title: { [searchCondition]: search } },
       limit: pageSize,
       offset: pageNo,
@@ -97,7 +112,7 @@ class ProductService {
         },
       ],
     });
-    return courses;
+    return { totalCount: count, records: courses };
   }
 
   public async addProduct({ productDetails, file, user }): Promise<Product> {
@@ -185,10 +200,10 @@ class ProductService {
       .split('/')
       .splice(-2)
       .join('/')}`;
-    if (filePath) productDetails.productImg = `${API_BASE}/media/${filePath}`;
     const updateProduct = await this.product.update(
       {
         ...productDetails,
+        thumbnail: filePath,
       },
       {
         where: {
