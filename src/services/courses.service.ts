@@ -71,7 +71,7 @@ class CourseService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const { trailer, thumbnail } = file;
-    const trailerPath = `${API_SECURE_BASE}/media/${trailer[0].path
+    const trailerPath = `${API_BASE}/media/${trailer[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
@@ -98,7 +98,7 @@ class CourseService {
       description: newCourse.description,
       thumbnail: `${API_BASE}/media/${newCourse.thumbnail}`,
       // @ts-ignore
-      trailer: `${API_SECURE_BASE}/media/${newCourse.trailer}`,
+      trailer: `${API_BASE}/media/${newCourse.trailer}`,
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
       deletedAt: newCourse.deletedAt,
@@ -150,7 +150,7 @@ class CourseService {
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
     const { trailer, thumbnail } = file;
-    const trailerPath = `${API_SECURE_BASE}/media/${trailer[0].path
+    const trailerPath = `${API_BASE}/media/${trailer[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
