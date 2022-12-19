@@ -161,8 +161,6 @@ class CourseService {
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
-        trailer: trailerPath,
-        thumbnail: thumbnailPath,
       },
       {
         where: {
@@ -233,7 +231,10 @@ class CourseService {
       ],
     });
     const courses = await this.course.findAll({
-      where: { title: { [searchCondition]: search } },
+      where: DB.Sequelize.or(
+        { title: { [searchCondition]: search } },
+        { language: { [searchCondition]: search } }
+      ),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
