@@ -95,7 +95,10 @@ class ProductService {
       ],
     });
     const courses = await this.product.findAll({
-      where: { title: { [searchCondition]: search } },
+      where: DB.Sequelize.or(
+        { title: { [searchCondition]: search } },
+        { sku: { [searchCondition]: search } }
+      ),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
