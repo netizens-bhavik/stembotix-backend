@@ -154,10 +154,12 @@ class CourseService {
       .split('/')
       .splice(-2)
       .join('/')}`;
+    courseDetails.trailer = trailerPath;
     const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
+    courseDetails.thumbnail = thumbnailPath;
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
