@@ -150,16 +150,20 @@ class CourseService {
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
     const { trailer, thumbnail } = file;
-    const trailerPath = `${API_BASE}/media/${trailer[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    courseDetails.trailer = trailerPath;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    courseDetails.thumbnail = thumbnailPath;
+    if (trailer) {
+      const trailerPath = `${API_BASE}/media/${trailer[0].path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+      courseDetails.trailer = trailerPath;
+    }
+    if (thumbnail) {
+      const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+      courseDetails.thumbnail = thumbnailPath;
+    }
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
