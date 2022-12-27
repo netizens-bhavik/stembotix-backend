@@ -117,7 +117,6 @@ class CartService {
       where: { user_id: userId },
       include: {
         model: this.cartItem,
-        sortBy: ['product_id', 'ASC'],
         include: [
           {
             model: this.course,
@@ -127,6 +126,7 @@ class CartService {
           },
         ],
       },
+      order: [[{ model: this.cartItem, as: 'CartItems' }, 'created_at', 'ASC']],
     });
     if (!cart) return { message: 'Empty Cart' };
     return cart;

@@ -33,7 +33,7 @@ const uploadFiles = multer({
     filePath = req.url.slice(1);
     if (
       !file.originalname.match(
-        /\.(png|jpg|jpeg|xlsx|xlx|doc|txt|xls|pdf|docx|ppt|pptx|csv|svg|mp4)$/
+        /\.(png|jpg|jpeg|xlsx|xlx|doc|txt|xls|pdf|docx|ppt|pptx|csv|svg|mp4|mkv)$/
       )
     ) {
       return cb(new Error('Please upload a Image'), null);
