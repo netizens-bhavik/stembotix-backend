@@ -1,9 +1,9 @@
 const userData = {
-  firstName: "Admin",
-  lastName: "Admin",
-  email: "admin@yopmail.com",
-  password: "admin@123",
-  date_of_birth: "2000-01-01",
+  firstName: "User",
+  lastName: "Manual",
+  email: "stembotic@yopmail.com",
+  password: "12345678",
+  date_of_birth: "07-11-2000",
   isEmailVerified: true,
   role: "admin",
 };

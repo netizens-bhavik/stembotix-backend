@@ -1,7 +1,8 @@
-import CreateUser from "./createUser";
-import CreateRole from "./createRoles";
-import CreateCourses from "./createCourse";
-import CreateProduct from "./createProduct";
+import CreateUser from './createUser';
+import CreateRole from './createRoles';
+import CreateCourses from './createCourse';
+import CreateProduct from './createProduct';
+
 class BootFiles {
   public createRole = new CreateRole();
   public createUser = new CreateUser();
@@ -13,7 +14,6 @@ class BootFiles {
     await this.createUser.init();
     await this.createCourses.init();
     await this.createProduct.init();
-
   }
 }
 export default BootFiles;

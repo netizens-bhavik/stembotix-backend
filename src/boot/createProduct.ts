@@ -1,4 +1,3 @@
-import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 import DB from '@/databases';
 import productData from "./data/product"
 import { ProductDto } from '@/dtos/product.dto';

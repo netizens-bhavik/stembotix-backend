@@ -28,6 +28,7 @@ class CreateUser {
           role_id: roleRes.id,
         });
       }
+      
     } catch (error) {
       console.log(error);
     }
