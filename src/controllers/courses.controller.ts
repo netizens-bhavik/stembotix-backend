@@ -39,7 +39,7 @@ class CourseController {
       const response: Course = await this.courseService.addCourse({
         courseDetails,
         file,
-        trainer,
+        user: trainer,
       });
       res.status(200).send(response);
     } catch (error) {

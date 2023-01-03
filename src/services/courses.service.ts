@@ -12,7 +12,7 @@ class CourseService {
   public coursesTrainers = DB.CoursesTrainers;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer';
+     return user.role === 'trainer'|| user.role === 'admin';
   }
   public async viewCourses(
     queryObject
@@ -27,6 +27,7 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+      
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -46,7 +47,7 @@ class CourseService {
             {
               model: this.user,
             },
-          ],
+          ],  
         },
       ],
 
@@ -56,14 +57,14 @@ class CourseService {
     });
     return { totalCount: courseData.count, records: data };
   }
-  public async addCourse({ courseDetails, file, trainer }): Promise<Course> {
-    if (!this.isTrainer(trainer)) {
+  public async addCourse({ courseDetails, file, user }): Promise<Course> {
+    if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
     const trainerRecord = await this.trainer.findOne({
       where: {
-        user_id: trainer.id,
+        user_id: user.id,
       },
     });
 
@@ -233,6 +234,7 @@ class CourseService {
           where: {
             trainer_id: trainerRecord.trainer_id,
           },
+
         },
       ],
     });
