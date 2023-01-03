@@ -56,6 +56,7 @@ class CartService {
       where: DB.Sequelize.and({ id: courseId }, { status: 'Published' }),
     });
     if (!courseData) {
+      console.log(courseData);
       throw new HttpException(404, 'Course not found');
     }
 

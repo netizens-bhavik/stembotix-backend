@@ -149,6 +149,7 @@ class AuthService {
       accessToken: token,
       refreshToken: refreshToken,
     };
+    console.log(response);
     return response;
   }
   public async resendMail(id: string): Promise<{ message: string }> {

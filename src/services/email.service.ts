@@ -39,7 +39,7 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err)
+        if (err) console.log(err);
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -49,11 +49,11 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (error) {
-          return error;
+          console.log(error);
         }
       });
     } catch (err) {
-      return err;
+      console.log(err);
     }
   }
   public async forgotPassword(payload: MailPayload) {
@@ -64,7 +64,7 @@ class EmailService {
       const pathToView = path.resolve(__dirname, '../view/forgotPassword.ejs');
       const { templateData, mailerData } = payload;
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) 
+        if (err) console.log(err);
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -74,11 +74,11 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (error) {
-        return error;
+          console.log(error);
         }
       });
     } catch (err) {
-      return err;
+      console.log(err);
     }
   }
 }

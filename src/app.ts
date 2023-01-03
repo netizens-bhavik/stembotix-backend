@@ -43,7 +43,7 @@ class App {
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
     } catch (err) {
-     return err;
+      console.log(err);
     }
   }
   public getCredentials() {
@@ -77,7 +77,7 @@ class App {
   }
 
   private connectToDatabase() {
-    DB.sequelize.sync({ force: false }).catch((err) => {return (err)});
+    DB.sequelize.sync({ force: false }).catch((err) => console.log(err));
   }
 
   private initializeMiddlewares() {
@@ -118,7 +118,7 @@ class App {
       const specs = swaggerJSDoc(options);
       this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
     } catch (err) {
-     return err;
+      console.log(err);
     }
   }
 
