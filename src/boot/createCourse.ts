@@ -14,10 +14,9 @@ class CreateCourses {
 
       let courseInstance: AddCourseDTO;
 
-
       courseInstance = await this.course.create(courseData);
     } catch (error) {
-      console.log(error);
+      return error;
     }
   };
 }

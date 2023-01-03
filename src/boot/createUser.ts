@@ -1,8 +1,8 @@
-import { hashSync, genSaltSync, compareSync } from "bcrypt";
-import DB from "@/databases";
-import userData from "./data/user";
-import UserService from "@/services/users.service";
-import { RegisterUserDto } from "@dtos/users.dto";
+import { hashSync, genSaltSync, compareSync } from 'bcrypt';
+import DB from '@/databases';
+import userData from './data/user';
+import UserService from '@/services/users.service';
+import { RegisterUserDto } from '@dtos/users.dto';
 
 class CreateUser {
   public users = DB.User;
@@ -28,7 +28,6 @@ class CreateUser {
           role_id: roleRes.id,
         });
       }
-      
     } catch (error) {
       console.log(error);
     }
