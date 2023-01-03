@@ -17,7 +17,7 @@ class CreateProduct {
 
       productInstance = await this.product.create(productData);
     } catch (error) {
-      console.log(error);
+      return error;
     }
   };
 }

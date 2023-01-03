@@ -10,7 +10,7 @@ class CreateRole {
       if (res !== 0) return;
       await this.roles.bulkCreate(roleData);
     } catch (error) {
-      console.log(error);
+     return error;
     }
   };
 }

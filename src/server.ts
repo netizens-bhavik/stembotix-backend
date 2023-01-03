@@ -12,7 +12,7 @@ import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 
 validateEnv();
-try{
+
   const app = new App([
     new IndexRoute(),
     new UsersRoute(),
@@ -27,6 +27,4 @@ try{
   ]);
   app.listen();
   
-}catch(error){
-  console.log("first,error",error)
-}
+
