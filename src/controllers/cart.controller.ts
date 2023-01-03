@@ -31,7 +31,6 @@ class CartController {
       // @ts-ignore
       const { id: userId } = req.user;
       const { courseId }: AddCourseDTO = req.body;
-      console.log(courseId);
       const response: { message: string; data?: CartItem | {} } =
         await this.cartService.addCourseToCart(userId, courseId);
       res.status(200).send(response);

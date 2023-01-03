@@ -13,16 +13,18 @@ import ProductRoute from './routes/product.route';
 
 validateEnv();
 
-const app = new App([
-  new IndexRoute(),
-  new UsersRoute(),
-  new AuthRoute(),
-  new FileUploadRoute(),
-  new CourseRoute(),
-  new CartRoute(),
-  new ProductRoute(),
-  new CurriculumSectionRoute(),
-  new CurriculumVideoRoute(),
-  new OrderRoute(),
-]);
-app.listen();
+  const app = new App([
+    new IndexRoute(),
+    new UsersRoute(),
+    new AuthRoute(),
+    new FileUploadRoute(),
+    new CourseRoute(),
+    new CartRoute(),
+    new ProductRoute(),
+    new CurriculumSectionRoute(),
+    new CurriculumVideoRoute(),
+    new OrderRoute(),
+  ]);
+  app.listen();
+  
+
