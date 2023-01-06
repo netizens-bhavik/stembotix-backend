@@ -1,11 +1,11 @@
-import { IsArray, IsString,IsBoolean } from 'class-validator';
+import { IsArray, IsString,IsBoolean, IsUUID, UUIDVersion } from 'class-validator';
 
 export class QuizQueDto {
   @IsString()
   question: string;
 
-  @IsString()
-  quiz_id: string;
+  @IsUUID()
+  quiz_id: UUIDVersion;
 
   @IsArray()
   public  options: string[];

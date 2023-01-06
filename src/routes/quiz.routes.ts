@@ -23,20 +23,18 @@ class QuizRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(QuizDto, 'body'),
       this.quizController.createQuiz
-      );
-      this.router.post(
-        `${this.path}/que-ans`,
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(QuizQueDto, 'body'),
-        this.quizController.createQuizQueAns
-      );
-      this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
+    );
 
-    
-      this.router.get(`${this.path}/que-ans/:quizQueId`, this.quizController.getQuizQueAnsById);
+    this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
 
 
-      this.router.put(
+    this.router.get(
+      `${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.quizController.viewQuiz
+    );
+
+    this.router.put(
       `${this.path}/:quizId`,
 
       passport.authenticate('jwt', { session: false }),
@@ -46,17 +44,6 @@ class QuizRoute implements Routes {
       this.quizController.updateQuiz
     );
 
-    this.router.put(
-      `${this.path}/que-ans/:quizQueId`,
-
-      passport.authenticate('jwt', { session: false }),
-
-      validationMiddleware(QuizQueDto, 'body'),
-
-      this.quizController.updateQuizQueAns
-    );
-
-
 
 
     this.router.delete(
@@ -65,11 +52,7 @@ class QuizRoute implements Routes {
       this.quizController.deleteQuiz
     );
 
-    this.router.delete(
-      `${this.path}/que-ans/:quizQueId`,
-      passport.authenticate('jwt', { session: false }),
-      this.quizController.deleteQuizqueAns
-    );
+
   }
 }
 

@@ -1,167 +1,85 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { QuizQue } from '@/interfaces/quizQue.interface';
-import QuizQueService from '@/services/quizQue.service';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParsedQs } from 'qs';
-import { QuizOption } from '@/interfaces/quizOption.interface';
+import QuizQueAnsService from '@/services/quizQue.service';
 
-class QuizQueController {
-  public quizQueService = new QuizQueService();
-  public quizOptionService = new QuizQueService()
+class QuizQueAnsController {
+  public quizQueAnsService = new QuizQueAnsService();
 
-  public createQuizQue = async (
+  public createQuizQueAns = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const quizQueData = req.body;
-      const users = req.user;
-      const quizQue = {
-        ...quizQueData,
-        QuizId:req.body.quiz_id
+      const quizQueAnsData = req.body;
+      const trainer = req.user;
 
+      const quizQueAnsData2 = {
+        ...quizQueAnsData,
+        quiz_id: req.body.quiz_id,
       };
-      const response =await this.quizQueService.createQuizQuestion(quizQue,quizQue)
-      res.status(200).send(response)
-    } catch (err) {
-      next(err);
-    }
-    
-  };
-
-
-
-  public createQuizOption = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const quizOptionData = req.body;
-      const users = req.user;
-      const quizOption = {
-        ...quizOptionData,
-        QuizQueId:req.body.quizQue_id
-
-      };
-      const response =await this.quizOptionService.createQuizOption(quizOption)
-      res.status(200).send(response)
-    } catch (err) {
-      next(err);
-    }
-}
-
-
-
-
-  // public getQuizQueById = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { quizQueId } = req.params;
-  //     const response: QuizQue = await this.quizQueService.getQuizQueById(quizQueId);
-  //     res.status(200).send(response);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
-
-
-
-
-
-  public getQuizOptionById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { quizAnsId } = req.params;
-      const response: QuizOption = await this.quizOptionService.getQuizOptionById(quizAnsId);
+      const response = await this.quizQueAnsService.createQuizQue(
+        quizQueAnsData2,
+        trainer
+      );
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-
-
-
-
-
-  public updateQuizQues = async (
+  public getQuizQueAnsById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const { quizQueId } = req.params;
-      const quizQueDetail = req.body;
-      quizQueDetail['id'] = quizQueId;
-
-
-      const update = await this.quizQueService.updateQuizQue(quizQueDetail);
-      res.status(200).send(update);
+      const response: QuizQue = await this.quizQueAnsService.getQuizQueAnsById(
+        quizQueId
+      );
+      res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-
-  public updateQuizAns = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { quizAnsId } = req.params;
-      const quizAnsDetail = req.body;
-      quizAnsDetail['id'] = quizAnsId;
-
-
-      const update = await this.quizOptionService.updateQuizOption(quizAnsDetail);
-      res.status(200).send(update);
-    } catch (err) {
-      next(err);
-    }
-  };
-
-
-
-
-  public deleteQuizQue = async (
+  public updateQuizQueAns = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const { quizQueId } = req.params;
-      const response: { count: number } = await this.quizQueService.deleteQuizQue({
-        quizQueId,
-      });
-      res.status(200).send(response);
-    } catch (error) {
-      next(error);
+      const trainer = req.user;
+      const quizQueAnsDetail = req.body;
+      quizQueAnsDetail['id'] = quizQueId;
+
+      const update = await this.quizQueAnsService.updateQuizQueAns(
+        quizQueAnsDetail,
+        trainer
+      );
+      res.status(200).send(update);
+    } catch (err) {
+      next(err);
     }
   };
-
-  public deleteQuizOption = async (
+  public deleteQuizqueAns = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { quizAnsId } = req.params;
-      const response: { count: number } = await this.quizOptionService.deleteQuizOption({
-        quizAnsId,
-      });
-      res.status(200).send(response);
+      const { quizQueId } = req.params;
+      const trainer = req.user;
+
+      const response: { count: number } =
+        await this.quizQueAnsService.deleteQuizQueAns({
+          quizQueId,
+          trainer
+        });
+      res.sendStatus(200).send(response);
     } catch (error) {
       next(error);
     }
   };
-
-
 }
-export default QuizQueController
+export default QuizQueAnsController;

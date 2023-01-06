@@ -3,73 +3,48 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import QuizQueController from '@/controllers/quizQue.controller';
+import QuizController from '@/controllers/quiz.controller';
 import { QuizQueDto } from '@/dtos/quizQue.dto';
-import { QuizOptionDto } from '@/dtos/quizOption.dto';
+import QuizQueAnsController from '@/controllers/quizQue.controller';
 
 class QuizQueRoute implements Routes {
-  public path = '/quizQue';
+  public path = '/quiz';
   public router = Router();
-  public quizQueController = new QuizQueController();
+  public quizController = new QuizController();
+  public quizQueAnsController = new QuizQueAnsController();
   public passport = passportConfig(passport);
 
   constructor() {
     this.initializeRoutes();
   }
+
   private initializeRoutes() {
     this.router.post(
-      `${this.path}`,
+      `${this.path}/que-ans`,
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(QuizQueDto, 'body'),
-      this.quizQueController.createQuizQue
+      this.quizQueAnsController.createQuizQueAns
     );
-    this.router.post(
-      `${this.path}/option`,
-      passport.authenticate('jwt', { session: false }),
-      validationMiddleware(QuizOptionDto, 'body'),
-      this.quizQueController.createQuizOption
-    );
-    // this.router.get(
-    //   `${this.path}/:quizQueId`,
-    //   this.quizQueController.getQuizQueById
-    // );
 
     this.router.get(
-      `${this.path}/option/:quizAnsId`,
-      this.quizQueController.getQuizOptionById
+      `${this.path}/que-ans/:quizQueId`,
+      this.quizQueAnsController.getQuizQueAnsById
     );
-
     this.router.put(
-      `${this.path}/:quizQueId`,
+      `${this.path}/que-ans/:quizQueId`,
 
       passport.authenticate('jwt', { session: false }),
 
       validationMiddleware(QuizQueDto, 'body'),
 
-      this.quizQueController.updateQuizQues
+      this.quizQueAnsController.updateQuizQueAns
     );
-
-    this.router.put(
-      `${this.path}/option/:quizAnsId`,
-
-      passport.authenticate('jwt', { session: false }),
-
-      validationMiddleware(QuizOptionDto, 'body'),
-
-      this.quizQueController.updateQuizAns
-    );
-
     this.router.delete(
-      `${this.path}/:quizQueId`,
+      `${this.path}/que-ans/:quizQueId`,
       passport.authenticate('jwt', { session: false }),
-      this.quizQueController.deleteQuizQue
-    );
-
-    this.router.delete(
-      `${this.path}/option/:quizAnsId`,
-      passport.authenticate('jwt', { session: false }),
-      this.quizQueController.deleteQuizOption
+      this.quizQueAnsController.deleteQuizqueAns
     );
   }
 }
-export default QuizQueRoute;
+
+export default QuizQueRoute

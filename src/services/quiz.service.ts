@@ -9,6 +9,8 @@ import QuizRoute from '@/routes/quiz.routes';
 import { where } from 'sequelize/types';
 import { isEmpty } from '@/utils/util';
 class QuizService {
+  public trainer = DB.Trainer;
+  public user = DB.User;
   public quiz = DB.Quiz;
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
@@ -18,49 +20,41 @@ class QuizService {
     return user.role === 'trainer' || user.role === 'admin';
   }
 
-  public async createQuiz(quizData: QuizDto): Promise<Quiz> {
-    const newQuiz = await this.quiz.create(quizData);
-
-    return newQuiz;
-  }
-  public async createQuizQue(quizData: QuizQueDto): Promise<QuizQue> {
-    const newQuizQue = await this.quizQue.create(quizData);
-    console.log("newQuizQue",newQuizQue.question)
-    const op = [];
-    quizData.options?.forEach((element: any) => {
-      console.log(element);
-      const obj = {
-        QuizQueId: newQuizQue.id,
-        option: element.option,
-        is_correct: element.is_correct,
-        question:newQuizQue.question
-      };
-      op.push(obj);
+  public async createQuiz(quizData: QuizDto, user): Promise<Quiz> {
+    if (!this.isTrainer(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const trainerRecord = await this.trainer.findOne({
+      where: {
+        user_id: user.id,
+      },
     });
 
-    const res = await this.quizAns.bulkCreate(op);
-    return res;
+    if (!trainerRecord)
+      throw new HttpException(404, 'Requested trainer details do not exist');
+
+    const newQuiz = await this.quiz.create(quizData);
+    // newQuiz.addTrainer(trainerRecord);
+    return newQuiz;
   }
+
   public async getQuizById(quizId: string): Promise<Quiz> {
     const response: Quiz = await this.quiz.findOne({
       where: {
         id: quizId,
       },
     });
-    // console.log("first",response)
     return response;
   }
-  public async getQuizQueAnsById(quizQueId: string): Promise<QuizQue> {
-    const response: QuizQue = await this.quizQue.findOne({
-      where: {
-        id: quizQueId,
-      },
-    });
-    return response;
-  }
+
   public async updateQuiz(
-    quizDetail
+    quizDetail,
+    trainer
   ): Promise<{ count: number; rows: Quiz[] }> {
+    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+      throw new HttpException(403, 'Forbidden Resource');
+
+
     const updateQuiz = await this.quiz.update(
       {
         ...quizDetail,
@@ -75,82 +69,64 @@ class QuizService {
 
     return { count: updateQuiz[0], rows: updateQuiz[1] };
   }
-  public async updateQuizQueAns(
-    quizQueAnsDetail
-  ): Promise<{ count: number; rows: Quiz[] }> {
-    const updateQuizQueAns = await this.quizQue.update(
-      {
-        ...quizQueAnsDetail,
-      },
-      {
-        where: {
-          id: quizQueAnsDetail.id,
-        },
-        returning: true,
-      }
-    );
 
-    return { count: updateQuizQueAns[0], rows: updateQuizQueAns[1] };
-  }
+  public async deleteQuiz({
+    quizId,
+    trainer,
+  }): Promise<{ count: number; row: Quiz[] }> {
+    if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
 
-  public async deleteQuiz({ quizId }): Promise<{ count: number ;row:Quiz[]}> {
     const res: number = await this.quiz.destroy({
       where: {
         id: quizId,
       },
     });
-    return { count: res [0],row:res[1]};
+    return { count: res[0], row: res[1] };
   }
-  public async deleteQuizQueAns({ quizQueId }): Promise<{ count: number ;row:QuizQue}> {
-    const res: number = await this.quizQue.destroy({
-      where: {
-        id: quizQueId,
-      },
+
+  public async viewQuiz(
+    queryObject
+  ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const quizData = await this.quiz.findAndCountAll({
+      where: { deleted_at: null },
     });
-    return { count: res[0], row:res[1]};
-  }
-
-  public async listQuiz({
-    user
-    queryObject,
-  }):Promise<{totalCount:number;record:(QuizQue|undefined)[]}>{
-    if (isEmpty(user) || !this.isTrainer(user))
-    throw new HttpException(401, 'Unauthorized');
-     // sorting
-     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
-     // pagination
-     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-     // Search
-     const [search, searchCondition] = queryObject.search
-       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-       : ['', DB.Sequelize.Op.ne];
- 
-    const quizRecord=await this.quiz.findOne({
-where:{quiz_id:quiz.id}
-    })
-    const quizCount=await this.quizQue.findAndCountAll({
-      include:[
+    const data: (Quiz | undefined)[] = await this.quiz.findAll({
+      where: DB.Sequelize.and(
+        { deleted_at: null },
         {
-          model:this.quiz;
-          where:{
-            quiz_id:quizRecord.quiz_id
-          }
+          title: {
+            [searchCondition]: search,
+          },
         }
-      ]
-    })
-    const Quiz =await this.quizQue.findAll({
-      where:DB.Sequelize.or(
+      ),
+      include: [
         {
+          model: this.quizQue,
+          include: [
+            {
+              model: this.quizAns,
+            },
+          ],
+        },
+      ],
 
-        }
-      )
-    })
-    
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: quizData.count, records: data };
   }
- 
-
 }
 
 export default QuizService;

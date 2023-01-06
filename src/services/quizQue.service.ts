@@ -1,20 +1,26 @@
 import DB from '@databases';
-import { QuizQue } from '@/interfaces/quizQue.interface';
+import { Quiz } from '@/interfaces/quiz.interface';
 import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQue } from '@/interfaces/quizQue.interface';
 import { HttpException } from '@/exceptions/HttpException';
-import { QuizOptionDto } from '@/dtos/quizOption.dto';
-import { QuizOption } from '@/interfaces/quizOption.interface';
+import { cloneDeep } from 'sequelize/types/utils';
 
-class QuizQueService {
+class QuizQueAnsService {
+  public trainer = DB.Trainer;
+  public user = DB.User;
   public quiz = DB.Quiz;
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
   public quizQueAns = DB.QuizQueAns;
+  public curriculum = DB.CurriculumSection;
 
-  public async createQuizQuestion(
-    quizData: QuizQueDto,
-    quizQue_id
-  ): Promise<QuizQue> {
+  public isTrainer(user): boolean {
+    return user.role === 'trainer' || user.role === 'admin';
+  }
+  public async createQuizQue(quizData: QuizQueDto, user): Promise<QuizQue> {
+    if (!this.isTrainer(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
     const newQuizQue = await this.quizQue.create(quizData);
     const op = [];
     quizData.options?.forEach((element: any) => {
@@ -23,100 +29,55 @@ class QuizQueService {
         QuizQueId: newQuizQue.id,
         option: element.option,
         is_correct: element.is_correct,
+        question: newQuizQue.question,
       };
       op.push(obj);
     });
     const res = await this.quizAns.bulkCreate(op);
     return res;
-  
   }
-  
-    
- 
-  // public async createQuizQue(quizData: QuizQueDto): Promise<QuizQue> {
-  //   const newQuizQue = await this.quizQue.create(quizData);
-    
-
-  public async createQuizOption(
-    quizOption: QuizOptionDto
-  ): Promise<QuizOption> {
-    const newOption = await this.quizAns.create(quizOption);
-    if (newOption === quizOption) {
-    }
-    return newOption;
-  }
-
-  // public async getQuizQueById(quizQueId: string): Promise<QuizQue> {
-  //   const response: QuizQue = await this.quizQue.findOne({
-  //     where: {
-  //       id: quizQueId,
-  //     },
-  //   });
-  //   return response;
-  // }
-
-  public async getQuizOptionById(quizAnsId: string): Promise<QuizOption> {
-    const response: QuizOption = await this.quizAns.findOne({
+  public async getQuizQueAnsById(quizQueId: string): Promise<QuizQue> {
+    const response: QuizQue = await this.quizQue.findOne({
       where: {
-        id: quizAnsId,
+        id: quizQueId,
       },
     });
     return response;
   }
+  public async updateQuizQueAns(
+    quizQueAnsDetail,
+    trainer
+  ): Promise<{ count: number; rows: Quiz[] }> {
+    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+      throw new HttpException(403, 'Forbidden Resource');
 
-  public async updateQuizQue(
-    quizQueDetail
-  ): Promise<{ count: number; rows: QuizQue[] }> {
-    const updateQuizQue = await this.quizQue.update(
+
+    const updateQuizQueAns = await this.quizQue.update(
       {
-        ...quizQueDetail,
+        ...quizQueAnsDetail,
       },
       {
         where: {
-          id: quizQueDetail.id,
+          id: quizQueAnsDetail.id,
         },
         returning: true,
       }
     );
 
-    return { count: updateQuizQue[0], rows: updateQuizQue[1] };
+    return { count: updateQuizQueAns[0], rows: updateQuizQueAns[1] };
   }
+  public async deleteQuizQueAns({
+    quizQueId,
+    trainer,
+  }): Promise<{ count: number; row: QuizQue }> {
+    if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
 
-  public async updateQuizOption(
-    quizOptionDetails
-  ): Promise<{ count: number; rows: QuizOption[] }> {
-    const updateQuizOption = await this.quizAns.update(
-      {
-        ...quizOptionDetails,
-      },
-      {
-        where: {
-          id: quizOptionDetails.id,
-        },
-        returning: true,
-      }
-    );
-
-    return { count: updateQuizOption[0], rows: updateQuizOption[1] };
-  }
-
-  public async deleteQuizQue({ quizQueId }): Promise<{ count: number }> {
     const res: number = await this.quizQue.destroy({
       where: {
         id: quizQueId,
       },
     });
-    return { count: res };
-  }
-
-  public async deleteQuizOption({ quizAnsId }): Promise<{ count: number }> {
-    const res: number = await this.quizAns.destroy({
-      where: {
-        id: quizAnsId,
-      },
-    });
-    return { count: res };
+    return { count: res[0], row: res[1] };
   }
 }
-
-export default QuizQueService;
+export default QuizQueAnsService;

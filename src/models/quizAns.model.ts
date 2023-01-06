@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
   );
   QuizAns.associate = (models) => {
     QuizAns.belongsTo(models.QuizQue, {
-      foreignkey: 'quizQue_id',
+      foreignkey: 'quiz_que_id',
       targetkey: 'id',
     });
   }
