@@ -10,21 +10,23 @@ import CurriculumVideoRoute from './routes/curriculumVideo.route';
 import FileUploadRoute from './routes/fileUploads.route';
 import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
+import QuizRoute from './routes/quiz.routes';
+import QuizQueRoute from './routes/quizQue.route';
 
 validateEnv();
 
-  const app = new App([
-    new IndexRoute(),
-    new UsersRoute(),
-    new AuthRoute(),
-    new FileUploadRoute(),
-    new CourseRoute(),
-    new CartRoute(),
-    new ProductRoute(),
-    new CurriculumSectionRoute(),
-    new CurriculumVideoRoute(),
-    new OrderRoute(),
-  ]);
-  app.listen();
-  
-
+const app = new App([
+  new IndexRoute(),
+  new UsersRoute(),
+  new AuthRoute(),
+  new FileUploadRoute(),
+  new CourseRoute(),
+  new CartRoute(),
+  new ProductRoute(),
+  new CurriculumSectionRoute(),
+  new CurriculumVideoRoute(),
+  new OrderRoute(),
+  new QuizRoute(),
+  new QuizQueRoute(),
+]);
+app.listen();
