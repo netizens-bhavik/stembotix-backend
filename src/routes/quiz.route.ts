@@ -4,7 +4,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import QuizController from '@/controllers/quiz.controller';
-import { QuizDto } from '@/dtos/quiz.dto';
+import { QuizDto, UpdateQuizDto } from '@/dtos/quiz.dto';
 import { QuizQueDto } from '@/dtos/quizQue.dto';
 
 class QuizRoute implements Routes {
@@ -18,6 +18,7 @@ class QuizRoute implements Routes {
   }
 
   private initializeRoutes() {
+    //create quiz
     this.router.post(
       `${this.path}`,
       passport.authenticate('jwt', { session: false }),
@@ -25,33 +26,33 @@ class QuizRoute implements Routes {
       this.quizController.createQuiz
     );
 
+    //get single quiz by id
     this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
 
-
+    //get all quiz
     this.router.get(
       `${this.path}`,
       passport.authenticate('jwt', { session: false }),
       this.quizController.viewQuiz
     );
 
+    //update quiz
     this.router.put(
       `${this.path}/:quizId`,
 
       passport.authenticate('jwt', { session: false }),
 
-      validationMiddleware(QuizDto, 'body'),
+      validationMiddleware(UpdateQuizDto, 'body'),
 
       this.quizController.updateQuiz
     );
 
-
-
+    //delete quiz
     this.router.delete(
       `${this.path}/:quizId`,
       passport.authenticate('jwt', { session: false }),
       this.quizController.deleteQuiz
     );
-
   }
 }
 

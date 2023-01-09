@@ -5,7 +5,7 @@ import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { QuizQueDto } from '@/dtos/quizQue.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
-import QuizRoute from '@/routes/quiz.routes';
+import QuizRoute from '@/routes/quiz.route';
 import { where } from 'sequelize/types';
 import { isEmpty } from '@/utils/util';
 class QuizService {
@@ -14,8 +14,6 @@ class QuizService {
   public quiz = DB.Quiz;
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
-  public quizQueAns = DB.QuizQueAns;
-  public curriculum = DB.CurriculumSection;
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
@@ -54,7 +52,6 @@ class QuizService {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
 
-
     const updateQuiz = await this.quiz.update(
       {
         ...quizDetail,
@@ -70,18 +67,16 @@ class QuizService {
     return { count: updateQuiz[0], rows: updateQuiz[1] };
   }
 
-  public async deleteQuiz({
-    quizId,
-    trainer,
-  }): Promise<{ count: number; row: Quiz[] }> {
-    if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
+  public async deleteQuiz({ quizId, trainer }): Promise<{ count: number }> {
+    if (!this.isTrainer(trainer))
+      throw new HttpException(401, 'Forbidden Resource');
 
     const res: number = await this.quiz.destroy({
       where: {
         id: quizId,
       },
     });
-    return { count: res[0], row: res[1] };
+    return { count: res };
   }
 
   public async viewQuiz(

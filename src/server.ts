@@ -10,7 +10,7 @@ import CurriculumVideoRoute from './routes/curriculumVideo.route';
 import FileUploadRoute from './routes/fileUploads.route';
 import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
-import QuizRoute from './routes/quiz.routes';
+import QuizRoute from './routes/quiz.route';
 import QuizQueRoute from './routes/quizQue.route';
 
 validateEnv();

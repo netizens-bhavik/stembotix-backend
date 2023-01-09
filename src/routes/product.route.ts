@@ -23,7 +23,7 @@ class ProductRoute implements Routes {
 
     // view own courses
     this.router.get(
-      `${this.path}/list/`,
+      `${this.path}/list`,
       passport.authenticate('jwt', { session: false }),
       this.productController.listProduct
     );

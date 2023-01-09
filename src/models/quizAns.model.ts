@@ -19,14 +19,13 @@ module.exports = (sequelize, Sequelize) => {
     {
       paranoid: true,
     }
-    
   );
   QuizAns.associate = (models) => {
     QuizAns.belongsTo(models.QuizQue, {
-      foreignkey: 'quiz_que_id',
-      targetkey: 'id',
+      foreignKey: 'quizQue_id',
+      targetKey: 'id',
     });
-  }
+  };
 
   return QuizAns;
 };

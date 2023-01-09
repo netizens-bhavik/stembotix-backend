@@ -3,7 +3,6 @@ import { Quiz } from '@/interfaces/quiz.interface';
 import { QuizQueDto } from '@/dtos/quizQue.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import { HttpException } from '@/exceptions/HttpException';
-import { cloneDeep } from 'sequelize/types/utils';
 
 class QuizQueAnsService {
   public trainer = DB.Trainer;
@@ -51,7 +50,6 @@ class QuizQueAnsService {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
 
-
     const updateQuizQueAns = await this.quizQue.update(
       {
         ...quizQueAnsDetail,
@@ -70,7 +68,8 @@ class QuizQueAnsService {
     quizQueId,
     trainer,
   }): Promise<{ count: number; row: QuizQue }> {
-    if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
+    if (!this.isTrainer(trainer))
+      throw new HttpException(401, 'Forbidden Resource');
 
     const res: number = await this.quizQue.destroy({
       where: {

@@ -10,7 +10,6 @@ module.exports = (sequelize, Sequelize) => {
       title: {
         type: Sequelize.STRING,
         allowNull: false,
-
       },
     },
     {
@@ -19,10 +18,13 @@ module.exports = (sequelize, Sequelize) => {
   );
   Quiz.associate = (models) => {
     Quiz.belongsTo(models.CurriculumSection, {
-      foreignkey: 'curriculum_id',
-      targetkey: 'id',
+      foreignKey: 'curriculum_id',
+      targetKey: 'id',
     });
-    Quiz.hasMany(models.QuizQue);
+    Quiz.hasMany(models.QuizQue, {
+      foreignKey: 'quiz_id',
+      targetKey: 'id',
+    });
   };
   return Quiz;
 };

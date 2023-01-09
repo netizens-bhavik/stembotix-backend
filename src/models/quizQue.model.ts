@@ -9,15 +9,15 @@ module.exports = (sequelize, Sequelize) => {
       },
       question: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false,
       },
     },
     { paranoid: true }
   );
   QuizQue.associate = (models) => {
     QuizQue.belongsTo(models.Quiz, {
-      foreignkey: 'quiz_id',
-      targetkey: 'id',
+      foreignKey: 'quiz_id',
+      targetKey: 'id',
     });
     QuizQue.hasMany(models.QuizAns);
   };

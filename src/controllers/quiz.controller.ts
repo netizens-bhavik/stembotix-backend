@@ -4,7 +4,6 @@ import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
 import QuizService from '@/services/quiz.service';
 
-
 class QuizController {
   public quizService = new QuizService();
   public user = DB.User;
@@ -22,13 +21,12 @@ class QuizController {
         ...quizData,
         CurriculumSectionId: req.body.curriculum_id,
       };
-      const response = await this.quizService.createQuiz(quizData2,trainer);
+      const response = await this.quizService.createQuiz(quizData2, trainer);
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-
 
   public getQuizById = async (
     req: Request,
@@ -44,7 +42,6 @@ class QuizController {
     }
   };
 
-
   public updateQuiz = async (
     req: Request,
     res: Response,
@@ -57,13 +54,12 @@ class QuizController {
 
       quizDetail['id'] = quizId;
 
-      const update = await this.quizService.updateQuiz(quizDetail,trainer);
+      const update = await this.quizService.updateQuiz(quizDetail, trainer);
       res.status(200).send(update);
     } catch (err) {
       next(err);
     }
   };
-
 
   public deleteQuiz = async (
     req: Request,
@@ -74,12 +70,11 @@ class QuizController {
       const { quizId } = req.params;
       const trainer = req.user;
 
-
       const response: { count: number } = await this.quizService.deleteQuiz({
         quizId,
-        trainer
+        trainer,
       });
-      res.sendStatus(200).send(response);
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }
@@ -87,11 +82,15 @@ class QuizController {
 
   public viewQuiz = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Quiz | undefined)[] } =
-        await this.quizService.viewQuiz({ search, pageRecord, pageNo, sortBy, order});
+        await this.quizService.viewQuiz({
+          search,
+          pageRecord,
+          pageNo,
+          sortBy,
+          order,
+        });
       res.status(200).send(response);
     } catch (error) {
       next(error);
