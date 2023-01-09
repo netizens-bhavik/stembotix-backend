@@ -87,6 +87,14 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     User.hasMany(models.Order);
+    User.hasMany(models.FeaturedQuestion, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    });
+    User.hasMany(models.FeaturedAnswer, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {
