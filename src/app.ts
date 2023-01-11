@@ -77,7 +77,9 @@ class App {
   }
 
   private connectToDatabase() {
-    DB.sequelize.sync({ force: false }).catch((err) => {return (err)});
+    DB.sequelize.sync({ force: false }).catch((err) => {
+      return (err)
+    });
   }
 
   private initializeMiddlewares() {

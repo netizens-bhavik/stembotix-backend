@@ -1,13 +1,8 @@
 import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
-import { API_BASE } from '@/config';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
-import { QuizQue } from '@/interfaces/quizQue.interface';
-import QuizRoute from '@/routes/quiz.routes';
-import { where } from 'sequelize/types';
-import { isEmpty } from '@/utils/util';
+;
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -34,7 +29,6 @@ class QuizService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const newQuiz = await this.quiz.create(quizData);
-    // newQuiz.addTrainer(trainerRecord);
     return newQuiz;
   }
 
