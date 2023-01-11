@@ -28,6 +28,8 @@ const thumbnail = commentData.thumbnail
     return newComment;
   }
 
+  
+
   public async getCommentById(comment_id: string): Promise<Comment> {
     const response: Comment = await this.comment.findOne({
       where: {

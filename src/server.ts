@@ -16,7 +16,7 @@ import QuizQueRoute from './routes/quizQue.route';
 import ReplyRoute from './routes/reply.route';
 
 validateEnv();
-
+try {
   const app = new App([
     new IndexRoute(),
     new UsersRoute(),
@@ -32,5 +32,10 @@ validateEnv();
     new QuizQueRoute(),
     new CommentRoute(),
     new ReplyRoute()
+    new LikeDislikeRoute()
   ]);
   app.listen();
+} catch (error) {
+  console.log(error)
+}
+

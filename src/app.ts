@@ -43,7 +43,7 @@ class App {
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
     } catch (err) {
-     return err;
+      return err;
     }
   }
   public getCredentials() {
@@ -110,7 +110,7 @@ class App {
           title: 'Stembotix API',
           version: '1.0.0',
           description:
-            'Base URL: \n1. https://192.168.1.106:3000/api \n2. https://192.168.1.14:3000/api',
+            'Base URL: \n1. https://192.168.29.57:3000/api \n2. https://192.168.29.57:3000/api',
         },
       },
       apis: ['swagger.yaml'],
@@ -120,7 +120,7 @@ class App {
       const specs = swaggerJSDoc(options);
       this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
     } catch (err) {
-     return err;
+      return err;
     }
   }
 
