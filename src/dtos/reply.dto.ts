@@ -7,4 +7,6 @@ export class ReplyDto {
   @IsString()
   public comment_id: string;
 
+  @IsString()
+  public thumbnail: string;
 }

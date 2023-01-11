@@ -5,7 +5,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import { AddCourseDTO } from '@/dtos/course.dto';
-import uploadFiles from '@/rest/fileUpload';
+import {uploadFiles} from '@/rest/fileUpload';
 
 class CourseRoute implements Routes {
   public path = '/courses';

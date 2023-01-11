@@ -67,7 +67,7 @@ class QuizService {
   public async deleteQuiz({
     quizId,
     trainer,
-  }): Promise<{ count: number; row: Quiz[] }> {
+  }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
 
     const res: number = await this.quiz.destroy({
@@ -75,8 +75,9 @@ class QuizService {
         id: quizId,
       },
     });
-    return { count: res[0], row: res[1] };
+    return { count: res };
   }
+
 
   public async viewQuiz(
     queryObject

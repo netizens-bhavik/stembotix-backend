@@ -15,15 +15,14 @@ class Replycontroller {
         next: NextFunction
     )=>{
         try {
-            const {reply,comment_id} = req.body
-            const { id } = req.user;
-            const file =req.files
+            const {reply,comment_id,thumbnail} = req.body
+            const  user  = req.user;
 
             const response : Reply = await this.replyService.addReply({
                 reply,
                 comment_id,
-                user_id:id,
-                file
+                user,
+                thumbnail
             })
             res.status(200).send({response:response,message:"Reply Successfully"})
         }catch (error){
@@ -97,5 +96,16 @@ class Replycontroller {
           next(error);
         }
       };
+      public uploadImage = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  )=>{
+    try{
+      res.status(200).send(req.file);
+    } catch (error){
+      next(error);
+    }
+  }
 }
 export default Replycontroller

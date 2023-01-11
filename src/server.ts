@@ -17,20 +17,20 @@ import ReplyRoute from './routes/reply.route';
 
 validateEnv();
 
-const app = new App([
-  new IndexRoute(),
-  new UsersRoute(),
-  new AuthRoute(),
-  new FileUploadRoute(),
-  new CourseRoute(),
-  new CartRoute(),
-  new ProductRoute(),
-  new CurriculumSectionRoute(),
-  new CurriculumVideoRoute(),
-  new OrderRoute(),
-  new QuizRoute(),
-  new QuizQueRoute(),
-  new CommentRoute(),
-  new ReplyRoute()
-]);
-app.listen();
+  const app = new App([
+    new IndexRoute(),
+    new UsersRoute(),
+    new AuthRoute(),
+    new FileUploadRoute(),
+    new CourseRoute(),
+    new CartRoute(),
+    new ProductRoute(),
+    new CurriculumSectionRoute(),
+    new CurriculumVideoRoute(),
+    new OrderRoute(),
+    new QuizRoute(),
+    new QuizQueRoute(),
+    new CommentRoute(),
+    new ReplyRoute()
+  ]);
+  app.listen();

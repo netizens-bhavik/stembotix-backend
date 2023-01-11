@@ -5,7 +5,13 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CommentController from '@/controllers/comment.controller';
 import { CommentDto } from '@/dtos/comment.dto';
-import uploadFiles from '@/rest/fileUpload';
+import { uploadFiles, uploadImage } from '@/rest/fileUpload';
+import uploadMiddleware from '@/middlewares/uploadMiddleware';
+
+
+  const thumbnailUploadMiddleware = uploadMiddleware(
+    uploadImage.single('thumbnail')
+  );
 
 class CommentRoute implements Routes {
   public path = '/comment';
@@ -53,6 +59,13 @@ class CommentRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.commentController.deleteComment
     );
+
+    this.router
+      .post(`${this.path}/uploadFile/:type`,
+        passport.authenticate('jwt', { session: false }),
+        thumbnailUploadMiddleware,
+        this.commentController.uploadImage
+      );
   }
 }
 export default CommentRoute;

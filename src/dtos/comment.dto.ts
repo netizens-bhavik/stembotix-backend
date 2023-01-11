@@ -7,4 +7,7 @@ export class CommentDto {
   @IsString()
   public course_id: string;
 
+  @IsString()
+  public thumbnail:string;
+
 }

@@ -5,8 +5,15 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CommentController from '@/controllers/comment.controller';
 import { ReplyDto } from '@dtos/reply.dto';
-import uploadFiles from '@/rest/fileUpload';
+import {uploadFiles,uploadImage} from '@/rest/fileUpload';
 import Replycontroller from '@/controllers/reply.controller';
+import uploadMiddleware from '@/middlewares/uploadMiddleware';
+
+
+
+const thumbnailUploadMiddleware = uploadMiddleware(
+  uploadImage.single('thumbnail')
+);
 
 class ReplyRoute implements Routes {
   public path = '/reply';
@@ -20,7 +27,10 @@ class ReplyRoute implements Routes {
   private initializeRoutes() {
     this.router.post(
       `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
+      [
+        passport.authenticate('jwt', { session: false }),
+        uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
+      ],
 
       validationMiddleware(ReplyDto, 'body'),
       this.replyController.addReply
@@ -31,7 +41,6 @@ class ReplyRoute implements Routes {
       this.replyController.getReplyById
     );
 
-
     this.router.get(
       `${this.path}`,
       passport.authenticate('jwt', { session: false }),
@@ -39,8 +48,10 @@ class ReplyRoute implements Routes {
     );
     this.router.put(
       `${this.path}/:reply_id`,
-
-      passport.authenticate('jwt', { session: false }),
+      [
+        passport.authenticate('jwt', { session: false }),
+        uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
+      ],
 
       validationMiddleware(ReplyDto, 'body'),
 
@@ -51,6 +62,12 @@ class ReplyRoute implements Routes {
       `${this.path}/:reply_id`,
       passport.authenticate('jwt', { session: false }),
       this.replyController.deleteReply
+    );
+    this.router
+    .post(`${this.path}/uploadFile/:type`,
+      passport.authenticate('jwt', { session: false }),
+      thumbnailUploadMiddleware,
+      this.replyController.uploadImage
     );
   }
 }

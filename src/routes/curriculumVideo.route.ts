@@ -4,7 +4,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CurriculumVideoController from '@/controllers/curriculumVideo.controller';
-import uploadFiles from '@/rest/fileUpload';
+import {uploadFiles} from '@/rest/fileUpload';
 import { CurriCulumVideoDto } from '@/dtos/curriculumVideo.dto';
 
 class CurriculumVideoRoute implements Routes {

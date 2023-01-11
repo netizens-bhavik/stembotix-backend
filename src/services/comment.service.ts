@@ -13,9 +13,9 @@ class CommentService {
 
 
   public async addComment(commentData): Promise<Comment> {
-const {thumbnail} = commentData.file
+const thumbnail = commentData.thumbnail
 
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+    const thumbnailPath = `${API_BASE}/media/${thumbnail
       .split('/')
       .splice(-2)
       .join('/')}`;
@@ -53,7 +53,6 @@ const {thumbnail} = commentData.file
     const commentData = await this.comment.findAndCountAll({
       where: { deleted_at: null },
     });
-    console.log("first",commentData)
     const data: (Comment | undefined)[] = await this.comment.findAll({
       where: DB.Sequelize.and(
         { deleted_at: null },
@@ -81,9 +80,9 @@ const {thumbnail} = commentData.file
   {  commentDetail,
     file}
   ): Promise<{ count: number; rows: Comment[] }> {
-const {thumbnail}= file
+const thumbnail= file
    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+      const thumbnailPath = `${API_BASE}/media/${thumbnail
         .split('/')
         .splice(-2)
         .join('/')}`;

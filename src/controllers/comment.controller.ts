@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { Comment } from '@/interfaces/comment.interface';
 import CommentService from '@/services/comment.service';
 
+
+
 class CommentController {
   public commentService = new CommentService();
 
@@ -11,15 +13,15 @@ class CommentController {
     next: NextFunction
   ) => {
     try {
-      const {comment,course_id}= req.body;
-      console.log("comment",comment)
-      const { id } = req.user;
-      const file =req.files
+      const {comment,course_id,thumbnail}= req.body;
+
+      const  user  = req.user;
+  
       const response: Comment = await this.commentService.addComment({
         comment,
         course_id,
-        user_id: id,
-        file
+        user,
+        thumbnail
       });
       res.status(200).send({response:response,message:"Comment added successfully"});
     } catch (error) {
@@ -96,5 +98,16 @@ class CommentController {
       next(error);
     }
   };
+  public uploadImage = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  )=>{
+    try{
+      res.status(200).send(req.file);
+    } catch (error){
+      next(error);
+    }
+  }
 }
-export default CommentController;
+export default CommentController

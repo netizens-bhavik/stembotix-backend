@@ -10,9 +10,9 @@ class ReplyService {
   public comment = DB.Comment;
 
   public async addReply(replyData): Promise<Reply> {
-    const { thumbnail } = replyData.file;
+    const  thumbnail  = replyData.thumbnail
 
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+    const thumbnailPath = `${API_BASE}/media/${thumbnail
       .split('/')
       .splice(-2)
       .join('/')}`;
