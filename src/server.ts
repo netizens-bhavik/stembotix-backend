@@ -32,7 +32,7 @@ try {
     new QuizQueRoute(),
     new CommentRoute(),
     new ReplyRoute()
-    new LikeDislikeRoute()
+    // new LikeDislikeRoute()
   ]);
   app.listen();
 } catch (error) {
