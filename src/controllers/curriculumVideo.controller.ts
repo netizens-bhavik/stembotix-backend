@@ -30,8 +30,9 @@ class CurriculumVideoController {
     res: Response,
     next: NextFunction
   ) => {
+    const { sectionId } = req.params;
     const response: CurriCulumVideo[] =
-      await this.curriculumVideoService.listVideos();
+      await this.curriculumVideoService.listVideos(sectionId);
     res.status(200).send(response);
   };
 

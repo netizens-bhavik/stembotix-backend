@@ -33,7 +33,7 @@ class CurriculumVideoRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/video`,
+      `${this.path}/:sectionId/video`,
       this.curriculumVideoController.listVideo
     );
 

@@ -45,14 +45,16 @@ class CurriculumVideoService {
     };
   }
 
-  public async listVideos(): Promise<CurriCulumVideo[]> {
+  public async listVideos(sectionId): Promise<CurriCulumVideo[]> {
     const data = await this.curriculumVideo.findAll({
+      where: { curriculum_id: sectionId },
       include: [
         {
           model: this.curriculumSection,
         },
       ],
     });
+
     return data;
   }
 

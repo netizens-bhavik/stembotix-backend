@@ -20,6 +20,13 @@ class CourseRoute implements Routes {
   private initializeRoutes() {
     // view all courses with pagination (without bearer)
     this.router.get(`${this.path}`, this.courseController.viewCourses);
+
+    // view all courses by admin with pagination (without bearer)
+    this.router.get(
+      `${this.path}/admin`,
+      this.courseController.viewCoursesAdmin
+    );
+
     // view own courses
     this.router.get(
       `${this.path}/list/`,

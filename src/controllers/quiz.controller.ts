@@ -28,6 +28,22 @@ class QuizController {
     }
   };
 
+  public getQuizBycurriculumId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { curriculumId } = req.params;
+      const response: Quiz = await this.quizService.getQuizBycurriculumId(
+        curriculumId
+      );
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   public getQuizById = async (
     req: Request,
     res: Response,
@@ -55,6 +71,22 @@ class QuizController {
       quizDetail['id'] = quizId;
 
       const update = await this.quizService.updateQuiz(quizDetail, trainer);
+      res.status(200).send(update);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public AnswerQuiz = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { quizId } = req.params;
+      const trainer = req.user;
+
+      const update = await this.quizService.AnswerQuiz(quizId, trainer);
       res.status(200).send(update);
     } catch (err) {
       next(err);

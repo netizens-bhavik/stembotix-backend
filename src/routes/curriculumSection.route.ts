@@ -25,6 +25,7 @@ class CurriculumSectionRoute implements Routes {
 
     this.router.get(
       `${this.path}/:courseId/section`,
+      passport.authenticate('jwt', { session: false }),
       this.curriculumSectionController.viewCurriculum
     );
 

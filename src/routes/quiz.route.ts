@@ -26,7 +26,12 @@ class QuizRoute implements Routes {
       this.quizController.createQuiz
     );
 
-    //get single quiz by id
+    //get single quiz by curriculumId
+    this.router.get(
+      `${this.path}/section/:curriculumId`,
+      this.quizController.getQuizBycurriculumId
+    );
+    //get single quiz by curriculumId
     this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
 
     //get all quiz
@@ -45,6 +50,12 @@ class QuizRoute implements Routes {
       validationMiddleware(UpdateQuizDto, 'body'),
 
       this.quizController.updateQuiz
+    );
+
+    this.router.get(
+      `${this.path}/answer/:quizId`,
+      passport.authenticate('jwt', { session: false }),
+      this.quizController.AnswerQuiz
     );
 
     //delete quiz

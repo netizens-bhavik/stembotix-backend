@@ -73,7 +73,6 @@ class QuizQueAnsController {
   ) => {
     try {
       const { quizQueId } = req.params;
-      console.log(quizQueId);
 
       const trainer = req.user;
 
