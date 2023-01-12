@@ -30,9 +30,23 @@ class CurriculumVideoController {
     res: Response,
     next: NextFunction
   ) => {
-    const response: CurriCulumVideo[] =
-      await this.curriculumVideoService.listVideos();
-    res.status(200).send(response);
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const { curriculum_id } = req.params;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      // console.log("first",queryObject)
+      const response: {
+        totalCount: number;
+        records: (CurriCulumVideo | undefined)[];
+      } = await this.curriculumVideoService.listVideos(
+        queryObject,
+        curriculum_id
+      );
+      // console.log("second",response)
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
   };
 
   public updateVideo = async (
@@ -76,5 +90,6 @@ class CurriculumVideoController {
       next(error);
     }
   };
+
 }
 export default CurriculumVideoController;

@@ -3,17 +3,10 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import CommentController from '@/controllers/comment.controller';
 import { ReplyDto } from '@dtos/reply.dto';
-import {uploadFiles,uploadImage} from '@/rest/fileUpload';
+import uploadFiles from '@/rest/fileUpload';
 import Replycontroller from '@/controllers/reply.controller';
-import uploadMiddleware from '@/middlewares/uploadMiddleware';
 
-
-
-const thumbnailUploadMiddleware = uploadMiddleware(
-  uploadImage.single('thumbnail')
-);
 
 class ReplyRoute implements Routes {
   public path = '/reply';
@@ -32,7 +25,6 @@ class ReplyRoute implements Routes {
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
       ],
 
-      validationMiddleware(ReplyDto, 'body'),
       this.replyController.addReply
     );
     this.router.get(
@@ -63,12 +55,7 @@ class ReplyRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.replyController.deleteReply
     );
-    this.router
-    .post(`${this.path}/uploadFile/:type`,
-      passport.authenticate('jwt', { session: false }),
-      thumbnailUploadMiddleware,
-      this.replyController.uploadImage
-    );
+
   }
 }
 export default ReplyRoute;

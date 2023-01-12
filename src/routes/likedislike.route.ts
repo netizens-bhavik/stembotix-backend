@@ -4,22 +4,21 @@ import { Routes } from '@/interfaces/routes.interface';
 import { Router } from 'express';
 import passport from 'passport';
 
+class LikeDislikeRoute implements Routes {
+  public path = '/likedislike';
+  public router = Router();
+  public passport = passportConfig(passport);
+  public likedislikeController = new LikeDislikeController();
 
-class LikeDislikeRoute implements Routes{
-    public path ='/likedislike';
-    public router=Router();
-    public passport = passportConfig(passport);
-public likedislikeController = new LikeDislikeController
-
-constructor() {
+  constructor() {
     this.initializeRoutes();
   }
   private initializeRoutes() {
-
-  this.router.post(
-    `${this.path}`,
-    passport.authenticate('jwt', { session: false }),
-    this.likedislikeController.addLike
-  );
+    this.router.post(
+      `${this.path}/:comment_id/like`,
+      passport.authenticate('jwt', { session: false }),
+      this.likedislikeController.addLike
+    );
   }
 }
+export default LikeDislikeRoute;

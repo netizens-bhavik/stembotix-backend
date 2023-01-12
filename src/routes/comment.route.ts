@@ -5,32 +5,26 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CommentController from '@/controllers/comment.controller';
 import { CommentDto } from '@/dtos/comment.dto';
-import { uploadFiles, uploadImage } from '@/rest/fileUpload';
-import uploadMiddleware from '@/middlewares/uploadMiddleware';
+import uploadFiles from '@/rest/fileUpload';
 
-
-  const thumbnailUploadMiddleware = uploadMiddleware(
-    uploadImage.single('thumbnail')
-  );
 
 class CommentRoute implements Routes {
   public path = '/comment';
   public router = Router();
-  public passport = passportConfig(passport);
   public commentController = new CommentController();
+  public passport = passportConfig(passport);
 
   constructor() {
     this.initializeRoutes();
   }
   private initializeRoutes() {
+
     this.router.post(
       `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
-      ],
-
-      validationMiddleware(CommentDto, 'body'),
+      ],  
       this.commentController.addComment
     );
     this.router.get(
@@ -60,12 +54,12 @@ class CommentRoute implements Routes {
       this.commentController.deleteComment
     );
 
-    this.router
-      .post(`${this.path}/uploadFile/:type`,
-        passport.authenticate('jwt', { session: false }),
-        thumbnailUploadMiddleware,
-        this.commentController.uploadImage
-      );
+    // this.router
+    //   .post(`${this.path}/uploadFile/:type`,
+    //     passport.authenticate('jwt', { session: false }),
+    //     thumbnailUploadMiddleware,
+    //     this.commentController.uploadImage
+    //   );
   }
 }
 export default CommentRoute;

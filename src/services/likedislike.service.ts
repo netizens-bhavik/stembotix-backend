@@ -6,9 +6,9 @@ class LikeDislikeService {
     public user = DB.User
     public likedislike = DB.LikeDislike
 
-    public async addLikedislike(likeDislikeDetails): Promise<LikeDislike> {
+    public async addLikeDislike(likeDislikeDetails): Promise<LikeDislike> {
         const newLike = await this.likedislike.create({
-            ...likeDislikeDetails
+            likeDislikeDetails
         })
         return newLike
     }

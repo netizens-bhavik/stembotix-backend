@@ -1,5 +1,3 @@
-import { NUMBER } from "sequelize";
-
 module.exports = (sequelize, Sequelize) => {
   const Reply = sequelize.define(
     'Reply',
@@ -16,12 +14,6 @@ module.exports = (sequelize, Sequelize) => {
       thumbnail: {
         type: Sequelize.STRING,
       },
-      like:{
-        type:Sequelize.INTEGER
-      },
-      dislike:{
-        type:Sequelize.INTEGER
-      }
     },
     { paranoid: true }
   );
@@ -31,10 +23,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Reply.belongsTo(models.User, {
-      foreignKey: 'user_id',
+      foreignKey: 'userId',
       targetKey: 'id',
     });
-
+    Reply.hasMany(models.Comment)
   };
   return Reply;
 };

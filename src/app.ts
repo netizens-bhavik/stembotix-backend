@@ -110,7 +110,7 @@ class App {
           title: 'Stembotix API',
           version: '1.0.0',
           description:
-            'Base URL: \n1. https://192.16829.240:3000/api \n2. https://192.168.29.240:3000/api',
+            'Base URL: \n1. https://192.168.1.101:3000/api \n2. https://192.168.1.101:3000/api',
         },
       },
       apis: ['swagger.yaml'],

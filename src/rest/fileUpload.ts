@@ -41,20 +41,20 @@ export const uploadFiles = multer({
     cb(undefined, true);
   },
 });
-export const uploadImage = multer({
-  storage: fileStorage,
-  limits: {
-    fileSize: 5000000, // Up to 5 MB
-  },
-  fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
-      // upload only png and jpg format
-      return cb(new Error('Please upload jpg or png file'));
-    }
-    // return cb('Please upload a Image');
-    return cb(undefined, true);
-  },
-});
+// export const uploadImage = multer({
+//   storage: fileStorage,
+//   limits: {
+//     fileSize: 5000000, // Up to 5 MB
+//   },
+//   fileFilter(req, file, cb) {
+//     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
+//       // upload only png and jpg format
+//       return cb(new Error('Please upload jpg or png file'));
+//     }
+//     // return cb('Please upload a Image');
+//     return cb(undefined, true);
+//   },
+// });
 
-module.exports = { uploadFiles, uploadImage };
-// export default uploadFiles
+// module.exports = uploadFiles;
+export default uploadFiles

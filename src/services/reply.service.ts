@@ -9,17 +9,17 @@ class ReplyService {
   public trainer = DB.Trainer;
   public comment = DB.Comment;
 
-  public async addReply(replyData): Promise<Reply> {
-    const  thumbnail  = replyData.thumbnail
+  public async addReply({replyDetail,file,user}): Promise<Reply> {
+    const  thumbnail  = file
 
-    const thumbnailPath = `${API_BASE}/media/${thumbnail
+    const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
     const newReply = await this.reply.create({
-      reply: replyData.reply.trim(),
-      user_id: replyData.user_id,
-      CommentId: replyData.comment_id,
+     reply:replyDetail.reply.trim(),
+     CommentId:replyDetail.comment_id,
+     userId:user.id,
       thumbnail: thumbnailPath,
     });
     return newReply;
@@ -75,9 +75,9 @@ class ReplyService {
     replyDetail,
     file
   ): Promise<{ count: number; rows: Reply[] }> {
-    const { thumbnail } = file;
+    const  thumbnail  = file;
     if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+      const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
         .splice(-2)
         .join('/')}`;

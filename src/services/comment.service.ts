@@ -1,5 +1,6 @@
 import courseData from '@/boot/data/course';
 import { API_BASE } from '@/config';
+import { HttpException } from '@/exceptions/HttpException';
 import { Comment } from '@/interfaces/comment.interface';
 import { isEmpty } from '@/utils/util';
 import DB from '@databases';
@@ -7,28 +8,25 @@ import DB from '@databases';
 class CommentService {
   public comment = DB.Comment;
   public trainer = DB.Trainer;
-  public reply = DB.Reply
-  public user =DB.User
-  public course = DB.Course
+  public reply = DB.Reply;
+  public user = DB.User;
+  public course = DB.Course;
 
+  public async addComment({ comentDetail, user, file }): Promise<Comment> {
+    const thumbnail = file;
 
-  public async addComment(commentData): Promise<Comment> {
-const thumbnail = commentData.thumbnail
-
-    const thumbnailPath = `${API_BASE}/media/${thumbnail
+    const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
       .split('/')
       .splice(-2)
       .join('/')}`;
     const newComment = await this.comment.create({
-      comment: commentData.comment.trim(),
-      user_id: commentData.user_id,
-      course_id: commentData.course_id,
+      comment: comentDetail.comment.trim(),
+      course_id: comentDetail.course_id,
+      userId: user.id,
       thumbnail: thumbnailPath,
     });
     return newComment;
   }
-
-  
 
   public async getCommentById(comment_id: string): Promise<Comment> {
     const response: Comment = await this.comment.findOne({
@@ -68,27 +66,26 @@ const thumbnail = commentData.thumbnail
         {
           model: this.reply,
         },
-        
       ],
 
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    console.log("second",data)
+    // console.log('second', data);
     return { totalCount: commentData.count, records: data };
   }
-  public async updateComment(
-  {  commentDetail,
-    file}
-  ): Promise<{ count: number; rows: Comment[] }> {
-const thumbnail= file
-   if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail
+  public async updateComment({
+    commentDetail,
+    file,
+  }): Promise<{ count: number; rows: Comment[] }> {
+    const thumbnail = file;
+    if (thumbnail) {
+      const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
         .splice(-2)
         .join('/')}`;
-        commentDetail.thumbnail = thumbnailPath;
+      commentDetail.thumbnail = thumbnailPath;
     }
 
     const updateComment = await this.comment.update(
@@ -110,7 +107,6 @@ const thumbnail= file
     comment_id,
     trainer,
   }): Promise<{ count: number; row: Comment[] }> {
-
     const res: number = await this.comment.destroy({
       where: {
         id: comment_id,
@@ -118,7 +114,5 @@ const thumbnail= file
     });
     return { count: res[0], row: res[1] };
   }
-
-
 }
 export default CommentService;

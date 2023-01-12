@@ -9,6 +9,7 @@ import CourseRoute from './routes/courses.route';
 import CurriculumSectionRoute from './routes/curriculumSection.route';
 import CurriculumVideoRoute from './routes/curriculumVideo.route';
 import FileUploadRoute from './routes/fileUploads.route';
+import LikeDislikeRoute from './routes/likedislike.route';
 import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 import QuizRoute from './routes/quiz.route';
@@ -31,8 +32,8 @@ try {
     new QuizRoute(),
     new QuizQueRoute(),
     new CommentRoute(),
-    new ReplyRoute()
-    // new LikeDislikeRoute()
+    new ReplyRoute(),
+    new LikeDislikeRoute()
   ]);
   app.listen();
 } catch (error) {

@@ -34,6 +34,7 @@ class CourseController {
   ) => {
     try {
       const courseDetails: Request = req.body;
+      // console.log("first",req.body)
       const trainer = req.user;
       const file = req.files;
       const response: Course = await this.courseService.addCourse({
@@ -41,6 +42,7 @@ class CourseController {
         file,
         user: trainer,
       });
+      // console.log("first",response)
       res.status(200).send(response);
     } catch (error) {
       next(error);

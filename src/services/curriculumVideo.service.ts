@@ -45,15 +45,42 @@ class CurriculumVideoService {
     };
   }
 
-  public async listVideos(): Promise<CurriCulumVideo[]> {
-    const data = await this.curriculumVideo.findAll({
+  public async listVideos(
+    queryObject,
+    curriculum_id
+  ): Promise<{totalCount:number; records:(CurriCulumVideo | undefined)[]}> {
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const videoData = await this.curriculumVideo.findAndCountAll({
+      where: { curriculum_id: curriculum_id },
+    });
+    const data:(CurriCulumVideo|undefined)[] = await this.curriculumVideo.findAll({
+      where:DB.Sequelize.and(
+        {curriculum_id: curriculum_id },
+        {
+          title: {
+            [searchCondition]: search,
+          },
+        }
+      ),
       include: [
         {
           model: this.curriculumSection,
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
-    return data;
+    return { totalCount: videoData.count, records: data };
   }
 
   public async updatevideo({

@@ -28,9 +28,16 @@ class CurriculumSectionController {
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const { courseId } = req.params;
-      const response: CurriculumSection[] =
-        await this.curriculumSectionService.viewSection(courseId);
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: {
+        totalCount: number;
+        records: (CurriculumSection | undefined)[];
+      } = await this.curriculumSectionService.viewSection(
+        queryObject,
+        courseId
+      );
       res.status(200).send(response);
     } catch (error) {
       next(error);
