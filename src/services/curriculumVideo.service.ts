@@ -9,7 +9,7 @@ class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
   public curriculumSection = DB.CurriculumSection;
   public isTrainer(user): boolean {
-    return user.role === 'trainer';
+    return user.role === 'trainer' || user.role === 'admin';
   }
   public async addVideo({
     curriculumVideoDetails,
@@ -45,17 +45,43 @@ class CurriculumVideoService {
     };
   }
 
-  public async listVideos(sectionId): Promise<CurriCulumVideo[]> {
-    const data = await this.curriculumVideo.findAll({
-      where: { curriculum_id: sectionId },
-      include: [
-        {
-          model: this.curriculumSection,
-        },
-      ],
-    });
+  public async listVideos(
+    queryObject,
+    sectionId
+  ): Promise<{ totalCount: number; records: (CurriCulumVideo | undefined)[] }> {
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
 
-    return data;
+    const videoData = await this.curriculumVideo.findAndCountAll({
+      where: { curriculum_id: sectionId },
+    });
+    const data: (CurriCulumVideo | undefined)[] =
+      await this.curriculumVideo.findAll({
+        where: DB.Sequelize.and(
+          { curriculum_id: sectionId },
+          {
+            title: {
+              [searchCondition]: search,
+            },
+          }
+        ),
+        include: [
+          {
+            model: this.curriculumSection,
+          },
+        ],
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
+    return { totalCount: videoData.count, records: data };
   }
 
   public async updatevideo({

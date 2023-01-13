@@ -31,7 +31,7 @@ class QuizRoute implements Routes {
       `${this.path}/section/:curriculumId`,
       this.quizController.getQuizBycurriculumId
     );
-    //get single quiz by curriculumId
+    //get single quiz by quizId
     this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
 
     //get all quiz
