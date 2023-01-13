@@ -43,7 +43,7 @@ class App {
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
     } catch (err) {
-     return err;
+      return err;
     }
   }
   public getCredentials() {
@@ -64,12 +64,12 @@ class App {
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });
-    this.httpsServer.listen(5001, () => {
-      logger.info(`==========================================`);
-      logger.info(`============ ENV: ${this.env} ============`);
-      logger.info(`🚀 App listening securely on the port 5001`);
-      logger.info(`==========================================`);
-    });
+    // this.httpsServer.listen(5001, () => {
+    //   logger.info(`==========================================`);
+    //   logger.info(`============ ENV: ${this.env} ============`);
+    //   logger.info(`🚀 App listening securely on the port 5001`);
+    //   logger.info(`==========================================`);
+    // });
   }
 
   public getServer() {
@@ -77,7 +77,9 @@ class App {
   }
 
   private connectToDatabase() {
-    DB.sequelize.sync({ force: false }).catch((err) => {return (err)});
+    DB.sequelize.sync({ force: false }).catch((err) => {
+      return err;
+    });
   }
 
   private initializeMiddlewares() {
@@ -118,7 +120,7 @@ class App {
       const specs = swaggerJSDoc(options);
       this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
     } catch (err) {
-     return err;
+      return err;
     }
   }
 
