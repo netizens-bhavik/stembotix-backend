@@ -2,7 +2,6 @@ import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-;
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -48,7 +47,6 @@ class QuizService {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
 
-
     const updateQuiz = await this.quiz.update(
       {
         ...quizDetail,
@@ -64,11 +62,9 @@ class QuizService {
     return { count: updateQuiz[0], rows: updateQuiz[1] };
   }
 
-  public async deleteQuiz({
-    quizId,
-    trainer,
-  }): Promise<{ count: number }> {
-    if (!this.isTrainer(trainer)) throw new HttpException(401, 'Forbidden Resource');
+  public async deleteQuiz({ quizId, trainer }): Promise<{ count: number }> {
+    if (!this.isTrainer(trainer))
+      throw new HttpException(401, 'Forbidden Resource');
 
     const res: number = await this.quiz.destroy({
       where: {
@@ -77,7 +73,6 @@ class QuizService {
     });
     return { count: res };
   }
-
 
   public async viewQuiz(
     queryObject

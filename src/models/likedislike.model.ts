@@ -2,7 +2,11 @@ module.exports = (sequelize, Sequelize) => {
   const LikeDislike = sequelize.define(
     'LikeDislike',
     {
-
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+      },
     },
 
     { paranoid: true }
@@ -17,5 +21,5 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
   };
-  return LikeDislike
+  return LikeDislike;
 };
