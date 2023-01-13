@@ -10,5 +10,5 @@ export class QuizDto {
 
 export class UpdateQuizDto {
   @IsString()
-  title: string;
+  public title: string;
 }
