@@ -64,12 +64,6 @@ class App {
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });
-    // this.httpsServer.listen(5001, () => {
-    //   logger.info(`==========================================`);
-    //   logger.info(`============ ENV: ${this.env} ============`);
-    //   logger.info(`🚀 App listening securely on the port 5001`);
-    //   logger.info(`==========================================`);
-    // });
   }
 
   public getServer() {
