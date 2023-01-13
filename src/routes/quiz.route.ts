@@ -44,9 +44,7 @@ class QuizRoute implements Routes {
     //update quiz
     this.router.put(
       `${this.path}/:quizId`,
-
       passport.authenticate('jwt', { session: false }),
-
       validationMiddleware(UpdateQuizDto, 'body'),
 
       this.quizController.updateQuiz
