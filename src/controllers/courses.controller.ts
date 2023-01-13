@@ -27,6 +27,28 @@ class CourseController {
       next(error);
     }
   };
+  public viewCoursesAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const coursesData: {
+        totalCount: number;
+        records: (Course | undefined)[];
+      } = await this.courseService.viewCoursesAdmin({
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+      });
+      res.status(200).send(coursesData);
+    } catch (error) {
+      next(error);
+    }
+  };
   public addCourse = async (
     req: Request,
     res: Response,
@@ -39,7 +61,7 @@ class CourseController {
       const response: Course = await this.courseService.addCourse({
         courseDetails,
         file,
-        trainer,
+        user: trainer,
       });
       res.status(200).send(response);
     } catch (error) {

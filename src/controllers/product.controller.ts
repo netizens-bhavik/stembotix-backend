@@ -28,6 +28,29 @@ class ProductController {
     }
   };
 
+  public viewCoursesAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const coursesData: {
+        totalCount: number;
+        records: (Product | undefined)[];
+      } = await this.productService.viewProductsAdmin({
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+      });
+      res.status(200).send(coursesData);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public listProduct = async (
     req: Request,
     res: Response,
