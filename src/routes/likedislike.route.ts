@@ -15,7 +15,7 @@ class LikeDislikeRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/:comment_id/like`,
+      `${this.path}/:comment_id`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.addLike
     );

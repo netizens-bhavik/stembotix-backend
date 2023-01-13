@@ -91,7 +91,7 @@ class Replycontroller {
             reply_id,
             trainer
           });
-          res.sendStatus(200).send(response);
+          res.status(200).send(response);
         } catch (error) {
           next(error);
         }

@@ -1,4 +1,4 @@
 export interface LikeDislike {
-    like: boolean
-    dislike: boolean
+  like: number;
+  dislike: number;
 }

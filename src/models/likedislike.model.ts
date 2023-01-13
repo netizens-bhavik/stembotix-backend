@@ -2,12 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   const LikeDislike = sequelize.define(
     'LikeDislike',
     {
-      like: {
-        type: Sequelize.BOOLEAN,
-      },
-      dislike: {
-        type: Sequelize.BOOLEAN,
-      },
+
     },
 
     { paranoid: true }

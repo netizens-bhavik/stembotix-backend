@@ -73,7 +73,7 @@ class CommentController {
     try {
       const { comment_id } = req.params;
       const commentDetail = req.body;
-      console.log("pppp",req.body)
+      // console.log("pppp",req.body)
       const file = req.files;
       commentDetail['id'] = comment_id;
 
@@ -101,7 +101,7 @@ class CommentController {
           comment_id,
           trainer,
         });
-      res.sendStatus(200).send(response);
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }

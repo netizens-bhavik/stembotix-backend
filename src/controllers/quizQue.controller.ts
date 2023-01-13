@@ -76,7 +76,7 @@ class QuizQueAnsController {
           quizQueId,
           trainer
         });
-      res.sendStatus(200).send(response);
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }

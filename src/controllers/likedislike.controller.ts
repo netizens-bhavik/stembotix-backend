@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { LikeDislike } from '@/interfaces/likedislike.interface';
 import LikeDislikeService from '@/services/likedislike.service';
 import DB from '@/databases';
-import { timeStamp } from 'console';
 
 class LikeDislikeController {
   public likeDislikeService = new LikeDislikeService();
@@ -13,30 +11,17 @@ class LikeDislikeController {
   public addLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
-      const { comment_id } = req.params;
-      const record = await this.likedislike.findOne({
-        where: {
-          comment_id: comment_id,
-        },
-        include: [
-          {
-            model: this.user,
-          },
-        ],
+      const response = this.likeDislikeService.addLikeDislike({
+        comment_id: req.params.comment_id,
+        user: user,
+        isLike: req.body.isLike,
       });
-      if (!record) {
-        const newlikeDislike = await this.likeDislikeService.addLikeDislike;
-        ({
-          comment_id: req.params.id,
-          user_id: user,
-        });
-        return res.json(newlikeDislike);
-      } else {
-        await this.likedislike.destroy();
-        return res.send();
-      }
+      res.status(200).send(response); 
     } catch (error) {
+      next(error);
     }
   };
+
+  public getLIkeDislike
 }
 export default LikeDislikeController;
