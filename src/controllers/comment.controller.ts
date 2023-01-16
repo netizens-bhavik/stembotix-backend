@@ -13,20 +13,21 @@ class CommentController {
     next: NextFunction
   ) => {
     try {
-      const comentDetail= req.body;
-      const  user  = req.user;
-      const file =req.files;
+      const comentDetail = req.body;
+      const user = req.user;
+      const file = req.files;
       const response: Comment = await this.commentService.addComment({
         comentDetail,
         user: user,
-        file
+        file,
       });
-      res.status(200).send({response:response,message:"Comment added successfully"});
+      res
+        .status(200)
+        .send({ response: response, message: 'Comment added successfully' });
     } catch (error) {
       next(error);
     }
   };
-
 
   public getCommentById = async (
     req: Request,
@@ -81,7 +82,9 @@ class CommentController {
         commentDetail,
         file,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Comment update successfully' });
     } catch (err) {
       next(err);
     }
@@ -101,22 +104,12 @@ class CommentController {
           comment_id,
           trainer,
         });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Comment deleted successfully' });
     } catch (error) {
       next(error);
     }
   };
-
-  // public uploadImage = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     res.status(200).send(req.file);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
 }
 export default CommentController;

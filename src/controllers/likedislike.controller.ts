@@ -12,30 +12,29 @@ class LikeDislikeController {
   public addLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
-      const response = this.likeDislikeService.addLikeDislike({
+      const response = await this.likeDislikeService.addLikeDislike({
         comment_id: req.params.comment_id,
         user: user,
       });
-      res.status(200).send(response); 
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }
   };
 
- public listLike = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public listLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {comment_id} = req.params
+      const { comment_id } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: { totalCount: number; likes: (LikeDislike | undefined)[] } =
-        await this.likeDislikeService.viewLike(queryObject,comment_id);
+      const response: {
+        totalCount: number;
+        likes: (LikeDislike | undefined)[];
+      } = await this.likeDislikeService.viewLike(queryObject, comment_id);
       res.status(200).send(response);
     } catch (error) {
       next(error);
     }
-  };}
+  };
+}
 export default LikeDislikeController;

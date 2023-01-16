@@ -12,7 +12,7 @@ class CourseService {
   public coursesTrainers = DB.CoursesTrainers;
 
   public isTrainer(user): boolean {
-     return user.role === 'trainer'|| user.role === 'admin';
+    return user.role === 'trainer' || user.role === 'admin';
   }
   public async viewCourses(
     queryObject
@@ -27,7 +27,7 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-      
+
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -47,7 +47,7 @@ class CourseService {
             {
               model: this.user,
             },
-          ],  
+          ],
         },
       ],
 
@@ -234,7 +234,6 @@ class CourseService {
           where: {
             trainer_id: trainerRecord.trainer_id,
           },
-
         },
       ],
     });

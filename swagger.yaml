@@ -11,6 +11,8 @@ tags:
     description: Products API
   - name: cart
     description: Handle cart and cartitems of User
+  - name: order
+    description: Order items
 servers:
   - url: 'http://192.168.1.106:5000/api/'
 
@@ -809,7 +811,7 @@ paths:
     post:
       tags:
         - cart
-      summary: Adds a product to cart
+      summary: Adds a course to cart
       responses:
         200:
           description: 'OK'
@@ -883,6 +885,62 @@ paths:
                   message:
                     type: string
                     example: Cart Item removed successfully.
+        500:
+          description: 'Server Error'
+
+  # Order Endpoints
+  /order:
+    get:
+      tags:
+        - order
+      summary: View Order items
+      responses:
+      200:
+        description: 'OK'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      500:
+        description: 'Server Error'
+  /order/create-order:
+    post:
+      tags:
+        - order
+      summary:
+      responses:
+        200:
+          description: 'OK'
+          content:  
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order item's successfully.
+                  data:
+                    $ref: '#/components/schemas/Order'
+        500:
+          description: 'Server Error'
+  /order/verify-order:
+    post:
+      tags:
+        - order
+      summary:
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order verified Successfully.
+                  data:
+                    $ref: '#/components/schemas/Order'
         500:
           description: 'Server Error'
 

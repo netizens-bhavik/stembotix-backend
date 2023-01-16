@@ -22,7 +22,7 @@ class QuizQueAnsController {
         quizQueAnsData2,
         trainer
       );
-      res.status(200).send(response);
+      res.status(200).send({response:response,message:"Question Added Successfully"});
     } catch (err) {
       next(err);
     }
@@ -57,7 +57,7 @@ class QuizQueAnsController {
         quizQueAnsDetail,
         trainer
       );
-      res.status(200).send(update);
+      res.status(200).send({response:update,message:"Question Update Successfully"});
     } catch (err) {
       next(err);
     }
@@ -76,7 +76,7 @@ class QuizQueAnsController {
           quizQueId,
           trainer
         });
-      res.status(200).send(response);
+      res.status(200).send({response:response,message:"Question deleted Successfully"});
     } catch (error) {
       next(error);
     }

@@ -72,7 +72,7 @@ class Replycontroller {
             replyDetail,
             file
         );
-          res.status(200).send(response);
+          res.status(200).send({response:response,message:"Reply update Successfully"});
         } catch (err) {
           next(err);
         }
@@ -91,7 +91,7 @@ class Replycontroller {
             reply_id,
             trainer
           });
-          res.status(200).send(response);
+          res.status(200).send({response:response,message:"Reply deleted Successfully"});
         } catch (error) {
           next(error);
         }

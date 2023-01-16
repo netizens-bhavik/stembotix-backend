@@ -1,43 +1,31 @@
 import DB from '@databases';
 import { LikeDislike } from '@/interfaces/likedislike.interface';
 
+export type LikeDislikeType = {
+  record: LikeDislike;
+  message: string;
+};
+
 class LikeDislikeService {
   public comment = DB.Comment;
   public user = DB.User;
   public likedislike = DB.LikeDislike;
 
-  public async addLikeDislike(likeDislikeDetails): Promise<LikeDislike> {
-    const like = await this.likedislike.findOrCreate({
+  public async addLikeDislike(likeDislikeDetails): Promise<LikeDislikeType> {
+    let message = 'Like Successfuly';
+    const [record, isCreated] = await this.likedislike.findOrCreate({
       where: {
         comment_id: likeDislikeDetails.comment_id,
         user_id: likeDislikeDetails.user.id,
       },
     });
-    return like;
-
-    // } else {
-    //   await this.likedislike.destroy({
-    //     where: { comment_id: likeDislikeDetails.comment_id },
-    //   });
-    //     // const result =await this.likedislike.findAll({
-    //     //     where:{
-    //     //         comment_id:likeDislikeDetails.comment_id,
-    //     //         like: true
-    //     //     }
-    //     // })
-    //     const isLike = likeDislikeDetails.isLike;
-    //     try {
-    //       const newLike = await this.likedislike.create({
-    //         comment_id: likeDislikeDetails.comment_id,
-    //         user_id: likeDislikeDetails.user.id,
-    //         like: isLike,
-    //         dislike: !isLike,
-    //       });
-
-    //       return newLike;
-    //     } catch (err) {
-    //       console.log(err);
-    //     }
+    if (!isCreated) {
+      await this.likedislike.destroy({
+        where: { comment_id: likeDislikeDetails.comment_id },
+      });
+      message = 'Dislike Successfuly';
+    }
+    return { record, message };
   }
   public async viewLike(
     queryObject,

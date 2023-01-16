@@ -51,7 +51,7 @@ class AuthRoute implements Routes {
     this.router.post(
       `${this.path}/admin-login`,
       passport.authenticate('jwt', { session: false }),
-      this.authController.loginAdmin
+      this.authController.  loginAdmin
     );
     this.router.post(
       `${this.path}/forgot-password`,
