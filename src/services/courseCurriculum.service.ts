@@ -14,12 +14,14 @@ class CurriculumSectionService {
   public user = DB.User;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer';
+    return user.role === 'trainer' || user.role === 'admin';
   }
 
   public async addSection({
     curriculumDetails,
   }): Promise<CurriculumSection | Course> {
+    console.log(curriculumDetails);
+
     const response: Course = await this.course.findOne({
       where: {
         id: curriculumDetails.course_id,
@@ -52,10 +54,10 @@ class CurriculumSectionService {
   public async viewSection(
     queryObject,
     courseId
-  
-
-    ): Promise<{totalCount: number;records:(CurriculumSection| undefined)[]}> {
-    
+  ): Promise<{
+    totalCount: number;
+    records: (CurriculumSection | undefined)[];
+  }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
@@ -69,30 +71,28 @@ class CurriculumSectionService {
     const sectionData = await this.curriculumSection.findAndCountAll({
       where: { course_id: courseId },
     });
-    const data: (CurriculumSection | undefined)[] = await this.curriculumSection.findAll({
-      where: DB.Sequelize.and(
-        { course_id: courseId },
-        {
-          title: {
-            [searchCondition]: search,
+    const data: (CurriculumSection | undefined)[] =
+      await this.curriculumSection.findAll({
+        where: DB.Sequelize.and(
+          { course_id: courseId },
+          {
+            title: {
+              [searchCondition]: search,
+            },
+          }
+        ),
+        include: [
+          {
+            model: this.curriculumVideo,
           },
-        }
-      ),
-      include: [
-        {
-          model: this.curriculumVideo,
-        },
-        
-      ],
+        ],
 
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
-    });
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
     return { totalCount: sectionData.count, records: data };
   }
-
-
   public async updateSection({
     curriculumDetails,
     trainer,
@@ -112,6 +112,8 @@ class CurriculumSectionService {
         returning: true,
       }
     );
+    console.log('first', updateSection);
+
     return { count: updateSection[0], rows: updateSection[1] };
   }
 

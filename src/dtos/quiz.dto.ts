@@ -7,3 +7,8 @@ export class QuizDto {
   @IsString()
   curriculum_id: string;
 }
+
+export class UpdateQuizDto {
+  @IsString()
+  public title: string;
+}

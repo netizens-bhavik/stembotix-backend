@@ -3,13 +3,14 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import { CurriculumSectionDto } from '@/dtos/curriculumSection.dto';
-import CurriculumSectionController from '@/controllers/courseCurriculum.controller';
+import QuizController from '@/controllers/quiz.controller';
+import { QuizDto } from '@/dtos/quiz.dto';
+import { QuizQueDto } from '@/dtos/quizQue.dto';
 
-class CurriculumSectionRoute implements Routes {
-  public path = '/courses';
+class QuizRoute implements Routes {
+  public path = '/quiz';
   public router = Router();
-  public curriculumSectionController = new CurriculumSectionController();
+  public quizController = new QuizController();
   public passport = passportConfig(passport);
 
   constructor() {
@@ -18,28 +19,40 @@ class CurriculumSectionRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/section`,
+      `${this.path}`,
       passport.authenticate('jwt', { session: false }),
-      this.curriculumSectionController.addCurriculum
+      validationMiddleware(QuizDto, 'body'),
+      this.quizController.createQuiz
     );
 
+    this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
+
+
     this.router.get(
-      `${this.path}/:courseId/section`,
+      `${this.path}`,
       passport.authenticate('jwt', { session: false }),
-      this.curriculumSectionController.viewCurriculum
+      this.quizController.viewQuiz
     );
 
     this.router.put(
-      `${this.path}/section/:curriculumId`,
+      `${this.path}/:quizId`,
+
       passport.authenticate('jwt', { session: false }),
-      this.curriculumSectionController.updateCurriculum
+
+      validationMiddleware(QuizDto, 'body'),
+
+      this.quizController.updateQuiz
     );
 
+
+
     this.router.delete(
-      `${this.path}/section/:curriculumId`,
+      `${this.path}/:quizId`,
       passport.authenticate('jwt', { session: false }),
-      this.curriculumSectionController.deleteCurriculum
+      this.quizController.deleteQuiz
     );
+
   }
 }
-export default CurriculumSectionRoute;
+
+export default QuizRoute;

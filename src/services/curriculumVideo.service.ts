@@ -9,7 +9,7 @@ class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
   public curriculumSection = DB.CurriculumSection;
   public isTrainer(user): boolean {
-    return user.role === 'trainer';
+    return user.role === 'trainer' || user.role === 'admin';
   }
   public async addVideo({
     curriculumVideoDetails,
@@ -28,7 +28,7 @@ class CurriculumVideoService {
     if (!fetchSection) {
       throw new HttpException(403, 'No section found');
     }
-    const filePath = `${API_SECURE_BASE}/media/${file.path
+    const filePath = `${API_BASE}/media/${file.path
       .split('/')
       .splice(-2)
       .join('/')}`;
@@ -47,8 +47,8 @@ class CurriculumVideoService {
 
   public async listVideos(
     queryObject,
-    curriculum_id
-  ): Promise<{totalCount:number; records:(CurriCulumVideo | undefined)[]}> {
+    sectionId
+  ): Promise<{ totalCount: number; records: (CurriCulumVideo | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
@@ -60,26 +60,27 @@ class CurriculumVideoService {
       : ['', DB.Sequelize.Op.ne];
 
     const videoData = await this.curriculumVideo.findAndCountAll({
-      where: { curriculum_id: curriculum_id },
+      where: { curriculum_id: sectionId },
     });
-    const data:(CurriCulumVideo|undefined)[] = await this.curriculumVideo.findAll({
-      where:DB.Sequelize.and(
-        {curriculum_id: curriculum_id },
-        {
-          title: {
-            [searchCondition]: search,
+    const data: (CurriCulumVideo | undefined)[] =
+      await this.curriculumVideo.findAll({
+        where: DB.Sequelize.and(
+          { curriculum_id: sectionId },
+          {
+            title: {
+              [searchCondition]: search,
+            },
+          }
+        ),
+        include: [
+          {
+            model: this.curriculumSection,
           },
-        }
-      ),
-      include: [
-        {
-          model: this.curriculumSection,
-        },
-      ],
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
-    });
+        ],
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
     return { totalCount: videoData.count, records: data };
   }
 

@@ -19,6 +19,7 @@ class QuizQueRoute implements Routes {
   }
 
   private initializeRoutes() {
+    //create question and answer
     this.router.post(
       `${this.path}/que-ans`,
       passport.authenticate('jwt', { session: false }),
@@ -26,10 +27,13 @@ class QuizQueRoute implements Routes {
       this.quizQueAnsController.createQuizQueAns
     );
 
+    //get a single quetion-answer by id
     this.router.get(
       `${this.path}/que-ans/:quizQueId`,
       this.quizQueAnsController.getQuizQueAnsById
     );
+
+    //update quetion-answer
     this.router.put(
       `${this.path}/que-ans/:quizQueId`,
 
@@ -39,6 +43,8 @@ class QuizQueRoute implements Routes {
 
       this.quizQueAnsController.updateQuizQueAns
     );
+
+    //delete quetion-answer
     this.router.delete(
       `${this.path}/que-ans/:quizQueId`,
       passport.authenticate('jwt', { session: false }),
@@ -47,4 +53,4 @@ class QuizQueRoute implements Routes {
   }
 }
 
-export default QuizQueRoute
+export default QuizQueRoute;

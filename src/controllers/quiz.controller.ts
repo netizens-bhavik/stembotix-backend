@@ -4,7 +4,6 @@ import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
 import QuizService from '@/services/quiz.service';
 
-
 class QuizController {
   public quizService = new QuizService();
   public user = DB.User;
@@ -29,6 +28,21 @@ class QuizController {
     }
   };
 
+  public getQuizBycurriculumId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { curriculumId } = req.params;
+      const response: Quiz = await this.quizService.getQuizBycurriculumId(
+        curriculumId
+      );
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
 
   public getQuizById = async (
     req: Request,
@@ -43,7 +57,6 @@ class QuizController {
       next(err);
     }
   };
-
 
   public updateQuiz = async (
     req: Request,
@@ -64,6 +77,21 @@ class QuizController {
     }
   };
 
+  public AnswerQuiz = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { quizId } = req.params;
+      const trainer = req.user;
+
+      const update = await this.quizService.AnswerQuiz(quizId, trainer);
+      res.status(200).send(update);
+    } catch (err) {
+      next(err);
+    }
+  };
 
   public deleteQuiz = async (
     req: Request,
@@ -87,11 +115,15 @@ class QuizController {
 
   public viewQuiz = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Quiz | undefined)[] } =
-        await this.quizService.viewQuiz({ search, pageRecord, pageNo, sortBy, order});
+        await this.quizService.viewQuiz({
+          search,
+          pageRecord,
+          pageNo,
+          sortBy,
+          order,
+        });
       res.status(200).send(response);
     } catch (error) {
       next(error);

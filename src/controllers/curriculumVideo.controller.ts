@@ -32,17 +32,15 @@ class CurriculumVideoController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const { curriculum_id } = req.params;
+      const { sectionId } = req.params;
+      console.log(req.params);
+
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      // console.log("first",queryObject)
       const response: {
         totalCount: number;
         records: (CurriCulumVideo | undefined)[];
-      } = await this.curriculumVideoService.listVideos(
-        queryObject,
-        curriculum_id
-      );
-      // console.log("second",response)
+      } = await this.curriculumVideoService.listVideos(queryObject, sectionId);
+      console.log('second', response);
       res.status(200).send(response);
     } catch (error) {
       next(error);

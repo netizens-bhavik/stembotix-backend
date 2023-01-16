@@ -130,7 +130,6 @@ class AuthController {
   ) => {
     try {
       const data: User = req.user;
-      console.log("=----------------------------=====",req.user)
 
       const adminData = await this.tokenService.createUserToken(data);
       res.status(200).send(adminData);

@@ -22,7 +22,7 @@ class QuizQueAnsController {
         quizQueAnsData2,
         trainer
       );
-      res.status(200).send({response:response,message:"Question Added Successfully"});
+      res.status(200).send({response:response,message:"Question created Successfully"});
     } catch (err) {
       next(err);
     }
