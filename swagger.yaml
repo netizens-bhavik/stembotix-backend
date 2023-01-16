@@ -889,7 +889,7 @@ paths:
           description: 'Server Error'
 
   # Order Endpoints
-  /order:
+  # /order:
 
 
   /order:
@@ -919,6 +919,7 @@ paths:
                     $ref: '#/components/schemas/ordersRes'
         500:
           description: 'Server Error'
+  # Order verify Endpoints
   /order/verify:
     post:
       tags:
