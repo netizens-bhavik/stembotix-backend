@@ -889,7 +889,22 @@ paths:
           description: 'Server Error'
 
   # Order Endpoints
-  # /order:
+  /order:
+    get:
+      tags:
+        - order
+      summary: View all order
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+              type:object
+              items;
+                $ref: '#/compopnents/schemas/orderlistRes'
+        500:
+          description: 'Server Error'
 
 
   /order:
@@ -1732,6 +1747,7 @@ components:
           type: string
           example: b81a0536-ef57-4e39-ae3c-0ea0f87f109d
 
+    orderlistRes
 
     
 
