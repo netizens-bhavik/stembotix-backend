@@ -536,7 +536,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddTutorialReq'
+              
       responses:
         200:
           description: 'OK'
@@ -890,44 +890,45 @@ paths:
 
   # Order Endpoints
   /order:
-    get:
-      tags:
-        - order
-      summary: View Order items
-      responses:
-      200:
-        description: 'OK'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-      500:
-        description: 'Server Error'
-  /order/create-order:
+
+
+  /order:
     post:
       tags:
         - order
-      summary:
+      summary: Order successfully
+      requestBody:
+        description: Create order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ordersReq'
+
       responses:
         200:
           description: 'OK'
-          content:  
+          content:
             application/json:
               schema:
                 type: object
                 properties:
                   message:
                     type: string
-                    example: Order item's successfully.
+                    example: Order Successfully.
                   data:
-                    $ref: '#/components/schemas/Order'
+                    $ref: '#/components/schemas/ordersRes'
         500:
           description: 'Server Error'
-  /order/verify-order:
+  /order/verify:
     post:
       tags:
         - order
-      summary:
+      summary: Order verify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/orderverifyReq'
       responses:
         200:
           description: 'OK'
@@ -940,10 +941,9 @@ paths:
                     type: string
                     example: Order verified Successfully.
                   data:
-                    $ref: '#/components/schemas/Order'
+                    $ref: '#/components/schemas/orderverifyRes'
         500:
           description: 'Server Error'
-
 # definitions
 definitions:
   users:
@@ -1660,5 +1660,79 @@ components:
         message:
           type: string
           example: Requested Resource is not available
+    # Order
+
+    ordersReq:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 7880
+
+    ordersRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1e062ce6-0478-414a-ba8e-323308281bb1
+        amount:
+          type: number
+          example: 7880
+        payment_id:
+          type: string
+          example: pay_L4ntSx2tc4ekWw
+        razorpay_order_id:
+          type: string
+          example: order_L4ntFDu2fPX9ml
+        razorpay_signature:
+          type: string
+          example: 8d2bd04a7e83c4f6d3d86921b2a786af6b93e8245b98e44e0e33483846555261
+    # Order verify
+    orderverifyReq:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: b81a0536-ef57-4e39-ae3c-0ea0f87f109d
+        razorpayOrderId:
+          type: string
+          example: order_L4nhslmHmq8zjb
+        paymentId:
+          type: string
+          example: pay_L4niIh2fHC8f5C
+        razorpaySignature:
+          type: string
+          example: c21114de2c38b133100c0f184e833f15d797dbff6fed84d045dd5466f940221d
+        cartItems:
+          type: array
+          items:
+            type: string
+            example: "1bd8b0bd-491e-46e6-8238-fbdb669c42e6"
+
+    orderverifyRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 10de6b98-966b-40f4-9dd3-d1fc5af9764f
+        item_type:
+          type: string
+          example: Product
+        quantity:
+          type: number
+          example: 1
+        ProductId:
+          type: string
+          example: 09fe5328-b086-4d8c-b0c7-6258728e58be
+        CourseId:
+          type: string
+          example: null
+        OrderId:
+          type: string
+          example: b81a0536-ef57-4e39-ae3c-0ea0f87f109d
+
+
+    
+
 schemes:
   - http

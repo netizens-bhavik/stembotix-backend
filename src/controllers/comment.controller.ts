@@ -74,7 +74,6 @@ class CommentController {
     try {
       const { comment_id } = req.params;
       const commentDetail = req.body;
-      // console.log("pppp",req.body)
       const file = req.files;
       commentDetail['id'] = comment_id;
 

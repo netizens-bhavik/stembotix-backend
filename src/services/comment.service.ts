@@ -72,7 +72,6 @@ class CommentService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    // console.log('second', data);
     return { totalCount: commentData.count, records: data };
   }
   public async updateComment({

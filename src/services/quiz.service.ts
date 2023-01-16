@@ -113,7 +113,6 @@ class QuizService {
       },
       attributes: ['is_correct', 'option'],
     });
-    console.log(optionsData);
 
     let isFalse = updateQuiz.is_correct === true ? true : false;
     return { isFalse, data: optionsData };

@@ -27,7 +27,7 @@ class CurriculumVideoRoute implements Routes {
           req.body.video_url = String(req.body.video_url);
           next();
         },
-        validationMiddleware(CurriCulumVideoDto, 'body'),
+        // validationMiddleware(CurriCulumVideoDto, 'body'),
       ],
       this.curriculumVideoController.addVideo
     );

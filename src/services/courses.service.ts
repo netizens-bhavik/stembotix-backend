@@ -230,7 +230,6 @@ class CourseService {
         },
       ],
     });
-    console.log('ghghgh', courseRecord);
 
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     if (courseRecord.status === 'Published')
