@@ -889,7 +889,7 @@ paths:
           description: 'Server Error'
 
   # Order Endpoints
-  /order:
+  /getorder:
     get:
       tags:
         - order
@@ -900,8 +900,8 @@ paths:
           content:
             application/json:
               schema:
-              type:object
-              items;
+              type: object
+              items:
                 $ref: '#/compopnents/schemas/orderlistRes'
         500:
           description: 'Server Error'
@@ -910,7 +910,7 @@ paths:
   /order:
     post:
       tags:
-        - order
+        - get order
       summary: Order successfully
       requestBody:
         description: Create order
@@ -1747,7 +1747,7 @@ components:
           type: string
           example: b81a0536-ef57-4e39-ae3c-0ea0f87f109d
 
-    orderlistRes
+    # orderlistRes:
 
     
 

@@ -3,7 +3,7 @@ import { Quiz } from '@/interfaces/quiz.interface';
 import { API_BASE } from '@/config';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQueDTO } from '@/dtos/quiz.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import QuizRoute from '@/routes/quiz.route';
 import { where } from 'sequelize/types';
@@ -77,6 +77,7 @@ class QuizService {
     quizDetail,
     trainer
   ): Promise<{ count: number; rows: Quiz[] }> {
+    console.log("hhjcsdhcjc",quizDetail)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
 
@@ -88,6 +89,11 @@ class QuizService {
         where: {
           id: quizDetail.id,
         },
+        include:[
+          {
+            model:this.quizQue
+          }
+        ],
         returning: true,
       }
     );

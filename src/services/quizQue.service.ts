@@ -1,6 +1,5 @@
 import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import { HttpException } from '@/exceptions/HttpException';
 
@@ -10,13 +9,12 @@ class QuizQueAnsService {
   public quiz = DB.Quiz;
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
-  public quizQueAns = DB.QuizQueAns;
   public curriculum = DB.CurriculumSection;
 
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
-  public async createQuizQue(quizData: QuizQueDto, user): Promise<QuizQue> {
+  public async createQuizQue(quizData, user): Promise<QuizQue> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -44,25 +42,48 @@ class QuizQueAnsService {
   }
   public async updateQuizQueAns(
     quizQueAnsDetail,
-    trainer
+    trainer,
+    quizQueId
   ): Promise<{ count: number; rows: Quiz[] }> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
-
-    const updateQuizQueAns = await this.quizQue.update(
-      {
-        ...quizQueAnsDetail,
-      },
-      {
-        where: {
-          id: quizQueAnsDetail.id,
+    try {
+      const { options } = quizQueAnsDetail;
+      const updateQuizQueAns = await this.quizQue.update(
+        {
+          ...quizQueAnsDetail,
         },
-        returning: true,
-      }
-    );
+        {
+          where: {
+            id: quizQueId,
+          },
+          returning: true,
+        }
+      );
+      const res = await this.quizAns.findAll({
+        where: { quiz_que_id: quizQueId },
+      });
 
-    return { count: updateQuizQueAns[0], rows: updateQuizQueAns[1] };
+      options?.forEach(async (element, index) => {
+        await this.quizAns.update(
+          {
+            option: element.option,
+            is_correct: element.is_correct,
+          },
+          {
+            where: {
+              id: res[index].id,
+            },
+            returning: true,
+          }
+        );
+      });
+      return { count: updateQuizQueAns[0], rows: updateQuizQueAns[1] };
+    } catch (error) {
+      return error;
+    }
   }
+
   public async deleteQuizQueAns({
     quizQueId,
     trainer,
