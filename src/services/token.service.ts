@@ -45,7 +45,7 @@ export default class TokenService {
       user: user,
     };
   }
-  public async createUserToken(user: User): Promise<{ refreshToken: string }> {
+  public async createUserToken(user): Promise<{ refreshToken: string }> {
     const userData = await this.users.findOne({
       where: { email: user.email },
     });
