@@ -14,6 +14,7 @@ import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 import QuizRoute from './routes/quiz.route';
 import QuizQueRoute from './routes/quizQue.route';
+// import QuizScoreRoute from './routes/quizScore.route';
 import ReplyRoute from './routes/reply.route';
 
 validateEnv();
@@ -33,7 +34,8 @@ try {
     new QuizQueRoute(),
     new CommentRoute(),
     new ReplyRoute(),
-    new LikeDislikeRoute()
+    new LikeDislikeRoute(),
+    // new QuizScoreRoute()
   ]);
   app.listen();
 } catch (error) {

@@ -20,7 +20,7 @@ class QuizQueAnsService {
     }
     const newQuizQue = await this.quizQue.create(quizData);
     const op = [];
-    quizData.options?.forEach((element: any) => {
+    quizData.options?.forEach((element) => {
       const obj = {
         QuizQueId: newQuizQue.id,
         option: element.option,

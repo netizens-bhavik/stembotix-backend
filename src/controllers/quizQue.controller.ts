@@ -14,9 +14,6 @@ class QuizQueAnsController {
       const quizQueAnsData = req.body;
       const trainer = req.user;
 
-      // const quizQueAnsData2 = {
-      //   ...quizQueAnsData,
-      // };
       const response = await this.quizQueAnsService.createQuizQue(
         quizQueAnsData,
         trainer
@@ -52,7 +49,6 @@ class QuizQueAnsController {
       const { quizQueId } = req.params;
       const trainer = req.user;
       const quizQueAnsDetail = req.body;
-      // quizQueAnsDetail['id'] = quizQueId;
       const update = await this.quizQueAnsService.updateQuizQueAns(
         quizQueAnsDetail,
         trainer,

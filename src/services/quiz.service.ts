@@ -37,21 +37,24 @@ class QuizService {
   }
 
   public async getQuizBycurriculumId(curriculumId: string): Promise<Quiz> {
-    const response: Quiz = await this.quiz.findOne({
+    const response = await this.quiz.findOne({
       where: {
         curriculum_id: curriculumId,
       },
       include: [
         {
           model: this.quizQue,
+          attributes:["id","question","quiz_id"],
           include: [
             {
-              model: this.quizAns,
+              model: this.quizAns,  
+              attributes:["id","QuizQueId","option"]
             },
           ],
         },
       ],
     });
+
     return response;
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
@@ -77,7 +80,6 @@ class QuizService {
     quizDetail,
     trainer
   ): Promise<{ count: number; rows: Quiz[] }> {
-    console.log("hhjcsdhcjc",quizDetail)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
 
@@ -89,10 +91,10 @@ class QuizService {
         where: {
           id: quizDetail.id,
         },
-        include:[
+        include: [
           {
-            model:this.quizQue
-          }
+            model: this.quizQue,
+          },
         ],
         returning: true,
       }
@@ -105,8 +107,8 @@ class QuizService {
     quizId,
     trainer
   ): Promise<{ isFalse: boolean; data: Quiz }> {
-    // if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
-    //   throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+      throw new HttpException(403, 'Forbidden Resource');
 
     const updateQuiz = await this.quizAns.findOne({
       where: {
