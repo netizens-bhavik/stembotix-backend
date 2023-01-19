@@ -27,6 +27,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    QuizScore.belongsTo(models.QuizAns, {
+      foreignKey: 'option_id',
+      targetKey: 'id',
+    });
   };
   return QuizScore;
 };
