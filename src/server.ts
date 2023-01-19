@@ -13,12 +13,12 @@ import LikeDislikeRoute from './routes/likedislike.route';
 import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 import QuizRoute from './routes/quiz.route';
+import AnswerRoute from './routes/quizCorrect.route';
 import QuizQueRoute from './routes/quizQue.route';
-// import QuizScoreRoute from './routes/quizScore.route';
+import QuizScoreRoute from './routes/quizScore.route';
 import ReplyRoute from './routes/reply.route';
 
 validateEnv();
-try {
   const app = new App([
     new IndexRoute(),
     new UsersRoute(),
@@ -35,10 +35,8 @@ try {
     new CommentRoute(),
     new ReplyRoute(),
     new LikeDislikeRoute(),
-    // new QuizScoreRoute()
+    new AnswerRoute(),
+    new QuizScoreRoute(),
   ]);
   app.listen();
-} catch (error) {
-  console.log(error)
-}
 

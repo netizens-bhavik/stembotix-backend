@@ -34,9 +34,15 @@ class QuizController {
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const { curriculumId } = req.params;
-      const response: Quiz = await this.quizService.getQuizBycurriculumId(
-        curriculumId
+
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: {
+        totalCount: number;
+        records: (Quiz | undefined)[];
+      } = await this.quizService.getQuizBycurriculumId(
+        queryObject, curriculumId
       );
       res.status(200).send(response);
     } catch (err) {

@@ -8,6 +8,7 @@ import { QuizQue } from '@/interfaces/quizQue.interface';
 import QuizRoute from '@/routes/quiz.route';
 import { where } from 'sequelize/types';
 import { isEmpty } from '@/utils/util';
+import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -36,26 +37,39 @@ class QuizService {
     return newQuiz;
   }
 
-  public async getQuizBycurriculumId(curriculumId: string): Promise<Quiz> {
-    const response = await this.quiz.findOne({
-      where: {
-        curriculum_id: curriculumId,
-      },
-      include: [
-        {
-          model: this.quizQue,
-          attributes:["id","question","quiz_id"],
-          include: [
-            {
-              model: this.quizAns,  
-              attributes:["id","QuizQueId","option"]
+  public async getQuizBycurriculumId(queryObject,curriculumId): Promise<{totalCount: number; records: (Quiz | undefined)[]}> {
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+      const quizData = await this.quiz.findAndCountAll({
+        where: { curriculum_id: curriculumId },
+      });
+    
+    const data: (Quiz | undefined)[] =
+      await this.quiz.findAll({
+        where: DB.Sequelize.and(
+          { curriculum_id: curriculumId },
+          {
+            title: {
+              [searchCondition]: search,
             },
-          ],
-        },
-      ],
-    });
+          }
+        ),
+        // attributes:["id","question","quiz_id"],
+        // attributes:["id","QuizQueId","option"]
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
 
-    return response;
+      return { totalCount: quizData.count, records: data };
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
     const response: Quiz = await this.quiz.findOne({
@@ -65,9 +79,12 @@ class QuizService {
       include: [
         {
           model: this.quizQue,
+          // attributes: ['id', 'question', 'quiz_id'],
+
           include: [
             {
               model: this.quizAns,
+              // attributes: ['id', 'QuizQueId', 'option'], 
             },
           ],
         },

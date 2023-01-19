@@ -26,10 +26,15 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
+
     CurriculumSection.hasMany(models.CurriCulumVideo, {
       foreignKey: 'curriculum_id',
       targetKey: 'id',
     });
+    CurriculumSection.hasMany(models.Quiz, {
+      foreignKey: 'curriculum_id',
+      targetKey: 'id',
+    })
   };
   return CurriculumSection;
 };
