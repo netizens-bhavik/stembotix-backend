@@ -55,6 +55,8 @@ class QuizService {
     return response;
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
+    console.log(quizId);
+
     const response: Quiz = await this.quiz.findOne({
       where: {
         id: quizId,
