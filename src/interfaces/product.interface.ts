@@ -7,7 +7,6 @@ export interface Product {
   thumbnail: string;
   sku: string;
   status: string;
-  // tag: string
   weight: string;
   dimension: string;
 }

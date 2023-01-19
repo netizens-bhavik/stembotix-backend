@@ -20,7 +20,6 @@ class CurriculumSectionService {
   public async addSection({
     curriculumDetails,
   }): Promise<CurriculumSection | Course> {
-    console.log(curriculumDetails);
 
     const response: Course = await this.course.findOne({
       where: {
@@ -112,7 +111,6 @@ class CurriculumSectionService {
         returning: true,
       }
     );
-    console.log('first', updateSection);
 
     return { count: updateSection[0], rows: updateSection[1] };
   }

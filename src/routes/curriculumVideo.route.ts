@@ -4,7 +4,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CurriculumVideoController from '@/controllers/curriculumVideo.controller';
-import uploadFiles from '@/rest/fileUpload';
+import { uploadFiles } from '@/rest/fileUpload';
 import { CurriCulumVideoDto } from '@/dtos/curriculumVideo.dto';
 
 class CurriculumVideoRoute implements Routes {
@@ -19,7 +19,7 @@ class CurriculumVideoRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/:curriculumId/video`,
+      `${this.path}/:curriculum_id/video`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.single('tutorial'),
@@ -27,7 +27,7 @@ class CurriculumVideoRoute implements Routes {
           req.body.video_url = String(req.body.video_url);
           next();
         },
-        validationMiddleware(CurriCulumVideoDto, 'body'),
+        // validationMiddleware(CurriCulumVideoDto, 'body'),
       ],
       this.curriculumVideoController.addVideo
     );

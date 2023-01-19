@@ -1,29 +1,32 @@
 module.exports = (sequelize, Sequelize) => {
-  const QuizQue = sequelize.define(
-    'QuizQue',
+  const Reply = sequelize.define(
+    'Reply',
     {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      question: {
+      reply: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      explanation: {
+      thumbnail: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
     },
     { paranoid: true }
   );
-  QuizQue.associate = (models) => {
-    QuizQue.belongsTo(models.Quiz, {
-      foreignKey: 'quiz_id',
+  Reply.assocaite = (models) => {
+    Reply.belongsTo(models.Comment, {
+      foreignKey: 'comment_id',
       targetKey: 'id',
     });
-    QuizQue.hasMany(models.QuizAns);
+    Reply.belongsTo(models.User, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    Reply.hasMany(models.Comment)
   };
-  return QuizQue;
+  return Reply;
 };

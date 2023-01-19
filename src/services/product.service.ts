@@ -285,7 +285,6 @@ class ProductService {
         },
       ],
     });
-    console.log(courseRecord);
 
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     if (courseRecord.status === 'Published')
@@ -316,7 +315,6 @@ class ProductService {
         },
       ],
     });
-    console.log(courseRecord);
 
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     const status = courseRecord.status === 'Drafted' ? 'Published' : 'Drafted';
