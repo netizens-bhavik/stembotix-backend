@@ -7,13 +7,11 @@ class QuizScoreService {
   public quizQue = DB.QuizQue;
 
   public async addScore(quizDetail, user): Promise<QuizScore> {
-    console.log("======================",quizDetail)
     const record = await this.quizScore.findAll({
       where: {
         quiz_id: quizDetail.id
       },
     });
-console.log("first",record)
     const newScore = await this.quizScore.create({
       user,
     });

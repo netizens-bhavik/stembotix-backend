@@ -9,11 +9,10 @@ class QuizScoreController {
     try {
       const user = req.user;
       const quizDetail = req.body
-      console.log(req.body)
       const response = await this.quizScoreService.addScore(user,quizDetail);
       res.status(200).send(response);
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   };
 }
