@@ -50,13 +50,14 @@ fs.readdirSync(path.resolve(__dirname, "../models/"))
     ));
 
     const tempModel = model(sequelize, Sequelize.DataTypes);
-    DB[tempModel.name] = tempModel;
+    DB[tempModel?.name] = tempModel;
   });
 
 Object.keys(DB).forEach((modelName) => {
-  if (DB[modelName].associate) {
-    DB[modelName].associate(DB);
+  if (DB[modelName]?.associate) {
+    DB[modelName]?.associate(DB);
   }
 });
+
 
 export default DB;

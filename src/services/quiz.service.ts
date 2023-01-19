@@ -3,7 +3,7 @@ import { Quiz } from '@/interfaces/quiz.interface';
 import { API_BASE } from '@/config';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQueDTO } from '@/dtos/quiz.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import QuizRoute from '@/routes/quiz.route';
 import { where } from 'sequelize/types';
@@ -37,21 +37,24 @@ class QuizService {
   }
 
   public async getQuizBycurriculumId(curriculumId: string): Promise<Quiz> {
-    const response: Quiz = await this.quiz.findOne({
+    const response = await this.quiz.findOne({
       where: {
         curriculum_id: curriculumId,
       },
       include: [
         {
           model: this.quizQue,
+          attributes:["id","question","quiz_id"],
           include: [
             {
-              model: this.quizAns,
+              model: this.quizAns,  
+              attributes:["id","QuizQueId","option"]
             },
           ],
         },
       ],
     });
+
     return response;
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
@@ -88,6 +91,11 @@ class QuizService {
         where: {
           id: quizDetail.id,
         },
+        include: [
+          {
+            model: this.quizQue,
+          },
+        ],
         returning: true,
       }
     );
@@ -99,8 +107,8 @@ class QuizService {
     quizId,
     trainer
   ): Promise<{ isFalse: boolean; data: Quiz }> {
-    // if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
-    //   throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+      throw new HttpException(403, 'Forbidden Resource');
 
     const updateQuiz = await this.quizAns.findOne({
       where: {
@@ -113,7 +121,6 @@ class QuizService {
       },
       attributes: ['is_correct', 'option'],
     });
-    console.log(optionsData);
 
     let isFalse = updateQuiz.is_correct === true ? true : false;
     return { isFalse, data: optionsData };

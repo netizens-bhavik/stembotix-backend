@@ -21,8 +21,8 @@ class QuizController {
         ...quizData,
         CurriculumSectionId: req.body.curriculum_id,
       };
-      const response = await this.quizService.createQuiz(quizData2, trainer);
-      res.status(200).send(response);
+      const response = await this.quizService.createQuiz(quizData2,trainer);
+      res.status(200).send({response:response,message:"Quiz Added Successfully"});
     } catch (err) {
       next(err);
     }
@@ -70,8 +70,8 @@ class QuizController {
 
       quizDetail['id'] = quizId;
 
-      const update = await this.quizService.updateQuiz(quizDetail, trainer);
-      res.status(200).send(update);
+      const update = await this.quizService.updateQuiz(quizDetail,trainer);
+      res.status(200).send({response:update,message:"Quiz Added Successfully"});
     } catch (err) {
       next(err);
     }
@@ -102,11 +102,12 @@ class QuizController {
       const { quizId } = req.params;
       const trainer = req.user;
 
+
       const response: { count: number } = await this.quizService.deleteQuiz({
         quizId,
-        trainer,
+        trainer
       });
-      res.status(200).send(response);
+      res.status(200).send({response:response,message:"Quiz Added Successfully"});
     } catch (error) {
       next(error);
     }

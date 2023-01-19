@@ -14,17 +14,13 @@ class QuizQueAnsController {
       const quizQueAnsData = req.body;
       const trainer = req.user;
 
-      const quizQueAnsData2 = {
-        ...quizQueAnsData,
-        quiz_id: req.body.quiz_id,
-      };
       const response = await this.quizQueAnsService.createQuizQue(
-        quizQueAnsData2,
+        quizQueAnsData,
         trainer
       );
       res
         .status(200)
-        .send({ data: response, message: 'Quiz created successfully' });
+        .send({ response: response, message: 'Question created Successfully' });
     } catch (err) {
       next(err);
     }
@@ -53,15 +49,14 @@ class QuizQueAnsController {
       const { quizQueId } = req.params;
       const trainer = req.user;
       const quizQueAnsDetail = req.body;
-      quizQueAnsDetail['id'] = quizQueId;
-
       const update = await this.quizQueAnsService.updateQuizQueAns(
         quizQueAnsDetail,
-        trainer
+        trainer,
+        quizQueId
       );
       res
         .status(200)
-        .send({ data: update, message: 'Quiz updated successfully' });
+        .send({ response: update, message: 'Question Update Successfully' });
     } catch (err) {
       next(err);
     }
@@ -73,7 +68,6 @@ class QuizQueAnsController {
   ) => {
     try {
       const { quizQueId } = req.params;
-
       const trainer = req.user;
 
       const response: { count: number } =
@@ -81,7 +75,9 @@ class QuizQueAnsController {
           quizQueId,
           trainer,
         });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Question deleted Successfully' });
     } catch (error) {
       next(error);
     }

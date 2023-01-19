@@ -5,7 +5,6 @@ export class AddOrderDTO {
   @Min(0)
   public amount: number;
 }
-
 export class VerifyOrderDTO {
   @IsString()
   public orderId: string;

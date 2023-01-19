@@ -5,7 +5,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import { ProductDto } from '@/dtos/product.dto';
-import uploadFiles from '@/rest/fileUpload';
+import {uploadFiles} from '@/rest/fileUpload';
 
 class ProductRoute implements Routes {
   public path = '/product';

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import uploadFiles from "@/rest/fileUpload";
+import {uploadFiles }from "@/rest/fileUpload";
 import { Routes } from "@interfaces/routes.interface";
 import FileUploadController from "@/controllers/fileUpload.controller";
 

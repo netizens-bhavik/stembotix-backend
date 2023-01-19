@@ -5,7 +5,7 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import QuizController from '@/controllers/quiz.controller';
 import { QuizDto, UpdateQuizDto } from '@/dtos/quiz.dto';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQueDTO } from '@/dtos/quiz.dto';
 
 class QuizRoute implements Routes {
   public path = '/quiz';
