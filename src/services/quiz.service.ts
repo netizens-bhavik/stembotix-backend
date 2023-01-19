@@ -3,11 +3,12 @@ import { Quiz } from '@/interfaces/quiz.interface';
 import { API_BASE } from '@/config';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQueDTO } from '@/dtos/quiz.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import QuizRoute from '@/routes/quiz.route';
 import { where } from 'sequelize/types';
 import { isEmpty } from '@/utils/util';
+import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -36,23 +37,39 @@ class QuizService {
     return newQuiz;
   }
 
-  public async getQuizBycurriculumId(curriculumId: string): Promise<Quiz> {
-    const response: Quiz = await this.quiz.findOne({
-      where: {
-        curriculum_id: curriculumId,
-      },
-      include: [
-        {
-          model: this.quizQue,
-          include: [
-            {
-              model: this.quizAns,
+  public async getQuizBycurriculumId(queryObject,curriculumId): Promise<{totalCount: number; records: (Quiz | undefined)[]}> {
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+      const quizData = await this.quiz.findAndCountAll({
+        where: { curriculum_id: curriculumId },
+      });
+    
+    const data: (Quiz | undefined)[] =
+      await this.quiz.findAll({
+        where: DB.Sequelize.and(
+          { curriculum_id: curriculumId },
+          {
+            title: {
+              [searchCondition]: search,
             },
-          ],
-        },
-      ],
-    });
-    return response;
+          }
+        ),
+        // attributes:["id","question","quiz_id"],
+        // attributes:["id","QuizQueId","option"]
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
+
+      return { totalCount: quizData.count, records: data };
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
     const response: Quiz = await this.quiz.findOne({
@@ -62,9 +79,12 @@ class QuizService {
       include: [
         {
           model: this.quizQue,
+          // attributes: ['id', 'question', 'quiz_id'],
+
           include: [
             {
               model: this.quizAns,
+              // attributes: ['id', 'QuizQueId', 'option'], 
             },
           ],
         },
@@ -88,6 +108,11 @@ class QuizService {
         where: {
           id: quizDetail.id,
         },
+        include: [
+          {
+            model: this.quizQue,
+          },
+        ],
         returning: true,
       }
     );
@@ -99,8 +124,8 @@ class QuizService {
     quizId,
     trainer
   ): Promise<{ isFalse: boolean; data: Quiz }> {
-    // if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
-    //   throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+      throw new HttpException(403, 'Forbidden Resource');
 
     const updateQuiz = await this.quizAns.findOne({
       where: {

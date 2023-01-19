@@ -4,7 +4,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import QuizController from '@/controllers/quiz.controller';
-import { QuizQueDto } from '@/dtos/quizQue.dto';
+import { QuizQueDTO } from '@/dtos/quiz.dto';
 import QuizQueAnsController from '@/controllers/quizQue.controller';
 
 class QuizQueRoute implements Routes {
@@ -23,7 +23,7 @@ class QuizQueRoute implements Routes {
     this.router.post(
       `${this.path}/que-ans`,
       passport.authenticate('jwt', { session: false }),
-      validationMiddleware(QuizQueDto, 'body'),
+      validationMiddleware(QuizQueDTO, 'body'),
       this.quizQueAnsController.createQuizQueAns
     );
 
@@ -39,7 +39,7 @@ class QuizQueRoute implements Routes {
 
       passport.authenticate('jwt', { session: false }),
 
-      validationMiddleware(QuizQueDto, 'body'),
+      validationMiddleware(QuizQueDTO, 'body'),
 
       this.quizQueAnsController.updateQuizQueAns
     );
