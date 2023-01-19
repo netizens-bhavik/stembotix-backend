@@ -37,7 +37,10 @@ class QuizService {
     return newQuiz;
   }
 
-  public async getQuizBycurriculumId(queryObject,curriculumId): Promise<{totalCount: number; records: (Quiz | undefined)[]}> {
+  public async getQuizBycurriculumId(
+    queryObject,
+    curriculumId
+  ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
@@ -48,28 +51,27 @@ class QuizService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-      const quizData = await this.quiz.findAndCountAll({
-        where: { curriculum_id: curriculumId },
-      });
-    
-    const data: (Quiz | undefined)[] =
-      await this.quiz.findAll({
-        where: DB.Sequelize.and(
-          { curriculum_id: curriculumId },
-          {
-            title: {
-              [searchCondition]: search,
-            },
-          }
-        ),
-        // attributes:["id","question","quiz_id"],
-        // attributes:["id","QuizQueId","option"]
-        limit: pageSize,
-        offset: pageNo,
-        order: [[`${sortBy}`, `${order}`]],
-      });
+    const quizData = await this.quiz.findAndCountAll({
+      where: { curriculum_id: curriculumId },
+    });
 
-      return { totalCount: quizData.count, records: data };
+    const data: (Quiz | undefined)[] = await this.quiz.findAll({
+      where: DB.Sequelize.and(
+        { curriculum_id: curriculumId },
+        {
+          title: {
+            [searchCondition]: search,
+          },
+        }
+      ),
+      // attributes:["id","question","quiz_id"],
+      // attributes:["id","QuizQueId","option"]
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+
+    return { totalCount: quizData.count, records: data };
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
     const response: Quiz = await this.quiz.findOne({
@@ -79,12 +81,12 @@ class QuizService {
       include: [
         {
           model: this.quizQue,
-          // attributes: ['id', 'question', 'quiz_id'],
+          attributes: ['id', 'question', 'quiz_id'],
 
           include: [
             {
               model: this.quizAns,
-              // attributes: ['id', 'QuizQueId', 'option'], 
+              attributes: ['id', 'QuizQueId', 'option'],
             },
           ],
         },

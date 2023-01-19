@@ -889,11 +889,7 @@ paths:
           description: 'Server Error'
 
   # Order Endpoints
-<<<<<<< HEAD
-  /order:
-=======
   /getorder:
->>>>>>> c2bd5e208c66a70c861cad72d389e3aa91442daa
     get:
       tags:
         - order
@@ -904,13 +900,8 @@ paths:
           content:
             application/json:
               schema:
-<<<<<<< HEAD
-              type:object
-              items;
-=======
               type: object
               items:
->>>>>>> c2bd5e208c66a70c861cad72d389e3aa91442daa
                 $ref: '#/compopnents/schemas/orderlistRes'
         500:
           description: 'Server Error'
@@ -919,11 +910,7 @@ paths:
   /order:
     post:
       tags:
-<<<<<<< HEAD
-        - order
-=======
         - get order
->>>>>>> c2bd5e208c66a70c861cad72d389e3aa91442daa
       summary: Order successfully
       requestBody:
         description: Create order

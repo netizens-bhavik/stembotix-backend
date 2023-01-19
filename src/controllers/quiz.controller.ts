@@ -19,10 +19,12 @@ class QuizController {
 
       const quizData2 = {
         ...quizData,
-        CurriculumSectionId: req.body.curriculum_id,
+        CurriculumSectionId: req.body.curriculum_section_id,
       };
-      const response = await this.quizService.createQuiz(quizData2,trainer);
-      res.status(200).send({response:response,message:"Quiz Added Successfully"});
+      const response = await this.quizService.createQuiz(quizData2, trainer);
+      res
+        .status(200)
+        .send({ response: response, message: 'Quiz Added Successfully' });
     } catch (err) {
       next(err);
     }
@@ -42,7 +44,8 @@ class QuizController {
         totalCount: number;
         records: (Quiz | undefined)[];
       } = await this.quizService.getQuizBycurriculumId(
-        queryObject, curriculumId
+        queryObject,
+        curriculumId
       );
       res.status(200).send(response);
     } catch (err) {
@@ -57,8 +60,8 @@ class QuizController {
   ) => {
     try {
       const { quizId } = req.params;
-      const response: Quiz = await this.quizService.getQuizById(quizId);
-      res.status(200).send(response);
+      const response = await this.quizService.getQuizById(quizId);
+        res.status(200).send(response);
     } catch (err) {
       next(err);
     }
@@ -76,8 +79,10 @@ class QuizController {
 
       quizDetail['id'] = quizId;
 
-      const update = await this.quizService.updateQuiz(quizDetail,trainer);
-      res.status(200).send({response:update,message:"Quiz Added Successfully"});
+      const update = await this.quizService.updateQuiz(quizDetail, trainer);
+      res
+        .status(200)
+        .send({ response: update, message: 'Quiz Added Successfully' });
     } catch (err) {
       next(err);
     }
@@ -108,12 +113,13 @@ class QuizController {
       const { quizId } = req.params;
       const trainer = req.user;
 
-
       const response: { count: number } = await this.quizService.deleteQuiz({
         quizId,
-        trainer
+        trainer,
       });
-      res.status(200).send({response:response,message:"Quiz Added Successfully"});
+      res
+        .status(200)
+        .send({ response: response, message: 'Quiz Added Successfully' });
     } catch (error) {
       next(error);
     }

@@ -1,5 +1,6 @@
 import { QuizCorrect } from '@/interfaces/quizCorrect.interface';
 import DB from '@databases';
+import { config } from 'dotenv';
 
 class QuizCorrectService {
   public quizQue = DB.QuizQue;
@@ -7,9 +8,10 @@ class QuizCorrectService {
 
   public async CorrectAns(optiondetail): Promise<QuizCorrect> {
     const options = await this.quizAns.findAll({
-      where: DB.Sequelize.and({
+      where: {
         quiz_que_id: optiondetail.quiz_que_id,
-      }),
+      },
+
       attributes: ['is_correct', 'option', 'id'],
 
       include: [{ model: this.quizQue, attributes: ['explanation'] }],
@@ -21,57 +23,19 @@ class QuizCorrectService {
     });
     const explanation = options[0].QuizQue.explanation;
     const correctOptions = options.filter((option) => option.is_correct);
-    // correctOptions.forEach((elem)=>{
-    //   delete elem.QuizQue
-    // })
-    // console.log(correctOptions)
-    const isCorrect = correctOptions.find(
-      (option) => option.id === optiondetail.option_id && option.is_correct
-    );
+
+    const res = correctOptions?.map((elem) => {
+      const { QuizQue, ...restRes } = elem?.dataValues;
+      return restRes;
+    });
 
     const response = {
       quiz_que_id: optiondetail.quiz_que_id,
       explanation,
-      correctOptions,
-      isCorrect,
+      res,
       selected_option: selection.is_correct,
     };
     return response;
   }
 }
 export default QuizCorrectService;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const name=[]
-// correctOptions.forEach((elem)=>{
-//   console.log(elem)
-//   const obj ={
-//     is_correct:elem.is_correct,
-//     option:elem.option,
-//     id:elem.id
-
-//   }
-//   name.push(obj)
-// })
-
-// const response = {
-//   quiz_que_id: optiondetail.quiz_que_id,
-//   explanation,
-//   correctOption:name,
-//   selected_option: selection.is_correct,
-// };
-
