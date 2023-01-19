@@ -31,3 +31,7 @@ export class QuizQueDTO {
   @IsString()
   public explanation: string;
 }
+export class QuizCorrectDTO{
+  @IsString ()
+  public quizQueId : string
+}
