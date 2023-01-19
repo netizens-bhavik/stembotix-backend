@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 class QuizScoreController {
   public quizScoreService = new QuizScoreService();
 
-  public addScore = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  public addScore = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
       const quizDetail = req.body

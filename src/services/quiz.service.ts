@@ -62,7 +62,8 @@ class QuizService {
             },
           }
         ),
-        
+        // attributes:["id","question","quiz_id"],
+        // attributes:["id","QuizQueId","option"]
         limit: pageSize,
         offset: pageNo,
         order: [[`${sortBy}`, `${order}`]],

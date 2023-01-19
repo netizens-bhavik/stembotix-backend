@@ -21,10 +21,10 @@ class QuizCorrectService {
     });
     const explanation = options[0].QuizQue.explanation;
     const correctOptions = options.filter((option) => option.is_correct);
-    correctOptions.forEach((elem)=>{
-      delete elem.QuizQue
-    })
-    console.log(correctOptions)
+    // correctOptions.forEach((elem)=>{
+    //   delete elem.QuizQue
+    // })
+    // console.log(correctOptions)
     const isCorrect = correctOptions.find(
       (option) => option.id === optiondetail.option_id && option.is_correct
     );
