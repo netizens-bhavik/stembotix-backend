@@ -62,13 +62,7 @@ class CartController {
       // @ts-ignore
 
       const { id: userId } = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
-
-      const response: {
-        totalCount: number;
-        records: (Cart | undefined)[];
-      } = await this.cartService.viewCart(queryObject, userId);
+      const response: Cart = await this.cartService.viewCart( userId);
       res.status(200).send(response);
     } catch (error) {
       next(error);

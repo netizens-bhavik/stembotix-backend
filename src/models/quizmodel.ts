@@ -11,10 +11,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      completeQuiz: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
+      // completeQuiz: {
+      //   type: Sequelize.STRING,
+      //   allowNull: false,
+      // },
     },
     {
       paranoid: true,

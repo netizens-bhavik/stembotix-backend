@@ -67,7 +67,7 @@ module.exports = (sequelize, Sequelize) => {
       paranoid: true,
     }
   );
-
+    
   User.associate = (models) => {
     User.hasOne(models.RefreshToken, {
       foreignKey: 'userId',
@@ -83,6 +83,10 @@ module.exports = (sequelize, Sequelize) => {
       otherKey: 'product_id',
     });
     User.hasOne(models.Cart, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    User.hasOne(models.QuizScore, {
       foreignKey: 'userId',
       targetKey: 'id',
     });
