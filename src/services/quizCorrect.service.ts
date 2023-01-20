@@ -13,14 +13,16 @@ class QuizCorrectService {
 
       attributes: ['is_correct', 'option', 'id'],
 
-      include: [{ model: this.quizQue, attributes: ['explanation'] }],
+      include: [
+        { model: this.quizQue, attributes: ['quiz_id', 'explanation'] },
+      ],
     });
     const selection = await this.quizAns.findOne({
       where: {
         id: optiondetail.option_id,
       },
     });
-    const explanation = options[0].QuizQue.explanation;
+    const explain = options[0].QuizQue;
     const correctOptions = options.filter((option) => option.is_correct);
     const res = correctOptions?.map((elem) => {
       const { QuizQue, ...restRes } = elem?.dataValues;
@@ -28,30 +30,12 @@ class QuizCorrectService {
     });
     const response = {
       quiz_que_id: optiondetail.quiz_que_id,
-      explanation,
+      explain,
       res,
       selected_option: selection.is_correct,
     };
     return response;
   }
+  
 }
 export default QuizCorrectService;
-
-// const name=[]
-// correctOptions.forEach((elem)=>{
-//   console.log(elem)
-//   const obj ={
-//     is_correct:elem.is_correct,
-//     option:elem.option,
-//     id:elem.id
-
-//   }
-//   name.push(obj)
-// })
-
-// const response = {
-//   quiz_que_id: optiondetail.quiz_que_id,
-//   explanation,
-//   correctOption:name,
-//   selected_option: selection.is_correct,
-// };
