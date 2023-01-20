@@ -11,8 +11,11 @@ class QuizCorrectController {
   ) => {
     try {
       const  optiondetail  = req.body;
+      const {quizId} = req.params
+      const user = req.user
       const response = await this.quizcorrectService.CorrectAns(
         optiondetail,
+        quizId,
       );
       res.status(200).send(response);
     } catch (error) {

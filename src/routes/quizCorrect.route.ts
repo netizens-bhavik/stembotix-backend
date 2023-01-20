@@ -18,7 +18,8 @@ class AnswerRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/correctAns`,
+      `${this.path}/correctAns/:quizId`,
+      passport.authenticate('jwt', { session: false }),
       validationMiddleware(QuizCorrectDto, 'body'),
 
       this.createCorrectAns.CorrectAns

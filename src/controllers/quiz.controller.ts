@@ -66,6 +66,20 @@ class QuizController {
       next(err);
     }
   };
+  public getQuizBy = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { quizId } = req.params;
+      const user = req.user
+      const response = await this.quizService.getQuizBy(quizId,user);
+        res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
 
   public updateQuiz = async (
     req: Request,

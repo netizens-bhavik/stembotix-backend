@@ -15,6 +15,7 @@ class QuizService {
   public quiz = DB.Quiz;
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
+  public quizScore = DB.QuizScore
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
@@ -90,6 +91,39 @@ class QuizService {
         },
       ],
     });
+    return response;
+  }
+  public async getQuizBy(quizId: string,user): Promise<Quiz> {
+    const response: Quiz = await this.quiz.findAndCountAll({
+      where: {
+        id: quizId,
+      },
+      include: [
+        {
+          model: this.quizQue,
+          attributes: ['id', 'question', 'quiz_id'],
+
+          include: [
+            {
+              model: this.quizAns,
+              attributes: ['id', 'QuizQueId', 'option'], 
+            },
+          ],
+        },
+      ],
+    });
+    const scoreData = await this.quizScore.findOne({
+      where:{quiz_id:quizId}
+    })
+    if(scoreData===null){
+     var data= await this.quizScore.create({
+        score: 0,
+        totalQue	: response.count,
+        quiz_id : quizId,
+        userId: user.id,
+
+      })
+    }
     return response;
   }
 
