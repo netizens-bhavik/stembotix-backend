@@ -22,12 +22,10 @@ class QuizCorrectService {
     });
     const explanation = options[0].QuizQue.explanation;
     const correctOptions = options.filter((option) => option.is_correct);
-
     const res = correctOptions?.map((elem) => {
       const { QuizQue, ...restRes } = elem?.dataValues;
       return restRes;
     });
-
     const response = {
       quiz_que_id: optiondetail.quiz_que_id,
       explanation,
@@ -38,21 +36,6 @@ class QuizCorrectService {
   }
 }
 export default QuizCorrectService;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // const name=[]
 // correctOptions.forEach((elem)=>{
@@ -72,4 +55,3 @@ export default QuizCorrectService;
 //   correctOption:name,
 //   selected_option: selection.is_correct,
 // };
-
