@@ -1,15 +1,12 @@
-'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.addColumn(
-      'Quiz',
+      'QuizScore',
       'completeQuiz',
       Sequelize.DataTypes.STRING
     );
   },
-
   async down(queryInterface) {
-    return queryInterface.removeColumn('Quiz', 'completeQuiz');
+    return queryInterface.removeColumn('QuizScore', 'completeQuiz');
   },
 };

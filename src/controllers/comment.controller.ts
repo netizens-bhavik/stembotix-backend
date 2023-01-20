@@ -59,6 +59,7 @@ class CommentController {
           pageNo,
           sortBy,
           order,
+          queryObject,
         });
       res.status(200).send(response);
     } catch (error) {
