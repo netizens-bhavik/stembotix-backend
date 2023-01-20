@@ -56,6 +56,7 @@ class CurriculumSectionService {
     totalCount: number;
     records: (CurriculumSection | undefined)[];
   }> {
+    //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination

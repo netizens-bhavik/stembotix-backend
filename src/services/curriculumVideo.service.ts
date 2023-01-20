@@ -49,6 +49,7 @@ class CurriculumVideoService {
     queryObject,
     sectionId
   ): Promise<{ totalCount: number; records: (CurriCulumVideo | undefined)[] }> {
+    //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
