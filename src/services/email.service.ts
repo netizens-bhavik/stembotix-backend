@@ -63,19 +63,20 @@ class EmailService {
 
       const pathToView = path.resolve(__dirname, '../view/forgotPassword.ejs');
       const { templateData, mailerData } = payload;
+
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err)
-          try {
-            await this.transporter.sendMail({
-              from: `StemBotix: ${SMTP_EMAIL_FROM}`,
-              to: mailerData.to,
-              subject: 'Passwrod Reset',
-              html: data,
-            });
-            this.terminateConnection();
-          } catch (error) {
-            return error;
-          }
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailerData.to,
+            subject: 'Passwrod Reset',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
       });
     } catch (err) {
       return err;

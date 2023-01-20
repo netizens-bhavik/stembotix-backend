@@ -101,7 +101,7 @@ class QuizService {
       include: [
         {
           model: this.quizQue,
-          attributes: ['id', 'question', 'quiz_id'],
+          attributes: ['id', 'question', 'quiz_id',],
 
           include: [
             {
@@ -112,6 +112,7 @@ class QuizService {
         },
       ],
     });
+    console.log(response)
     const scoreData = await this.quizScore.findOne({
       where:{quiz_id:quizId}
     })

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { AddProductDTO, AddCourseDTO, QuantityDTO } from '@/dtos/cart.dto';
 import CartService from '@/services/cart.service';
-import { CartItem } from '@interfaces/cart.interface';
+import { Cart, CartItem } from '@interfaces/cart.interface';
 
 class CartController {
   public cartService = new CartService();
@@ -60,8 +60,15 @@ class CartController {
   public viewCart = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // @ts-ignore
+
       const { id: userId } = req.user;
-      const response = await this.cartService.viewCart(userId);
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+
+      const response: {
+        totalCount: number;
+        records: (Cart | undefined)[];
+      } = await this.cartService.viewCart(queryObject, userId);
       res.status(200).send(response);
     } catch (error) {
       next(error);

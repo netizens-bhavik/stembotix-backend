@@ -33,7 +33,6 @@ class CurriculumVideoController {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const { sectionId } = req.params;
-
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;

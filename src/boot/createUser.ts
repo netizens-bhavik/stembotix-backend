@@ -22,6 +22,8 @@ class CreateUser {
       userInstance = await this.users.findOne({
         where: { email: userData.email },
       });
+      console.log(userInstance);
+
       if (!userInstance) {
         const roleRes = await this.roles.findOne({
           where: { roleName: userData.role },
