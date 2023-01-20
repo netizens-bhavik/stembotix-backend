@@ -16,6 +16,9 @@ class QuizService {
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
+
+
+  
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
