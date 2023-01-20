@@ -1,6 +1,5 @@
 import { QuizCorrect } from '@/interfaces/quizCorrect.interface';
 import DB from '@databases';
-import { config } from 'dotenv';
 
 class QuizCorrectService {
   public quizQue = DB.QuizQue;
