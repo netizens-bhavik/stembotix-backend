@@ -29,7 +29,7 @@ class QuizCorrectService {
     });
     if (selection.is_correct === true) {
       const scoreObject = {
-        score: findScore.score + 1,
+        score: findScore?.score + 1,
         option_id: optiondetail.option_id,
       };
       var scoreData = await this.quizScore.update(
