@@ -112,7 +112,6 @@ class QuizService {
         },
       ],
     });
-    console.log(response)
     const scoreData = await this.quizScore.findOne({
       where:{quiz_id:quizId}
     })
