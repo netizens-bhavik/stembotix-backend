@@ -29,7 +29,7 @@ class QuizCorrectService {
     });
     if (selection.is_correct === true) {
       const scoreObject = {
-        score: findScore.score + 1,
+        score: findScore?.score + 1,
         option_id: optiondetail.option_id,
       };
       var scoreData = await this.quizScore.update(
@@ -56,6 +56,43 @@ class QuizCorrectService {
       scoreData,
     };
     return response;
+  }
+
+  public async addScore(optiondetail, quizId): Promise<QuizCorrect> {
+    const selection = await this.quizAns.findOne({
+      where: {
+        id: optiondetail.option_id,
+      },
+    });
+    const findScore = await this.quizScore.findOne({
+      where: { quiz_id: quizId }, 
+    });
+    if (selection.is_correct === true) {
+      const scoreObject = {
+        score: findScore?.score + 1,
+        option_id: optiondetail.option_id,
+      };
+      var scoreData = await this.quizScore.update(
+        {
+          ...scoreObject,
+        },
+        {
+          where: { quiz_id: quizId },
+          attributes:["score"],
+          returning: true,
+        }
+      );
+    }
+    console.log(scoreData)
+    return scoreData;
+  }
+
+  public async getScoreByQuizId(quizId):Promise<QuizCorrect>{
+    const response:QuizCorrect = await this.quizScore.findOne({
+      where:{quiz_id:quizId},
+      attributes:['score','total_que']
+    })
+    return response
   }
 }
 export default QuizCorrectService;

@@ -22,8 +22,8 @@ export class QuizQueDTO {
   @IsString()
   public question: string;
 
-  @IsUUID()
-  public quiz_id: string;
+  // @IsUUID()
+  // public quiz_id: string;
 
   @IsArray()
   public options: QuizOption[];
