@@ -83,7 +83,6 @@ class QuizCorrectService {
         }
       );
     }
-    console.log(scoreData)
     return scoreData;
   }
 
