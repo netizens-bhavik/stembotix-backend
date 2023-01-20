@@ -79,12 +79,12 @@ class QuizService {
       include: [
         {
           model: this.quizQue,
-          // attributes: ['id', 'question', 'quiz_id'],
+          attributes: ['id', 'question', 'quiz_id'],
 
           include: [
             {
               model: this.quizAns,
-              // attributes: ['id', 'QuizQueId', 'option'], 
+              attributes: ['id', 'QuizQueId', 'option'], 
             },
           ],
         },
