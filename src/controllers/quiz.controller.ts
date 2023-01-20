@@ -19,10 +19,12 @@ class QuizController {
 
       const quizData2 = {
         ...quizData,
-        CurriculumSectionId: req.body.curriculum_id,
+        CurriculumSectionId: req.body.curriculum_section_id,
       };
       const response = await this.quizService.createQuiz(quizData2, trainer);
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Quiz Added Successfully' });
     } catch (err) {
       next(err);
     }
@@ -34,8 +36,15 @@ class QuizController {
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const { curriculumId } = req.params;
-      const response: Quiz = await this.quizService.getQuizBycurriculumId(
+
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: {
+        totalCount: number;
+        records: (Quiz | undefined)[];
+      } = await this.quizService.getQuizBycurriculumId(
+        queryObject,
         curriculumId
       );
       res.status(200).send(response);
@@ -72,7 +81,9 @@ class QuizController {
       quizDetail['id'] = quizId;
 
       const update = await this.quizService.updateQuiz(quizDetail, trainer);
-      res.status(200).send(update);
+      res
+        .status(200)
+        .send({ response: update, message: 'Quiz Added Successfully' });
     } catch (err) {
       next(err);
     }
@@ -107,7 +118,9 @@ class QuizController {
         quizId,
         trainer,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Quiz Added Successfully' });
     } catch (error) {
       next(error);
     }

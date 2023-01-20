@@ -161,9 +161,14 @@ class CourseService {
         },
         {
           model: DB.CurriculumSection,
-          include: {
-            model: DB.CurriCulumVideo,
-          },
+          include: [
+            {
+              model: DB.CurriCulumVideo,
+            },
+            {
+              model: DB.Quiz,
+            },
+          ],
         },
       ],
     });
@@ -183,9 +188,6 @@ class CourseService {
           id: courseDetails.id,
         },
       },
-      // where: {
-      //   user_id: trainer.id,
-      // },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
@@ -230,7 +232,6 @@ class CourseService {
         },
       ],
     });
-    console.log('ghghgh', courseRecord);
 
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     if (courseRecord.status === 'Published')

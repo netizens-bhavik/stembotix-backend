@@ -64,12 +64,6 @@ class App {
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });
-    // this.httpsServer.listen(5001, () => {
-    //   logger.info(`==========================================`);
-    //   logger.info(`============ ENV: ${this.env} ============`);
-    //   logger.info(`🚀 App listening securely on the port 5001`);
-    //   logger.info(`==========================================`);
-    // });
   }
 
   public getServer() {
@@ -110,7 +104,7 @@ class App {
           title: 'Stembotix API',
           version: '1.0.0',
           description:
-            'Base URL: \n1. https://192.168.1.106:3000/api \n2. https://192.168.1.14:3000/api',
+            'Base URL: \n1. https://192.168.1.101:106:3000/api \n2. https://192.168.1.14:3000/api \n3. https://192.168.1.101:3000/api',
         },
       },
       apis: ['swagger.yaml'],

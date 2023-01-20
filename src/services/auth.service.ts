@@ -151,7 +151,7 @@ class AuthService {
     };
     return response;
   }
-  public async resendMail(id: string): Promise<{ message: string }> {
+  public async resendMail(id): Promise<{ message }> {
     let user = await this.users.findOne({ where: { id: id } });
     if (!user) throw new HttpException(404, 'User not found');
     let token = await this.accountHash.findOne({

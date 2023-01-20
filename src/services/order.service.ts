@@ -69,7 +69,6 @@ class OrderService {
       razorpaySignature: razorpay_signature,
       cartItems,
     } = orderBody;
-
     // Verify Signature
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);

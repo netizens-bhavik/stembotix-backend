@@ -22,13 +22,13 @@ class CurriculumVideoService {
     }
 
     const fetchSection = await this.curriculumSection.findOne({
-      where: { id: curriculumId.curriculumId },
+      where: { id: curriculumId.curriculum_id },
     });
 
     if (!fetchSection) {
       throw new HttpException(403, 'No section found');
     }
-    const filePath = `${API_SECURE_BASE}/media/${file.path
+    const filePath = `${API_BASE}/media/${file.path
       .split('/')
       .splice(-2)
       .join('/')}`;

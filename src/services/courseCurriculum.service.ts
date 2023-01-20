@@ -20,8 +20,6 @@ class CurriculumSectionService {
   public async addSection({
     curriculumDetails,
   }): Promise<CurriculumSection | Course> {
-    console.log(curriculumDetails);
-
     const response: Course = await this.course.findOne({
       where: {
         id: curriculumDetails.course_id,
@@ -84,7 +82,9 @@ class CurriculumSectionService {
         include: [
           {
             model: this.curriculumVideo,
-          },
+          },{
+            model:DB.Quiz
+          }
         ],
 
         limit: pageSize,
@@ -112,7 +112,6 @@ class CurriculumSectionService {
         returning: true,
       }
     );
-    console.log('first', updateSection);
 
     return { count: updateSection[0], rows: updateSection[1] };
   }
