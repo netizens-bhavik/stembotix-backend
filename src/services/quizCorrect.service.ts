@@ -32,7 +32,6 @@ class QuizCorrectService {
         score: findScore.score + 1,
         option_id: optiondetail.option_id,
       };
-      console.log(scoreObject)
       var scoreData = await this.quizScore.update(
         {
           ...scoreObject,
@@ -42,7 +41,6 @@ class QuizCorrectService {
           returning: true,
         }
       );
-      console.log('kfcbjsdc sdcdccc', scoreData);
     }
     const explain = options[0].QuizQue;
     const correctOptions = options.filter((option) => option.is_correct);
