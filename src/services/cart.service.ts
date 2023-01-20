@@ -111,7 +111,17 @@ class CartService {
     }
     return { message };
   }
-  public async viewCart(userId: string) {
+  public async viewCart(userId, queryObject) {
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const cart = await this.cart.findOne({
       where: { user_id: userId },
       include: {
@@ -124,6 +134,9 @@ class CartService {
             model: this.product,
           },
         ],
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
       },
       order: [[{ model: this.cartItem, as: 'CartItems' }, 'created_at', 'ASC']],
     });

@@ -72,6 +72,8 @@ class QuizService {
       return { totalCount: quizData.count, records: data };
   }
   public async getQuizById(quizId: string): Promise<Quiz> {
+    console.log(quizId);
+
     const response: Quiz = await this.quiz.findOne({
       where: {
         id: quizId,

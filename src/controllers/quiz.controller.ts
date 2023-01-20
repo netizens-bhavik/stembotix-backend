@@ -60,8 +60,9 @@ class QuizController {
   ) => {
     try {
       const { quizId } = req.params;
-      const response = await this.quizService.getQuizById(quizId);
-        res.status(200).send(response);
+
+      const response: Quiz = await this.quizService.getQuizById(quizId);
+      res.status(200).send(response);
     } catch (err) {
       next(err);
     }
