@@ -1,4 +1,3 @@
-import { QuizCorrect } from '@/interfaces/quizCorrect.interface';
 import QuizCorrectService from '@/services/quizCorrect.service';
 import { NextFunction, Request, Response } from 'express';
 class QuizCorrectController {
@@ -26,7 +25,6 @@ class QuizCorrectController {
     try {
       const optiondetail = req.body;
       const { quizId } = req.params;
-      const user = req.user;
       const response = await this.quizcorrectService.addScore(
         optiondetail,
         quizId

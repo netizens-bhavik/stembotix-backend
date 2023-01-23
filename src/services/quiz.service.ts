@@ -17,8 +17,6 @@ class QuizService {
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
 
-
-  
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
@@ -55,6 +53,7 @@ class QuizService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
     const quizData = await this.quiz.findAndCountAll({
       where: { curriculum_id: curriculumId },
     });
@@ -77,32 +76,60 @@ class QuizService {
 
     return { totalCount: quizData.count, records: data };
   }
-  public async getQuizById(quizId: string): Promise<Quiz> {
-    const response: Quiz = await this.quiz.findOne({
-      where: {
-        id: quizId,
-      },
-      include: [
-        {
-          model: this.quizQue,
-          attributes: ['id', 'question', 'quiz_id'],
-
-          include: [
-            {
-              model: this.quizAns,
-              attributes: ['id', 'QuizQueId', 'option'],
-            },
-          ],
+  public async getQuizById(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+      const response = await this.quiz.findAndCountAll({
+        where: {
+          id: quizId,
         },
-      ],
-    });
-    return response;
-  }
-  public async getQuizBy(quizId: string, user): Promise<Quiz> {
+        include: [
+          {
+            model: this.quizQue,
+            attributes: ['id', 'question', 'id'],
+            include: [
+              {
+                model: this.quizAns,
+                attributes: ['id', 'QuizQueId', 'option'],
+                separate: true,
+              },
+            ],
+          },
+        ],
+      });
+      const scoreData = await this.quizScore.findOne({
+        where: { quiz_id: quizId },
+      });
+      if (scoreData === null) {
+        var data = await this.quizScore.create({
+          score: 0,
+          totalQue: response.rows[0].QuizQues.length,
+          quiz_id: quizId,
+          userId: user.id,
+        });
+      }
+      return { totalCount: response.count, records: response.rows };
+    }
+  public async getQuizByIdAdmin(
+    quizId: string,
+    user,
+    queryObject
+  ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const response = await this.quiz.findAndCountAll({
-      where: {
+      where: DB.Sequelize.and({
         id: quizId,
-      },
+        title: {
+          [searchCondition]: search,
+        },
+      }),
       include: [
         {
           model: this.quizQue,
@@ -116,6 +143,9 @@ class QuizService {
           ],
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
     const scoreData = await this.quizScore.findOne({
       where: { quiz_id: quizId },
@@ -123,13 +153,12 @@ class QuizService {
     if (scoreData === null) {
       var data = await this.quizScore.create({
         score: 0,
-        count: response.rows[0].QuizQues.length,
+        totalQue: response.rows[0].QuizQues.length,
         quiz_id: quizId,
         userId: user.id,
       });
     }
-
-    return response;
+    return { totalCount: response.count, records: response.rows };
   }
 
   public async updateQuiz(
@@ -237,6 +266,33 @@ class QuizService {
     });
     return { totalCount: quizData.count, records: data };
   }
+
+  public async completeQuiz(quiz_id): Promise<Quiz> {
+    const record = await this.quiz.findOne(
+      { completeQuiz: true },
+      { where: { id: quiz_id } }
+    );
+    if (record.completeQuiz) {
+      return record;
+    }
+  }
 }
 
 export default QuizService;
+
+// exports.getQuiz = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+
+//       const quiz = await Quiz.findOne({ where: { id } });
+//       if (!quiz) {
+//           return res.status(404).send({ error: 'Quiz not found' });
+//       }
+//       if (quiz.completed) {
+//           return res.status(400).send({ error: 'Quiz already completed' });
+//       }
+//       res.send(quiz);
+//   } catch (error) {
+//       res.status(500).send({ error: 'Error fetching quiz' });
+//   }
+// };

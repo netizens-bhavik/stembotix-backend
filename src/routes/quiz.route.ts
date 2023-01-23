@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
-import passport from 'passport';
+import passport, { authenticate } from 'passport';
 import passportConfig from '@/config/passportConfig';
 import QuizController from '@/controllers/quiz.controller';
 import { QuizDto, UpdateQuizDto } from '@/dtos/quiz.dto';
@@ -31,11 +31,14 @@ class QuizRoute implements Routes {
       `${this.path}/section/:curriculumId`,
       this.quizController.getQuizBycurriculumId
     );
+    //get single quiz by quizId admin
+    this.router.get(`${this.path}/admin/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizByIdAdmin);
+
     //get single quiz by quizId
-    this.router.get(`${this.path}/:quizId`, this.quizController.getQuizById);
+    this.router.get(`${this.path}/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizById);
 
         //get single quiz by quizId
-        this.router.get(`${this.path}/protected/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizBy);
+        // this.router.get(`${this.path}/protected/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizBy);
 
     //get all quiz
     this.router.get(
@@ -65,6 +68,12 @@ class QuizRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.quizController.deleteQuiz
     );
+    this.router.post(
+      `${this.path}/copmleteQuiz/:quizId`,
+      passport.authenticate('jwt',{session:false}),
+      this.quizController.completeQuiz
+    )
+    // 
   }
 }
 

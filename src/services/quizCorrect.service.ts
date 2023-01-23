@@ -53,7 +53,7 @@ class QuizCorrectService {
       explain,
       res,
       selected_option: selection.is_correct,
-      scoreData,
+      // scoreData,
     };
     return response;
   }
@@ -93,5 +93,6 @@ class QuizCorrectService {
     })
     return response
   }
+
 }
 export default QuizCorrectService;

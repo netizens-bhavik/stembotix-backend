@@ -1,4 +1,3 @@
-import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 import DB from '@/databases';
 import userData from './data/user';
 import UserService from '@/services/users.service';
