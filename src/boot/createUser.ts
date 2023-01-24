@@ -1,4 +1,3 @@
-import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 import DB from '@/databases';
 import userData from './data/user';
 import UserService from '@/services/users.service';
@@ -22,7 +21,6 @@ class CreateUser {
       userInstance = await this.users.findOne({
         where: { email: userData.email },
       });
-      console.log(userInstance);
 
       if (!userInstance) {
         const roleRes = await this.roles.findOne({

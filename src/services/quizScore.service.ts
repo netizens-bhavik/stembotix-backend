@@ -20,9 +20,5 @@ class QuizScoreService {
     //   if (is_selected_option === true) return newScore;
     return record
   }
-
-public async 
-
-
 }
 export default QuizScoreService;

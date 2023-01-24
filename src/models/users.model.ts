@@ -91,6 +91,11 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     User.hasMany(models.Order);
+    User.hasMany(models.CompleteQuiz,{
+      foreignKey:'user_id',
+      targetKey:'id'  
+  })
+  
   };
 
   User.prototype.validPassword = (password) => {

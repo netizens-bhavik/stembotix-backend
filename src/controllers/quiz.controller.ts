@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import DB from '@databases';
 
 import { Quiz } from '@/interfaces/quiz.interface';
-import QuizService from '@/services/quiz.service';
+import QuizService from '@services/quiz.service';
 
 class QuizController {
   public quizService = new QuizService();
@@ -52,7 +52,23 @@ class QuizController {
       next(err);
     }
   };
-
+  public getQuizByIdAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { quizId } = req.params;
+      const user = req.user;
+      const response: { totalCount: number; records: (Quiz | undefined)[] } =
+        await this.quizService.getQuizByIdAdmin(quizId, user, queryObject);
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
   public getQuizById = async (
     req: Request,
     res: Response,
@@ -60,27 +76,31 @@ class QuizController {
   ) => {
     try {
       const { quizId } = req.params;
-
-      const response: Quiz = await this.quizService.getQuizById(quizId);
-      res.status(200).send(response);
+      const user = req.user;
+      const response: { totalCount: number; records: (Quiz | undefined)[] } =
+        await this.quizService.getQuizById(quizId, user);
+      res.status(200).send({
+        response: response,
+        message: 'This is your final Score',
+      });
     } catch (err) {
       next(err);
     }
   };
-  public getQuizBy = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { quizId } = req.params;
-      const user = req.user
-      const response = await this.quizService.getQuizBy(quizId,user);
-        res.status(200).send(response);
-    } catch (err) {
-      next(err);
-    }
-  };
+  // public getQuizBy = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { quizId } = req.params;
+  //     const user = req.user;
+  //     const response = await this.quizService.getQuizBy(quizId, user);
+  //     res.status(200).send(response);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // };
 
   public updateQuiz = async (
     req: Request,
@@ -156,5 +176,28 @@ class QuizController {
       next(error);
     }
   };
+  public completeQuiz = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const quizComplete = req.body;
+    const response = await this.quizService.completeQuiz({ quizComplete });
+    res.status(200).send({ response: response, message: 'Quiz completed' });
+  };
 }
 export default QuizController;
+
+// exports.completeQuiz = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     // Update the quiz and set completed to true
+//     await Quiz.update(
+//       { completed: true, completedAt: new Date() },
+//       { where: { id } }
+//     );
+//     res.send({ message: 'Quiz completed' });
+//   } catch (error) {
+//     res.status(500).send({ error: 'Error completing quiz' });
+//   }
+// };

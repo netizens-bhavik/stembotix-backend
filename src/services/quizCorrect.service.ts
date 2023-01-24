@@ -32,7 +32,7 @@ class QuizCorrectService {
         score: findScore?.score + 1,
         option_id: optiondetail.option_id,
       };
-      var scoreData = await this.quizScore.update(
+      await this.quizScore.update(
         {
           ...scoreObject,
         },
@@ -53,7 +53,7 @@ class QuizCorrectService {
       explain,
       res,
       selected_option: selection.is_correct,
-      scoreData,
+      // scoreData,
     };
     return response;
   }
@@ -65,7 +65,7 @@ class QuizCorrectService {
       },
     });
     const findScore = await this.quizScore.findOne({
-      where: { quiz_id: quizId }, 
+      where: { quiz_id: quizId },
     });
     if (selection.is_correct === true) {
       const scoreObject = {
@@ -83,16 +83,15 @@ class QuizCorrectService {
         }
       );
     }
-    console.log(scoreData)
     return scoreData;
   }
 
-  public async getScoreByQuizId(quizId):Promise<QuizCorrect>{
-    const response:QuizCorrect = await this.quizScore.findOne({
-      where:{quiz_id:quizId},
-      attributes:['score','total_que']
-    })
-    return response
+  public async getScoreByQuizId(quizId): Promise<QuizCorrect> {
+    const response: QuizCorrect = await this.quizScore.findOne({
+      where: { quiz_id: quizId },
+      attributes: ['score', 'total_que'],
+    });
+    return response;
   }
 }
 export default QuizCorrectService;

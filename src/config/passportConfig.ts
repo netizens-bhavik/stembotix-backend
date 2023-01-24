@@ -22,7 +22,9 @@ export default (passport) => {
           },
         ],
       }).then((data, err) => {
-        if (err) return cb(err, false);
+        if (err) {
+          return cb(err, false);
+        }
         if (data) {
           const user = JSON.parse(JSON.stringify(data));
           Reflect.deleteProperty(user, "password");
