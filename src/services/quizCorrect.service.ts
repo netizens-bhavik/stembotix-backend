@@ -53,7 +53,6 @@ class QuizCorrectService {
       explain,
       res,
       selected_option: selection.is_correct,
-      // scoreData,
     };
     return response;
   }
@@ -78,7 +77,7 @@ class QuizCorrectService {
         },
         {
           where: { quiz_id: quizId },
-          attributes:["score"],
+          attributes: ['score'],
           returning: true,
         }
       );

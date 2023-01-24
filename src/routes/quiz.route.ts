@@ -32,13 +32,21 @@ class QuizRoute implements Routes {
       this.quizController.getQuizBycurriculumId
     );
     //get single quiz by quizId admin
-    this.router.get(`${this.path}/admin/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizByIdAdmin);
+    this.router.get(
+      `${this.path}/admin/:quizId`,
+      passport.authenticate('jwt', { session: false }),
+      this.quizController.getQuizByIdAdmin
+    );
 
     //get single quiz by quizId
-    this.router.get(`${this.path}/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizById);
+    this.router.get(
+      `${this.path}/protected/:quizId`,
+      passport.authenticate('jwt', { session: false }),
+      this.quizController.getQuizById
+    );
 
-        //get single quiz by quizId
-        // this.router.get(`${this.path}/protected/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizBy);
+    //get single quiz by quizId
+    // this.router.get(`${this.path}/protected/:quizId`,passport.authenticate('jwt', { session: false }), this.quizController.getQuizBy);
 
     //get all quiz
     this.router.get(
@@ -68,12 +76,12 @@ class QuizRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.quizController.deleteQuiz
     );
-    this.router.post(
+    this.router.get(
       `${this.path}/copmleteQuiz/:quizId`,
-      passport.authenticate('jwt',{session:false}),
-      this.quizController.completeQuiz
-    )
-    // 
+      passport.authenticate('jwt', { session: false }),
+      this.quizController.createQuizCompletetion
+    );
+    //
   }
 }
 

@@ -1,9 +1,9 @@
 import { IsArray, IsString, IsUUID } from 'class-validator';
 
 type QuizOption = {
-  option: string,
-  is_correct: boolean
-}
+  option: string;
+  is_correct: boolean;
+};
 
 export class QuizDto {
   @IsString()
@@ -31,7 +31,7 @@ export class QuizQueDTO {
   @IsString()
   public explanation: string;
 }
-export class QuizCorrectDTO{
-  @IsString ()
-  public quizQueId : string
+export class QuizCorrectDTO {
+  @IsString()
+  public quizQueId: string;
 }

@@ -17,7 +17,7 @@ class CompleteQuizController {
       );
       res.status(200).send(response);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   };
 
@@ -33,7 +33,7 @@ class CompleteQuizController {
       );
       res.status(200).send(response);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   };
 }

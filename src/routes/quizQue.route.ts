@@ -23,7 +23,7 @@ class QuizQueRoute implements Routes {
     this.router.post(
       `${this.path}/que-ans`,
       passport.authenticate('jwt', { session: false }),
-      validationMiddleware(QuizQueDTO, 'body'),
+      // validationMiddleware(QuizQueDTO, 'body'),
       this.quizQueAnsController.createQuizQueAns
     );
 

@@ -9,7 +9,7 @@ class QuizScoreService {
   public async addScore(quizDetail, user): Promise<QuizScore> {
     const record = await this.quizScore.findAll({
       where: {
-        quiz_id: quizDetail.id
+        quiz_id: quizDetail.id,
       },
     });
     const newScore = await this.quizScore.create({
@@ -18,7 +18,7 @@ class QuizScoreService {
     // let defaultScore = 0;
     // for (let i = 0; i <= defaultScore; i++)
     //   if (is_selected_option === true) return newScore;
-    return record
+    return record;
   }
 }
 export default QuizScoreService;

@@ -93,6 +93,7 @@ class CurriculumVideoService {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const { tutorial } = file;
 
     const filePath = `${API_BASE}/media/${file?.path
       .split('/')
