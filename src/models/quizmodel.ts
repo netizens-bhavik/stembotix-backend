@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       // completeQuiz: {
-      //   type: Sequelize.STRING,
+      //   type: Sequelize.BOOLEAN,
       //   allowNull: false,
       // },
     },
@@ -29,10 +29,14 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'quiz_id',
       targetKey: 'id',
     });
-    Quiz.hasMany(models.QuizScore, {
-      foreignKey: 'quiz_id',
-      targetKey: 'id',
-    });
+    Quiz.hasMany(models.CompleteQuiz,{
+      foreignKey:'quiz_id',
+      targetKey:'id'  
+  })
+    // Quiz.hasMany(models.QuizScore, {
+    //   foreignKey: 'quiz_id',
+    //   targetKey: 'id',
+    // });
   };
   return Quiz;
 };

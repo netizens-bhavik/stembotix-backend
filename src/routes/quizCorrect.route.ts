@@ -32,7 +32,7 @@ class AnswerRoute implements Routes {
       this.createCorrectAns.addScore
     );
     this.router.get(
-      `${this.path}/score/:quizId`,
+      `${this.path}/totalScore/:quizId`,
       passport.authenticate('jwt', { session: false }),
       this.createCorrectAns.getScorebyQuizId
     );

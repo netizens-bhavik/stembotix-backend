@@ -5,6 +5,7 @@ import UsersRoute from '@routes/users.route';
 import validateEnv from '@utils/validateEnv';
 import CartRoute from './routes/cart.route';
 import CommentRoute from './routes/comment.route';
+import CompleteQuizRoute from './routes/completeQuiz.route';
 import CourseRoute from './routes/courses.route';
 import CurriculumSectionRoute from './routes/curriculumSection.route';
 import CurriculumVideoRoute from './routes/curriculumVideo.route';
@@ -37,6 +38,7 @@ validateEnv();
     new LikeDislikeRoute(),
     new AnswerRoute(),
     new QuizScoreRoute(),
+    new CompleteQuizRoute()
   ]);
   app.listen();
 
