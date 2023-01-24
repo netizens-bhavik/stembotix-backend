@@ -6,9 +6,10 @@ import { HttpException } from '@exceptions/HttpException';
 import { QuizQueDTO } from '@/dtos/quiz.dto';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import QuizRoute from '@/routes/quiz.route';
-import { where } from 'sequelize/types';
+import { Sequelize, where } from 'sequelize/types';
 import { isEmpty } from '@/utils/util';
 import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
+import sequelize from 'sequelize';
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -16,7 +17,7 @@ class QuizService {
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
-
+  public completeQuiz = DB.CompleteQuiz;
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
@@ -75,44 +76,11 @@ class QuizService {
 
     return { totalCount: quizData.count, records: data };
   }
-  public async getQuizById(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
-    
-      const response = await this.quiz.findAndCountAll({
-        where: {
-          id: quizId,
-        },
-        include: [
-          {
-            model: this.quizQue,
-            attributes: ['id', 'question', 'id'],
-            include: [
-              {
-                model: this.quizAns,
-                attributes: ['id', 'QuizQueId', 'option'],
-                separate: true,
-              },
-            ],
-          },
-        ],
-      });
-      const scoreData = await this.quizScore.findOne({
-        where: { quiz_id: quizId },
-      });
-      if (scoreData === null) {
-        var data = await this.quizScore.create({
-          score: 0,
-          totalQue: response.rows[0].QuizQues.length,
-          quiz_id: quizId,
-          userId: user.id,
-        });
-      }
-      return { totalCount: response.count, records: response.rows };
-    }
   public async getQuizByIdAdmin(
-    quizId: string,
-    user,
+    quizId,
     queryObject
   ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+    // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
@@ -123,42 +91,73 @@ class QuizService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.quiz.findAndCountAll({
-      where: DB.Sequelize.and({
-        id: quizId,
-        title: {
-          [searchCondition]: search,
-        },
-      }),
-      include: [
+    const quizData = await this.quizQue.findAndCountAll({
+      where: { quiz_id: quizId },
+    });
+    const response: (Quiz | undefined)[] = await this.quiz.findAll({
+      where: DB.Sequelize.and(
+        { id: quizId },
         {
-          model: this.quizQue,
-          attributes: ['id', 'question', 'id'],
-          include: [
-            {
-              model: this.quizAns,
-              attributes: ['id', 'QuizQueId', 'option'],
-              separate: true,
-            },
-          ],
-        },
-      ],
+          title: {
+            [searchCondition]: search,
+          },
+        }
+      ),
+      include: {
+        model: this.quizQue,
+        attributes: ['id', 'question', 'quiz_id'],
+
+        include: [
+          {
+            model: this.quizAns,
+            attributes: ['id', 'QuizQueId', 'option'],
+          },
+        ],
+      },
+
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    return { totalCount: quizData.count, records: response };
+  }
+  public async getQuizBy(
+    quizId: string,
+    user
+  ): Promise<{ data: Quiz[] | undefined }> {
+    const response: Quiz = await this.quiz.findAndCountAll({
+      where: {
+        id: quizId,
+      },
+      include: {
+        model: this.quizQue,
+        attributes: ['id', 'question', 'quiz_id'],
+
+        include: [
+          {
+            model: this.quizAns,
+            separate: true,
+            attributes: ['id', 'QuizQueId', 'option'],
+          },
+        ],
+      },
+    });
+
     const scoreData = await this.quizScore.findOne({
       where: { quiz_id: quizId },
     });
-    if (scoreData === null) {
-      var data = await this.quizScore.create({
-        score: 0,
-        count: response.rows[0].QuizQues.length,
-        quiz_id: quizId,
-        userId: user.id,
+    if (scoreData) {
+      await this.quizScore.destroy({
+        where: { quiz_id: quizId },
       });
     }
-    return { totalCount: response.count, records: response.rows };
+    await this.quizScore.create({
+      score: 0,
+      totalQue: response.rows[0].QuizQues.length,
+      quiz_id: quizId,
+      userId: user.id,
+    });
+    return { data: response.rows[0] };
   }
 
   public async updateQuiz(
@@ -267,14 +266,20 @@ class QuizService {
     return { totalCount: quizData.count, records: data };
   }
 
-  public async completeQuiz(quiz_id): Promise<Quiz> {
-    const record = await this.quiz.findOne(
-      { completeQuiz: true },
-      { where: { id: quiz_id } }
-    );
-    if (record.completeQuiz) {
-      return record;
+  public async createQuizCompletetion(quizId, user): Promise<any> {
+    const record = await this.completeQuiz.findOne({
+      where: { quiz_id: quizId },
+    });
+    if (record) {
+      throw new HttpException(403, 'Already Exists!');
     }
+    const compleQuizResponse = await this.completeQuiz.create({
+      completeQuiz: true,
+      quiz_id: quizId,
+      user_id: user.id,
+    });
+
+    return compleQuizResponse;
   }
 }
 

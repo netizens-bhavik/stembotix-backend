@@ -8,8 +8,8 @@ class QuizScoreController {
   public addScore = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
-      const quizDetail = req.body
-      const response = await this.quizScoreService.addScore(user,quizDetail);
+      const quizDetail = req.body;
+      const response = await this.quizScoreService.addScore(user, quizDetail);
       res.status(200).send(response);
     } catch (err) {
       next(err);

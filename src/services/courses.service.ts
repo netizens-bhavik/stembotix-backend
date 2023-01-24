@@ -192,6 +192,7 @@ class CourseService {
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
     const { trailer, thumbnail } = file;
+
     if (trailer) {
       const trailerPath = `${API_BASE}/media/${trailer[0].path
         .split('/')
@@ -199,6 +200,7 @@ class CourseService {
         .join('/')}`;
       courseDetails.trailer = trailerPath;
     }
+
     if (thumbnail) {
       const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
         .split('/')
@@ -206,6 +208,7 @@ class CourseService {
         .join('/')}`;
       courseDetails.thumbnail = thumbnailPath;
     }
+
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
@@ -217,6 +220,7 @@ class CourseService {
         returning: true,
       }
     );
+
     return { count: updateCourse[0], rows: updateCourse[1] };
   }
   public async deleteCourse({ trainer, courseId }): Promise<{ count: number }> {
