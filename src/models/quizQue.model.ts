@@ -8,11 +8,11 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
       },
       question: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       explanation: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
     },

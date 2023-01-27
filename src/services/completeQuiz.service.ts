@@ -15,10 +15,9 @@ class CompleteQuizService {
           user_id: user.id,
         },
       });
-      console.log(record);
       return record;
     } catch (error) {
-      console.log('sdcsssssssssssssss', error);
+      return error;
     }
   }
 }

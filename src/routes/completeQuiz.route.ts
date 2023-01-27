@@ -23,7 +23,7 @@ class CompleteQuizRoute implements Routes{
                 this.completeQuizController.createCompleteQuiz
                 )
         } catch(err) {
-            console.log(err)
+            return(err)
         }
         }
     }
