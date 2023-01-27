@@ -63,26 +63,42 @@ class QuizController {
       const { quizId } = req.params;
       const user = req.user;
       const response: { totalCount: number; records: (Quiz | undefined)[] } =
-        await this.quizService.getQuizByIdAdmin(quizId, user, queryObject);
+        await this.quizService.getQuizByIdAdmin(quizId, queryObject);
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-    public getQuizById = async (
+  public getQuizById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const { quizId } = req.params;
       const user = req.user;
-      const response :{ totalCount: number; records: (Quiz | undefined)[]}= await this.quizService.getQuizById(quizId, user);
+      const response = await this.quizService.getQuizBy(quizId, user);
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
+  //   public getQuizById = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { quizId } = req.params;
+  //     const user = req.user;
+  //     const response :{ totalCount: number; records: (Quiz | undefined)[]}= await this.quizService.getQuizById(quizId, user);
+  //     res.status(200).send(response);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // };
   // public getQuizBy = async (
   //   req: Request,
   //   res: Response,
@@ -172,14 +188,22 @@ class QuizController {
       next(error);
     }
   };
-  public completeQuiz = async (
+  public createQuizCompletetion = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    const quizComplete = req.body;
-    const response = await this.quizService.completeQuiz({ quizComplete });
-    res.status(200).send({ response: response, message: 'Quiz completed' });
+    try {
+      const { quizId } = req.params;
+      const user = req.user;
+      const response = await this.quizService.createQuizCompletetion(
+        quizId,
+        user
+      );
+      res.status(200).send({ response: response, message: 'Quiz completed' });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 export default QuizController;

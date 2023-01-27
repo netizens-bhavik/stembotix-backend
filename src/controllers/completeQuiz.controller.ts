@@ -18,6 +18,25 @@ class CompleteQuizController {
       res.status(200).send(response);
     } catch (error) {
       next(error);
+<<<<<<< HEAD
+=======
+    }
+  };
+
+  public getCompleteQuizById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { quiz_id } = req.params;
+      const response = await this.completeQuizService.getCompleteQuizById(
+        quiz_id
+      );
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+>>>>>>> b769dfd10ecabba4204daea25206ff97090e99e3
     }
   };
 }
