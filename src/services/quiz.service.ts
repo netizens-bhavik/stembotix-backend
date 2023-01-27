@@ -113,7 +113,6 @@ class QuizService {
     }
   public async getQuizByIdAdmin(
     quizId: string,
-    user,
     queryObject
   ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
