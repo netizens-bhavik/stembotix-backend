@@ -28,9 +28,15 @@ class QuizQueRoute implements Routes {
     );
 
     //get a single quetion-answer by id
+
+    // this.router.get(
+    //   `${this.path}/que-ans/:quizQueId`,
+    //   this.quizQueAnsController.getQuizQueAnsById
+    // );
     this.router.get(
-      `${this.path}/que-ans/:quizQueId`,
-      this.quizQueAnsController.getQuizQueAnsById
+      `/admin${this.path}/que-ans/:quizId`,
+      passport.authenticate('jwt', { session: false }),
+      this.quizQueAnsController.getQuizQueAnsByIdAdmin
     );
 
     //update quetion-answer
