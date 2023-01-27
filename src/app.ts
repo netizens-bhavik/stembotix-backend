@@ -28,7 +28,6 @@ class App {
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
 
   constructor(routes: Routes[]) {
-    try {
       this.app = express();
       this.env = NODE_ENV || 'development';
       this.port = PORT || 3000;
@@ -42,9 +41,7 @@ class App {
       this.initializeErrorHandling();
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
-    } catch (err) {
-      console.log (err);
-    }
+  
   }
   public getCredentials() {
     this.credentials.key = readFileSync(

@@ -20,7 +20,6 @@ import QuizScoreRoute from './routes/quizScore.route';
 import ReplyRoute from './routes/reply.route';
 
 validateEnv();
-try{
 
   const app = new App([
     new IndexRoute(),
@@ -40,10 +39,7 @@ try{
     new LikeDislikeRoute(),
     new AnswerRoute(),
     new QuizScoreRoute(),
-    new CompleteQuizRoute()
+    new CompleteQuizRoute(),
   ]);
   app.listen();
-}catch(error){
-  console.log(error)
-}
 
