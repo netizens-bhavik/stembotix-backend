@@ -9,7 +9,6 @@ import QuizQueAnsController from '@/controllers/quizQue.controller';
 
 class QuizQueRoute implements Routes {
   public path = '/quiz';
-  public adminRoutes = '/admin';
   public router = Router();
   public quizController = new QuizController();
   public quizQueAnsController = new QuizQueAnsController();
@@ -29,12 +28,13 @@ class QuizQueRoute implements Routes {
     );
 
     //get a single quetion-answer by id
+
     // this.router.get(
     //   `${this.path}/que-ans/:quizQueId`,
     //   this.quizQueAnsController.getQuizQueAnsById
     // );
     this.router.get(
-      `${this.adminRoutes}/quiz/que-ans/:quizId`,
+      `/admin${this.path}/que-ans/:quizId`,
       passport.authenticate('jwt', { session: false }),
       this.quizQueAnsController.getQuizQueAnsByIdAdmin
     );
