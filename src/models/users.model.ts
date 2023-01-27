@@ -67,7 +67,7 @@ module.exports = (sequelize, Sequelize) => {
       paranoid: true,
     }
   );
-    
+
   User.associate = (models) => {
     User.hasOne(models.RefreshToken, {
       foreignKey: 'userId',
@@ -91,11 +91,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     User.hasMany(models.Order);
-    User.hasMany(models.CompleteQuiz,{
-      foreignKey:'user_id',
-      targetKey:'id'  
-  })
-  
+    User.hasMany(models.CompleteQuiz, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {

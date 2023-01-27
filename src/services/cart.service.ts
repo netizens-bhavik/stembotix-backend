@@ -125,6 +125,7 @@ class CartService {
           },
         ],
       },
+      order: [[{ model: this.cartItem, as: 'CartItems' }, 'created_at', 'ASC']],
     });
     if (!cart) return { message: 'Empty Cart' };
     return cart;

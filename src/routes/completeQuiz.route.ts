@@ -5,26 +5,26 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CompleteQuizController from '@/controllers/completeQuiz.controller';
 
-class CompleteQuizRoute implements Routes{
-    public path = '/completeQuiz';
-    public router = Router();
-    public passport = passportConfig(passport)
-    public completeQuizController = new CompleteQuizController()
-    
-    constructor(){
-        this.initializeRoutes()
-    }
-    private initializeRoutes(){
-        try {
+class CompleteQuizRoute implements Routes {
+  public path = '/completeQuiz';
+  public router = Router();
+  public passport = passportConfig(passport);
+  public completeQuizController = new CompleteQuizController();
 
-            this.router.post(
-                `${this.path}`,
-                passport.authenticate('jwt',{session:false}),
-                this.completeQuizController.createCompleteQuiz
-                )
-        } catch(err) {
-            console.log(err)
-        }
-        }
-    }
-export default CompleteQuizRoute
+  constructor() {
+    this.initializeRoutes();
+  }
+  private initializeRoutes() {
+    this.router.post(
+      `${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.completeQuizController.createCompleteQuiz
+    );
+    this.router.get(
+      `${this.path}/:quiz_id`,
+      passport.authenticate('jwt', { session: false }),
+      this.completeQuizController.getCompleteQuizById
+    );
+  }
+}
+export default CompleteQuizRoute;

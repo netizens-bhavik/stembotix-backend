@@ -9,12 +9,12 @@ class QuizCorrectController {
     next: NextFunction
   ) => {
     try {
-      const  optiondetail  = req.body;
-      const {quizId} = req.params
-      const user = req.user
+      const optiondetail = req.body;
+      const { quizId } = req.params;
+      const user = req.user;
       const response = await this.quizcorrectService.CorrectAns(
         optiondetail,
-        quizId,
+        quizId
       );
       res.status(200).send(response);
     } catch (error) {
@@ -40,10 +40,8 @@ class QuizCorrectController {
     next: NextFunction
   ) => {
     try {
-      const {quizId} = req.params;
-      const response = await this.quizcorrectService.getScoreByQuizId(
-        quizId
-      );
+      const { quizId } = req.params;
+      const response = await this.quizcorrectService.getScoreByQuizId(quizId);
       res.status(200).send({
         response: response,
         message: 'This is your final Score',
