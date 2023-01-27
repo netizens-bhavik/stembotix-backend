@@ -13,16 +13,6 @@ class CompleteQuizService {
 
   public async createCompleteQuiz(quiz_id, user): Promise<CompleteQuiz> {
     try {
-<<<<<<< HEAD
-      const record = await this.completeQuiz.findOrCreate({
-        where: {
-          completeQuiz: true,
-          quiz_id: quiz_id,
-          user_id: user.id,
-        },
-      });
-      return record;
-=======
       const completeData = {
         completeQuiz: true,
         quiz_id: quiz_id,
@@ -31,7 +21,6 @@ class CompleteQuizService {
       const response = await this.completeQuiz.create(completeData);
 
       return response;
->>>>>>> b769dfd10ecabba4204daea25206ff97090e99e3
     } catch (error) {
       return error;
     }

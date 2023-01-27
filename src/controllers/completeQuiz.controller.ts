@@ -18,8 +18,6 @@ class CompleteQuizController {
       res.status(200).send(response);
     } catch (error) {
       next(error);
-<<<<<<< HEAD
-=======
     }
   };
 
@@ -36,7 +34,6 @@ class CompleteQuizController {
       res.status(200).send(response);
     } catch (error) {
       next(error);
->>>>>>> b769dfd10ecabba4204daea25206ff97090e99e3
     }
   };
 }

@@ -43,7 +43,7 @@ class App {
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
     } catch (err) {
-      return err;
+      console.log (err);
     }
   }
   public getCredentials() {

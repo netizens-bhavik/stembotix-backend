@@ -11,19 +11,6 @@ class CompleteQuizRoute implements Routes {
   public passport = passportConfig(passport);
   public completeQuizController = new CompleteQuizController();
 
-<<<<<<< HEAD
-            this.router.post(
-                `${this.path}`,
-                passport.authenticate('jwt',{session:false}),
-                this.completeQuizController.createCompleteQuiz
-                )
-        } catch(err) {
-            return(err)
-        }
-        }
-    }
-export default CompleteQuizRoute
-=======
   constructor() {
     this.initializeRoutes();
   }
@@ -41,4 +28,3 @@ export default CompleteQuizRoute
   }
 }
 export default CompleteQuizRoute;
->>>>>>> b769dfd10ecabba4204daea25206ff97090e99e3
