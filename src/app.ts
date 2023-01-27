@@ -28,7 +28,6 @@ class App {
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
 
   constructor(routes: Routes[]) {
-    try {
       this.app = express();
       this.env = NODE_ENV || 'development';
       this.port = PORT || 3000;
@@ -42,9 +41,7 @@ class App {
       this.initializeErrorHandling();
       this.httpServer = http.createServer(this.app);
       this.httpsServer = https.createServer(this.getCredentials(), this.app);
-    } catch (err) {
-      return err;
-    }
+  
   }
   public getCredentials() {
     this.credentials.key = readFileSync(
@@ -104,7 +101,7 @@ class App {
           title: 'Stembotix API',
           version: '1.0.0',
           description:
-            'Base URL: \n1. https://192.168.1.101:106:3000/api \n2. https://192.168.1.14:3000/api \n3. https://192.168.1.101:3000/api',
+            'Base URL: \n1. https://192.168.1.18:106:3000/api \n2. https://192.168.1.14:3000/api \n3. https://192.168.1.18:3000/api',
         },
       },
       apis: ['swagger.yaml'],

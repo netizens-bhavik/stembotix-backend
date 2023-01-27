@@ -18,6 +18,9 @@ class QuizService {
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
   public completeQuiz = DB.CompleteQuiz;
+
+
+  
   public isTrainer(user): boolean {
     return user.role === 'trainer' || user.role === 'admin';
   }
@@ -76,11 +79,42 @@ class QuizService {
 
     return { totalCount: quizData.count, records: data };
   }
+  public async getQuizById(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+      const response = await this.quiz.findAndCountAll({
+        where: {
+          id: quizId,
+        },
+        include: [
+          {
+            model: this.quizQue,
+            attributes: ['id', 'question', 'id'],
+            include: [
+              {
+                model: this.quizAns,
+                attributes: ['id', 'QuizQueId', 'option'],
+                separate: true,
+              },
+            ],
+          },
+        ],
+      });
+      const scoreData = await this.quizScore.findOne({
+        where: { quiz_id: quizId },
+      });
+      if (scoreData === null) {
+        var data = await this.quizScore.create({
+          score: 0,
+          totalQue: response.rows[0].QuizQues.length,
+          quiz_id: quizId,
+          userId: user.id,
+        });
+      }
+      return { totalCount: response.count, records: response.rows };
+    }
   public async getQuizByIdAdmin(
-    quizId,
+    quizId: string,
     queryObject
   ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
-    // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination

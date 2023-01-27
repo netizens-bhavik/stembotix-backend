@@ -25,16 +25,38 @@ class QuizQueAnsController {
       next(err);
     }
   };
-  public getQuizQueAnsById = async (
+  // public getQuizQueAnsById = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
+  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  //     const { quizQueId } = req.params;
+  //     const response: QuizQue = await this.quizQueAnsService.getQuizQueAnsById(
+  //       quizQueId,
+  //       queryObject
+  //     );
+  //     res.status(200).send(response);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // };
+  public getQuizQueAnsByIdAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { quizQueId } = req.params;
-      const response: QuizQue = await this.quizQueAnsService.getQuizQueAnsById(
-        quizQueId
-      );
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { quizId } = req.params;
+      const response: { totalCount: number; records: (QuizQue | undefined)[] } =
+        await this.quizQueAnsService.getQuizQueAnsByIdAdmin(
+          quizId,
+          queryObject
+        );
       res.status(200).send(response);
     } catch (err) {
       next(err);

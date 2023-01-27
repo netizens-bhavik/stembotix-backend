@@ -32,13 +32,74 @@ class QuizQueAnsService {
     const res = await this.quizAns.bulkCreate(op);
     return res;
   }
-  public async getQuizQueAnsById(quizQueId: string): Promise<QuizQue> {
-    const response: QuizQue = await this.quizQue.findOne({
+  // public async getQuizQueAnsById(
+  //   quizQueId: string,
+  //   queryObject
+  // ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
+  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+  //   const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+  //   // pagination
+  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+  //   // Search
+  //   const [search, searchCondition] = queryObject.search
+  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+  //     : ['', DB.Sequelize.Op.ne];
+
+  //   const response = await this.quizQue.findOne({
+  //     where: {
+  //       id: quizQueId,
+  //       question: {
+  //         [searchCondition]: search,
+  //       },
+  //     },
+  //     include: [
+  //       {
+  //         model: this.quizAns,
+  //         separate: true,
+  //         attributes: ['id', 'QuizQueId', 'option'],
+  //       },
+  //     ],
+  //     limit: pageSize,
+  //     offset: pageNo,
+  //     order: [[`${sortBy}`, `${order}`]],
+  //   });
+  //   return { totalCount: response, records: response.rows };
+  // }
+
+  public async getQuizQueAnsByIdAdmin(
+    quizId: string,
+    queryObject
+  ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.quizQue.findAndCountAll({
       where: {
-        id: quizQueId,
+        quiz_id: quizId,
+        question: {
+          [searchCondition]: search,
+        },
       },
+      include: [
+        {
+          model: this.quizAns,
+          attributes: ['id', 'QuizQueId', 'option', 'is_correct'],
+          separate: true,
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
-    return response;
+    return { totalCount: response.count, records: response.rows };
   }
   public async updateQuizQueAns(
     quizQueAnsDetail,
