@@ -13,6 +13,8 @@ tags:
     description: Handle cart and cartitems of User
   - name: order
     description: Order items
+  - name: quiz
+    description: Quiz
 servers:
   - url: 'http://192.168.1.106:5000/api/'
 
@@ -478,7 +480,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EditResSection'
+                $ref: '#/components/schemas/EditSectionRes'
         500:
           description: 'Server Error'
     delete:
@@ -569,6 +571,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EditTutorialRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - course curriculum tutorials
+      parameters:
+        - in: path
+          name: Tutorial video ID
+          type: string
+          required: true
+          description: Unique ID associated with a curriculum
+      summary: Delete curriculum tutorial video
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
         500:
           description: 'Server Error'
   # Product Endpoints
@@ -889,7 +914,7 @@ paths:
           description: 'Server Error'
 
   # Order Endpoints
-  /getorder:
+  /order:
     get:
       tags:
         - order
@@ -900,17 +925,15 @@ paths:
           content:
             application/json:
               schema:
-              type: object
-              items:
-                $ref: '#/compopnents/schemas/orderlistRes'
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/orderlistRes'
         500:
           description: 'Server Error'
-
-
-  /order:
     post:
       tags:
-        - get order
+        - order
       summary: Order successfully
       requestBody:
         description: Create order
@@ -960,6 +983,118 @@ paths:
                     $ref: '#/components/schemas/orderverifyRes'
         500:
           description: 'Server Error'
+  # Quiz Endpoint
+  /quiz:
+    post:
+      tags:
+        - quiz
+      summary: Add quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/quiztitleReq'
+
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Quiz Added Successfully.
+                  data:
+                    $ref: '#/components/schemas/quiztitleRes'
+        500:
+          description: 'Server Error'
+    get:
+      tags:
+        - quiz
+      summary: View all Quiz
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/quizlistRes'
+        500:
+          description: 'Server Error'
+  get/quiz:
+    get:
+      tags:
+        - get quiz 
+      summary: View Quiz by user
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/getquizRes'
+  getAll/quiz:
+    get:
+      tags:
+        - get quiz 
+      summary: View all Quiz
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/getallquizRes'
+  get/admin:
+    get:
+      tags:
+        - get quiz by admin
+      summary: View Quiz by admin
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/quizlistadminRes'
 # definitions
 definitions:
   users:
@@ -1158,7 +1293,7 @@ components:
         objective:
           type: string
           example: Testing section editing
-    EditResSection:
+    EditSectionRes:
       type: object
       properties:
         count:
@@ -1214,6 +1349,8 @@ components:
         video_url:
           type: string
           example: http://192.168.1.106:5000/media/http://192.168.1.106:5000/media/tutorial/tutorial_1670498175618.mp4
+    DeleteTutorialRes:
+      type:
     # products
     AddProductReq:
       type: object
@@ -1568,7 +1705,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z
+          example: 2022-12-09T04:17:17.962Z 
         deletedAt:
           type: [string, null]
           example: null
@@ -1723,7 +1860,7 @@ components:
           type: array
           items:
             type: string
-            example: "1bd8b0bd-491e-46e6-8238-fbdb669c42e6"
+            example: 1bd8b0bd-491e-46e6-8238-fbdb669c42e6
 
     orderverifyRes:
       type: object
@@ -1747,9 +1884,599 @@ components:
           type: string
           example: b81a0536-ef57-4e39-ae3c-0ea0f87f109d
 
-    # orderlistRes:
+    orderlistRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 10de6b98-966b-40f4-9dd3-d1fc5af9764f
+        amount:
+          type: integer
+          example: 5565
+        payment_id: 
+          type: string
+          example: pay_LAITsL3NDw4xXs
+        razorpay_order_id: 
+          type: string
+          example: order_LAITVWDmrW23cF
+        razorpay_signature: 
+          type: string
+          example: 345714bd95053d61299a774f62ce88176d53c4c3e4c680d86eb21ca7920c4688
+        createdAt: 
+          type: string
+          example: 2023-01-30T06:54:43.757Z
+        updatedAt: 
+          type: string
+          example: 2023-01-30T06:54:43.757Z
+        deletedAt: 
+          type: [string, null]
+          example: null
+        UserId: 
+          type: string
+          example: a73a96df-679f-4217-a738-a9264c795395
+        OrderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f2d2040d-4f9e-4013-ac40-37c63428a32c
+        item_type:
+          type: string
+          example: Course
+        quantity:
+          type: number
+          example: 1
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        OrderId:
+          type: string
+          example: 33748c2d-bb33-4562-9649-80e9640ee8bf
+        CourseId:
+          type: string
+          example: 4beb161b-8997-4669-b8b1-e2771823e834
+        ProductId:
+          type: [string, null]
+          example: null
+        Product:
+          type: [string, null]
+          example: null
+        Course:
+          $ref: '#/components/schemas/Courses'     
+    Courses:
+      type: object
+      properties:
+        id:
+          type: string
+          example: f2d2040d-4f9e-4013-ac40-37c63428a32c
+        title:
+          type: string
+          example: Learn NodeJs
+        price:
+          type: number
+          example: 454
+        level:
+          type: string
+          example: Advanced
+        language:
+          type: string
+          example: English
+        status:
+          type: string
+          example: Published
+        description:
+          type: string
+          example: Best Course to learn
+        thumbnail:
+          type: string
+          example: http://192.168.1.18:5000/media/thumbnail/thumbnail_1675061632094.jpg
+        trailer:
+          type: string
+          example: http://192.168.1.18:5000/media/trailer/trailer_1675061632267.mp4
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        Trainers:
+          type: array
+          items:
+            $ref: '#/components/schemas/trainer'
 
+    trainer:
+      type: object
+      properties:
+        trainer_id:
+          type: string
+          example: f2d2040d-4f9e-4013-ac40-37c63428a32c
+        user_id:
+          type: string
+          example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        userId:
+          type: string
+          example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
+        CoursesTrainers:
+          $ref: '#/components/schemas/CoursesTrainer'
+        User:
+          $ref: '#/components/schemas/Users'
+    CoursesTrainer:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        course_id:
+          type: string
+          example: 4beb161b-8997-4669-b8b1-e2771823e834
+        trainer_id:
+          type: string
+          example: e1952a6f-b9c7-420b-8cee-fc013816277e
+    Users:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Admin Manual
+        id:
+          type: string
+          example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
+        firstName:
+          type: string
+          example: Admin
+        lastName:
+          type: string
+          example: Manual
+        isEmailVerified:
+          type: string
+          example: true
+        email:
+          type: string
+          example: admin@yopmail.com
+        password:
+          type: string
+          example: $2b$08$4Y1L0pRRxeM0oHmCJu1eA.PFcSOEGTlVBr8ZDOILJlO7HAjLsd1PW
+        date_of_birth:
+          type: string
+          example: 2000-07-10T18:30:00.000Z
+        role:
+          type: string
+          example: admin
+        role_id:
+          type: string
+          example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
+         
+    # Quiz
+    quiztitleReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: how are u
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    quiztitleRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+          
+    quizlistRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    quizlistadminRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        QuizQues:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizQue'
+
+    QuizQue:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        question:
+          type: string
+          example: How are you?
+        quiz_id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        explanation:
+          type: string
+          example: sxsxaxaxsxasxasxasx
+        QuizAns:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/QuizAnsw'
+              - $ref: '#/components/schemas/QuizAnswer'
+              - $ref: '#/components/schemas/Answer'
+              - $ref: '#/components/schemas/QuizAnswers'
+    QuizAnsw:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 7613dc96-dab7-4aae-b7c3-88896a4cdecb
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: fine
+    QuizAnswer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 554feb99-8487-47ac-bf3a-66f677ff2d13
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: not fine
+    Answer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a1ae9d2d-bf57-475b-a941-b9eb9fcdb709
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: good
+    QuizAnswers:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d1c8cc01-8fe3-49f1-8c32-33d77adcb991
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: excellent
+
+    getquizRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        QuizQuest:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizQuesti'
+
+    QuizQuesti:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        question:
+          type: string
+          example: How are you?
+        quiz_id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        explanation:
+          type: string
+          example: sxsxaxaxsxasxasxasx
+        aw:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/QuizAnswe'
+              - $ref: '#/components/schemas/QuizAn'
+              - $ref: '#/components/schemas/As'
+              - $ref: '#/components/schemas/QuizAnswerer'
+    QuizAnswe:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 7613dc96-dab7-4aae-b7c3-88896a4cdecb
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: fine
+    QuizAn:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 554feb99-8487-47ac-bf3a-66f677ff2d13
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: not fine
+    As:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a1ae9d2d-bf57-475b-a941-b9eb9fcdb709
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: good
+    QuizAnswerer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d1c8cc01-8fe3-49f1-8c32-33d77adcb991
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: excellent
+
+    getallquizRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        QuizQuest:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizQuestion'
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        question:
+          type: string
+          example: How are you?
+        quiz_id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        explanation:
+          type: string
+          example: sxsxaxaxsxasxasxasx
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+        aw:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/GetQuiz'
+              - $ref: '#/components/schemas/GetQuizAns'
+              - $ref: '#/components/schemas/GetAnsw'
+              - $ref: '#/components/schemas/GetQuizAnswer'
+    GetQuiz:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 7613dc96-dab7-4aae-b7c3-88896a4cdecb
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: fine
+        is_correct:
+          type: string
+          example: true
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+    GetQuizAns:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 554feb99-8487-47ac-bf3a-66f677ff2d13
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: not fine
+        is_correct:
+          type: string
+          example: true
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+    GetAnsw:
+      type: object
+      properties:
+        id:
+          type: string
+          example: a1ae9d2d-bf57-475b-a941-b9eb9fcdb709
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: good
+        is_correct:
+          type: string
+          example: true
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+    GetQuizAnswer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d1c8cc01-8fe3-49f1-8c32-33d77adcb991
+        QuizQueId:
+          type: string
+          example: 447ecc77-dcdb-4087-9b5b-005c2d0af3d0
+        option:
+          type: string
+          example: excellent
+        is_correct:
+          type: string
+          example: false
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z 
+        deletedAt:
+          type: [string, null]
+          example: null
+      
     
 
-schemes:
-  - http

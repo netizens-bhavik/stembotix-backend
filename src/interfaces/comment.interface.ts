@@ -1,5 +1,6 @@
 export interface Comment {
-    id:string
-    comment:string
-    thumbnail:string
+  id: string;
+  comment: string;
+  title: string;
+  thumbnail: string;
 }
