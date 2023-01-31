@@ -28,7 +28,7 @@ class CommentService {
         .join('/')}`;
     }
     const newComment = await this.comment.create({
-      comment: commentDetail.comment.trim(),
+      comment: commentDetail.comment?.trim(),
       title: commentDetail.title,
       course_id: course_id,
       userId: user.id,
