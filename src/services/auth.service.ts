@@ -41,7 +41,7 @@ class AuthService {
       ...userData,
       role_id: roleData.id,
     });
-    if (userData.role.match(/trainer/i)) {
+    if (userData.role.match(/Instructor/i)) {
       await this.trainers.create({
         user_id: createUserData.id,
       });

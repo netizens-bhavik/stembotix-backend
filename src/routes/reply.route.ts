@@ -33,11 +33,11 @@ class ReplyRoute implements Routes {
       this.replyController.getReplyById
     );
 
-    this.router.get(
-      `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
-      this.replyController.viewReply
-    );
+    // this.router.get(
+    //   `${this.path}`,
+    //   passport.authenticate('jwt', { session: false }),
+    //   this.replyController.viewReply
+    // );
     this.router.put(
       `${this.path}/:reply_id`,
       [

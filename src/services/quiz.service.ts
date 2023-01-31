@@ -22,7 +22,7 @@ class QuizService {
 
   
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
 
   public async createQuiz(quizData: QuizDto, user): Promise<Quiz> {
@@ -79,38 +79,38 @@ class QuizService {
 
     return { totalCount: quizData.count, records: data };
   }
-  public async getQuizById(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
-      const response = await this.quiz.findAndCountAll({
-        where: {
-          id: quizId,
-        },
-        include: [
-          {
-            model: this.quizQue,
-            attributes: ['id', 'question', 'id'],
-            include: [
-              {
-                model: this.quizAns,
-                attributes: ['id', 'QuizQueId', 'option'],
-                separate: true,
-              },
-            ],
-          },
-        ],
-      });
-      const scoreData = await this.quizScore.findOne({
-        where: { quiz_id: quizId },
-      });
-      if (scoreData === null) {
-        var data = await this.quizScore.create({
-          score: 0,
-          totalQue: response.rows[0].QuizQues.length,
-          quiz_id: quizId,
-          userId: user.id,
-        });
-      }
-      return { totalCount: response.count, records: response.rows };
-    }
+  // public async getQuizById(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+  //     const response = await this.quiz.findAndCountAll({
+  //       where: {
+  //         id: quizId,
+  //       },
+  //       include: [
+  //         {
+  //           model: this.quizQue,
+  //           attributes: ['id', 'question', 'id'],
+  //           include: [
+  //             {
+  //               model: this.quizAns,
+  //               attributes: ['id', 'QuizQueId', 'option'],
+  //               separate: true,
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
+  //     const scoreData = await this.quizScore.findOne({
+  //       where: { quiz_id: quizId },
+  //     });
+  //     if (scoreData === null) {
+  //       var data = await this.quizScore.create({
+  //         score: 0,
+  //         totalQue: response.rows[0].QuizQues.length,
+  //         quiz_id: quizId,
+  //         userId: user.id,
+  //       });
+  //     }
+  //     return { totalCount: response.count, records: response.rows };
+  //   }
   public async getQuizByIdAdmin(
     quizId: string,
     queryObject
@@ -155,45 +155,44 @@ class QuizService {
     });
     return { totalCount: quizData.count, records: response };
   }
-  // public async getQuizBy(
-  //   queryObject,
-  //   quizId: string,
-  //   user
-  // ): Promise<{ data: Quiz[] | undefined }> {
-  //   const response: Quiz = await this.quiz.findAndCountAll({
-  //     where: {
-  //       id: quizId,
-  //     },
-  //     include: {
-  //       model: this.quizQue,
-  //       attributes: ['id', 'question', 'quiz_id'],
+  public async getQuizById(
+    quizId: string,
+    user
+  ): Promise<{ data: Quiz[] | undefined }> {
+    const response: Quiz = await this.quiz.findAndCountAll({
+      where: {
+        id: quizId,
+      },
+      include: {
+        model: this.quizQue,
+        attributes: ['id', 'question', 'quiz_id'],
 
-  //       include: [
-  //         {
-  //           model: this.quizAns,
-  //           separate: true,
-  //           attributes: ['id', 'QuizQueId', 'option'],
-  //         },
-  //       ],
-  //     },
-  //   });
+        include: [
+          {
+            model: this.quizAns,
+            separate: true,
+            attributes: ['id', 'QuizQueId', 'option'],
+          },
+        ],
+      },
+    });
 
-  //   const scoreData = await this.quizScore.findOne({
-  //     where: { quiz_id: quizId },
-  //   });
-  //   if (scoreData) {
-  //     await this.quizScore.destroy({
-  //       where: { quiz_id: quizId },
-  //     });
-  //   }
-  //   await this.quizScore.create({
-  //     score: 0,
-  //     totalQue: response.rows[0].QuizQues.length,
-  //     quiz_id: quizId,
-  //     userId: user.id,
-  //   });
-  //   return { data: response.rows[0] };
-  // }
+    const scoreData = await this.quizScore.findOne({
+      where: { quiz_id: quizId },
+    });
+    if (scoreData) {
+      await this.quizScore.destroy({
+        where: { quiz_id: quizId },
+      });
+    }
+    await this.quizScore.create({
+      score: 0,
+      totalQue: response.rows[0].QuizQues.length,
+      quiz_id: quizId,
+      userId: user.id,
+    });
+    return { data: response.rows[0] };
+  }
 
   public async updateQuiz(
     quizDetail,

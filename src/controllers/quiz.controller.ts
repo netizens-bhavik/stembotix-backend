@@ -75,8 +75,6 @@ class QuizController {
     next: NextFunction
   ) => {
     try {
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const { quizId } = req.params;
       const user = req.user;
       const response = await this.quizService.getQuizById(quizId, user);

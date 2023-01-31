@@ -46,7 +46,8 @@ class CommentService {
     return response;
   }
   public async viewComment(
-    queryObject
+    queryObject,
+    user
   ): Promise<{ totalCount: number; records: (Comment | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
@@ -74,6 +75,14 @@ class CommentService {
       include: [
         {
           model: this.reply,
+          include: {
+            model:this.user,
+            attributes:['firstName','lastName','id']
+          },
+        },
+        {
+          model: this.user,
+          attributes: ['firstName', 'lastName','id'],
         },
       ],
 

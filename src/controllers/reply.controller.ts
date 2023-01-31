@@ -38,21 +38,21 @@ class Replycontroller {
       next(err);
     }
   };
-  public viewReply = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: { totalCount: number; records: (Reply | undefined)[] } =
-        await this.replyService.viewReply(queryObject);
-      res.status(200).send(response);
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public viewReply = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
+  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  //     const response: { totalCount: number; records: (Reply | undefined)[] } =
+  //       await this.replyService.viewReply(queryObject);
+  //     res.status(200).send(response);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   public updateReply = async (
     req: Request,

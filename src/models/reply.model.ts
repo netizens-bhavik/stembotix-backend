@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     { paranoid: true }
   );
-  Reply.assocaite = (models) => {
+  Reply.associate = (models) => {
     Reply.belongsTo(models.Comment, {
       foreignKey: 'comment_id',
       targetKey: 'id',

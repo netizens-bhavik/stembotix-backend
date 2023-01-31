@@ -12,7 +12,7 @@ class QuizQueAnsService {
   public curriculum = DB.CurriculumSection;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
   public async createQuizQue(quizData, user): Promise<QuizQue> {
     if (!this.isTrainer(user)) {

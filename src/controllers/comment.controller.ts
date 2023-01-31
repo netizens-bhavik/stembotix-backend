@@ -14,14 +14,14 @@ class CommentController {
   ) => {
     try {
       const commentDetail = req.body;
-      const {course_id}= req.params
+      const { course_id } = req.params;
       const user = req.user;
       const file = req.files;
       const response: Comment = await this.commentService.addComment({
         commentDetail,
         user: user,
         file,
-        course_id
+        course_id,
       });
       res
         .status(200)
@@ -54,15 +54,19 @@ class CommentController {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const user = req.user;
       const response: { totalCount: number; records: (Comment | undefined)[] } =
-        await this.commentService.viewComment({
-          search,
-          pageRecord,
-          pageNo,
-          sortBy,
-          order,
-          queryObject,
-        });
+        await this.commentService.viewComment(
+          {
+            search,
+            pageRecord,
+            pageNo,
+            sortBy,
+            order,
+            queryObject,
+          },
+          { user }
+        );
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -73,8 +77,8 @@ class CommentController {
     req: Request,
     res: Response,
     next: NextFunction
-    ) => {
-      try {
+  ) => {
+    try {
       const { comment_id } = req.params;
       const commentDetail = req.body;
       const file = req.files;
