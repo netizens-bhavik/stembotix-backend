@@ -34,7 +34,6 @@ class OrderService {
         ],
       },
     });
-    console.log(data)
     return data;
   }
   public async addOrder(userId: string, amount: number) {
