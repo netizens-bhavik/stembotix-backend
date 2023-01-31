@@ -10,11 +10,13 @@ class Replycontroller {
       const replyDetail = req.body;
       const user = req.user;
       const file = req.files;
+      const{comment_id}=req.params
 
       const response: Reply = await this.replyService.addReply({
         replyDetail,
         user: user,
         file,
+        comment_id
       });
       res
         .status(200)

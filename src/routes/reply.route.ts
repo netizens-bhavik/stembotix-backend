@@ -19,7 +19,7 @@ class ReplyRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.post(
-      `${this.path}`,
+      `${this.path}/:comment_id`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),

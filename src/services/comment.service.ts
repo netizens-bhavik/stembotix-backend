@@ -4,6 +4,7 @@ import { HttpException } from '@/exceptions/HttpException';
 import { Comment } from '@/interfaces/comment.interface';
 import { isEmpty } from '@/utils/util';
 import DB from '@databases';
+import _ from 'lodash';
 
 class CommentService {
   public comment = DB.Comment;
@@ -12,16 +13,24 @@ class CommentService {
   public user = DB.User;
   public course = DB.Course;
 
-  public async addComment({ comentDetail, user, file }): Promise<Comment> {
-    const thumbnail = file;
-
-    const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+  public async addComment({
+    commentDetail,
+    user,
+    file,
+    course_id,
+  }): Promise<Comment> {
+    let thumbnailPath = null;
+    if (!_.isEmpty(file)) {
+      const thumbnail = file;
+      thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+    }
     const newComment = await this.comment.create({
-      comment: comentDetail.comment.trim(),
-      course_id: comentDetail.course_id,
+      comment: commentDetail.comment.trim(),
+      title: commentDetail.title,
+      course_id: course_id,
       userId: user.id,
       thumbnail: thumbnailPath,
     });
@@ -79,6 +88,7 @@ class CommentService {
     file,
   }): Promise<{ count: number; rows: Comment[] }> {
     const thumbnail = file;
+
     if (thumbnail) {
       const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
@@ -111,7 +121,7 @@ class CommentService {
         id: comment_id,
       },
     });
-    return { count: res[0], row: res[1] };
+    return { count: res, row: res[1] };
   }
 }
 export default CommentService;

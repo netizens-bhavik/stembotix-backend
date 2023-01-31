@@ -20,7 +20,7 @@ class CommentRoute implements Routes {
   private initializeRoutes() {
 
     this.router.post(
-      `${this.path}`,
+      `${this.path}/:course_id`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),

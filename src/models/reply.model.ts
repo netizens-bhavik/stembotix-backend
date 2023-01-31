@@ -26,7 +26,9 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    Reply.hasMany(models.Comment)
+    // Reply.hasMany(models.Comment,{
+    //   foreignKey:"comment_id"
+    // })
   };
   return Reply;
 };

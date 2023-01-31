@@ -79,7 +79,7 @@ class QuizController {
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const { quizId } = req.params;
       const user = req.user;
-      const response = await this.quizService.getQuizBy(quizId, user);
+      const response = await this.quizService.getQuizById(quizId, user);
       res.status(200).send(response);
     } catch (err) {
       next(err);
