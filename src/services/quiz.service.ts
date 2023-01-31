@@ -155,44 +155,45 @@ class QuizService {
     });
     return { totalCount: quizData.count, records: response };
   }
-  public async getQuizBy(
-    quizId: string,
-    user
-  ): Promise<{ data: Quiz[] | undefined }> {
-    const response: Quiz = await this.quiz.findAndCountAll({
-      where: {
-        id: quizId,
-      },
-      include: {
-        model: this.quizQue,
-        attributes: ['id', 'question', 'quiz_id'],
+  // public async getQuizBy(
+  //   queryObject,
+  //   quizId: string,
+  //   user
+  // ): Promise<{ data: Quiz[] | undefined }> {
+  //   const response: Quiz = await this.quiz.findAndCountAll({
+  //     where: {
+  //       id: quizId,
+  //     },
+  //     include: {
+  //       model: this.quizQue,
+  //       attributes: ['id', 'question', 'quiz_id'],
 
-        include: [
-          {
-            model: this.quizAns,
-            separate: true,
-            attributes: ['id', 'QuizQueId', 'option'],
-          },
-        ],
-      },
-    });
+  //       include: [
+  //         {
+  //           model: this.quizAns,
+  //           separate: true,
+  //           attributes: ['id', 'QuizQueId', 'option'],
+  //         },
+  //       ],
+  //     },
+  //   });
 
-    const scoreData = await this.quizScore.findOne({
-      where: { quiz_id: quizId },
-    });
-    if (scoreData) {
-      await this.quizScore.destroy({
-        where: { quiz_id: quizId },
-      });
-    }
-    await this.quizScore.create({
-      score: 0,
-      totalQue: response.rows[0].QuizQues.length,
-      quiz_id: quizId,
-      userId: user.id,
-    });
-    return { data: response.rows[0] };
-  }
+  //   const scoreData = await this.quizScore.findOne({
+  //     where: { quiz_id: quizId },
+  //   });
+  //   if (scoreData) {
+  //     await this.quizScore.destroy({
+  //       where: { quiz_id: quizId },
+  //     });
+  //   }
+  //   await this.quizScore.create({
+  //     score: 0,
+  //     totalQue: response.rows[0].QuizQues.length,
+  //     quiz_id: quizId,
+  //     userId: user.id,
+  //   });
+  //   return { data: response.rows[0] };
+  // }
 
   public async updateQuiz(
     quizDetail,

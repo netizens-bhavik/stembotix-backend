@@ -7,12 +7,17 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
+      title: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       comment: {
         type: Sequelize.TEXT,
         allowNull: false,
       },
       thumbnail: {
         type: Sequelize.STRING,
+        allowNull:true
       },
     },
     { paranoid: true }
@@ -26,7 +31,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    Comment.hasMany(models.Reply);
+    Comment.hasMany(models.Reply, {
+      foreignKey: 'comment_id',
+      targetKey: 'id',
+    });
   };
   return Comment;
 };

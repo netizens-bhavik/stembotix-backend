@@ -13,13 +13,15 @@ class CommentController {
     next: NextFunction
   ) => {
     try {
-      const comentDetail = req.body;
+      const commentDetail = req.body;
+      const {course_id}= req.params
       const user = req.user;
       const file = req.files;
       const response: Comment = await this.commentService.addComment({
-        comentDetail,
+        commentDetail,
         user: user,
         file,
+        course_id
       });
       res
         .status(200)
@@ -71,8 +73,8 @@ class CommentController {
     req: Request,
     res: Response,
     next: NextFunction
-  ) => {
-    try {
+    ) => {
+      try {
       const { comment_id } = req.params;
       const commentDetail = req.body;
       const file = req.files;

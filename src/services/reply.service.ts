@@ -9,7 +9,7 @@ class ReplyService {
   public trainer = DB.Trainer;
   public comment = DB.Comment;
 
-  public async addReply({replyDetail,file,user}): Promise<Reply> {
+  public async addReply({replyDetail,file,user,comment_id}): Promise<Reply> {
     const  thumbnail  = file
 
     const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
@@ -18,7 +18,7 @@ class ReplyService {
       .join('/')}`;
     const newReply = await this.reply.create({
      reply:replyDetail.reply.trim(),
-     CommentId:replyDetail.comment_id,
+     comment_id:comment_id,
      userId:user.id,
       thumbnail: thumbnailPath,
     });
@@ -50,18 +50,13 @@ class ReplyService {
     const replyData = await this.reply.findAndCountAll({
       where: { deleted_at: null },
     });
-    const data: (Reply | undefined)[] = await this.reply.findAll({
+    const data: (Reply | undefined)[] = await this.comment.findAll({
       where: DB.Sequelize.and(
-        { deleted_at: null },
-        {
-          reply: {
-            [searchCondition]: search,
-          },
-        }
+        { deleted_at: null }
       ),
       include: [
         {
-          model: this.comment,
+          model: this.reply
         },
       ],
 
@@ -107,7 +102,7 @@ class ReplyService {
         id: reply_id,
       },
     });
-    return { count: res[0], row: res[1] };
+    return { count: res, row: res[1] };
   }
 }
 export default ReplyService;
