@@ -77,8 +77,8 @@ class CommentController {
     req: Request,
     res: Response,
     next: NextFunction
-  ) => {
-    try {
+    ) => {
+      try {
       const { comment_id } = req.params;
       const commentDetail = req.body;
       const file = req.files;
