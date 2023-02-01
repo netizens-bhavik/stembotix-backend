@@ -190,20 +190,18 @@ class CourseService {
         course_id: courseId,
         
       },
-      include:[{
-        model: this.user,
         include: [
           {
             model: this.reply,
-            include: [
+            include: 
               {
                 model: this.user,
               },
-            ],
           },
-        ],
-      }]
-      
+          {
+            model:this.user
+          }
+        ],      
     });
     return response;
   }
