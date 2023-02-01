@@ -53,7 +53,7 @@ class ReviewController {
         .status(200)
         .send({ response: response, message: 'Review update Successfully' });
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   };
   public deleteReview = async (
