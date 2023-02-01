@@ -4,7 +4,7 @@ import passportConfig from '@/config/passportConfig';
 import { Routes } from '@/interfaces/routes.interface';
 import ReviewController from '@/controllers/review.controller';
 import validationMiddleware from '@middlewares/validation.middleware';
-import { ReviewDTO } from '@/dtos/review.dto';
+import { ReviewDto, ReviewDTO } from '@/dtos/review.dto';
 
 
 class ReviewRoute implements Routes {
@@ -23,6 +23,24 @@ class ReviewRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(ReviewDTO, 'body'),
       this.reviewController.addReview
+    );
+
+    this.router.get(
+      `${this.path}/:id`,
+      passport.authenticate('jwt', { session: false }),
+      this.reviewController.getReview
+    );
+
+    this.router.put(
+      `${this.path}/:review_id`,
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(ReviewDto, 'body'),
+      this.reviewController.updateReview
+    );
+    this.router.delete(
+      `${this.path}/:review_id`,
+      passport.authenticate('jwt', { session: false }),
+      this.reviewController.deleteReview
     );
   }
 }

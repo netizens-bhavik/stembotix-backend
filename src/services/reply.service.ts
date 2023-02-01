@@ -76,13 +76,13 @@ class ReplyService {
     replyDetail,
     file
   ): Promise<{ count: number; rows: Reply[] }> {
-    const thumbnail = file;
-    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
+    let thumbnailPath = null;
+    if (!_.isEmpty(file)) {
+      const thumbnail = file;
+      thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
         .splice(-2)
         .join('/')}`;
-      replyDetail.thumbnail = thumbnailPath;
     }
 
     const updateComment = await this.comment.update(

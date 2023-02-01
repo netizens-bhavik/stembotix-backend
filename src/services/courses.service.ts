@@ -10,9 +10,11 @@ class CourseService {
   public trainer = DB.Trainer;
   public user = DB.User;
   public coursesTrainers = DB.CoursesTrainers;
+  public comment = DB.Comment;
+  public reply = DB.Reply;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
   public async viewCourses(
     queryObject
@@ -169,6 +171,31 @@ class CourseService {
               model: DB.Quiz,
             },
           ],
+        },
+        {
+          model: this.comment,
+          include: [
+            {
+              model: this.reply,
+            },
+          ],
+        },
+      ],
+    });
+    return response;
+  }
+  public async getCommentByCourseId(courseId: string): Promise<Course> {
+    const response: Course = await this.comment.findAll({
+      where: {
+        course_id: courseId,
+      },
+      include: [
+        {
+          model: this.reply,
+          include:[{
+            model:this.user,
+            // attributes:["id"]
+          }]
         },
       ],
     });

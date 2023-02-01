@@ -35,6 +35,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'comment_id',
       targetKey: 'id',
     });
+    Comment.hasOne(models.LikeDislike,{
+      foreignKey: 'comment_id',
+      targetKey: 'id',
+    })
   };
   return Comment;
 };

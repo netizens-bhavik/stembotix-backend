@@ -164,7 +164,7 @@ class QuizController {
       });
       res
         .status(200)
-        .send({ response: response, message: 'Quiz Added Successfully' });
+        .send({ response: response, message: 'Quiz Deleted Successfully' });
     } catch (error) {
       next(error);
     }

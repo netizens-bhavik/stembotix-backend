@@ -19,10 +19,23 @@ class LikeDislikeRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.addLike
     );
+
+    this.router.post(
+      `${this.path}/reply/:reply_id`,
+      passport.authenticate('jwt', { session: false }),
+      this.likedislikeController.addLikeOnReply
+    );
+
     this.router.get(
       `${this.path}/:comment_id/like`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.listLike
+    );
+
+    this.router.get(
+      `${this.path}/reply/:reply_id/like`,
+      passport.authenticate('jwt', { session: false }),
+      this.likedislikeController.listLikeOnReply
     );
   }
 }

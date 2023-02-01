@@ -14,3 +14,11 @@ export class ReviewDTO {
   @IsString()
   type: string;
 }
+export class ReviewDto{
+  @IsString()
+  review: string;
+
+  @IsNumber()
+  @Max(5)
+  rating: number;
+}

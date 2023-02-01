@@ -20,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
       paranoid: true,
     }
   );
-  Review.asociate = (models) => {
+  Review.associate = (models) => {
     Review.belongsTo(models.Course, {
       foreignKey: 'course_id',
       targetKey: 'id',

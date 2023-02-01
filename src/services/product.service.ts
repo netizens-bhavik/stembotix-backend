@@ -117,7 +117,7 @@ class ProductService {
     user,
     queryObject,
   }): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
-    if (user.Role.roleName === 'student' || !user.isEmailVerified)
+    if (user.Role.roleName === 'Student' || !user.isEmailVerified)
       throw new HttpException(401, 'Unauthorized');
 
     // sorting
@@ -171,7 +171,7 @@ class ProductService {
   }
 
   public async addProduct({ productDetails, file, user }): Promise<Product> {
-    if (user.Role.roleName === 'student' || !user.isEmailVerified) {
+    if (user.Role.roleName === 'Student' || !user.isEmailVerified) {
       throw new HttpException(403, 'Access Forbidden');
     }
 
@@ -236,7 +236,7 @@ class ProductService {
     file,
     user,
   }): Promise<{ count: number; rows: Product[] }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(403, 'Access Forbidden');
     const record = await this.user.findOne({
       include: {
@@ -272,7 +272,7 @@ class ProductService {
   }
 
   public async deleteProduct({ user, productId }): Promise<{ count: number }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(401, 'Unauthorized');
     const courseRecord: Product = await this.product.findOne({
       where: { id: productId },
@@ -302,7 +302,7 @@ class ProductService {
   }
 
   public async togglePublish({ user, productId }): Promise<{ count: number }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(403, 'Forbidden Resource');
     const courseRecord = await this.product.findOne({
       where: {

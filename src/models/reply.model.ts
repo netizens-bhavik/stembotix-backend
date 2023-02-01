@@ -29,6 +29,10 @@ module.exports = (sequelize, Sequelize) => {
     // Reply.hasMany(models.Comment,{
     //   foreignKey:"comment_id"
     // })
+    Reply.hasOne(models.LikeDislike,{
+      foreignKey: 'reply_id',
+      targetKey: 'id',
+    })
   };
   return Reply;
 };

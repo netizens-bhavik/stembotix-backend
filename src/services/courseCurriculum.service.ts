@@ -14,7 +14,7 @@ class CurriculumSectionService {
   public user = DB.User;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
 
   public async addSection({

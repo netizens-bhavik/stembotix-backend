@@ -20,6 +20,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'user_id',
       targetKey: 'id',
     });
+    LikeDislike.belongsTo(models.Reply,{
+      foreignKey: 'reply_id',
+      targetKey: 'id'
+    })
   };
   return LikeDislike;
 };

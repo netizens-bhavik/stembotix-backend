@@ -96,14 +96,13 @@ class CommentService {
     commentDetail,
     file,
   }): Promise<{ count: number; rows: Comment[] }> {
-    const thumbnail = file;
-
-    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
+    let thumbnailPath = null;
+    if (!_.isEmpty(file)) {
+      const thumbnail = file;
+      thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
         .splice(-2)
         .join('/')}`;
-      commentDetail.thumbnail = thumbnailPath;
     }
 
     const updateComment = await this.comment.update(
