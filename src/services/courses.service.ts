@@ -188,16 +188,22 @@ class CourseService {
     const response: Course = await this.comment.findAll({
       where: {
         course_id: courseId,
+        
       },
-      include: [
-        {
-          model: this.reply,
-          include:[{
-            model:this.user,
-            // attributes:["id"]
-          }]
-        },
-      ],
+      include:[{
+        model: this.user,
+        include: [
+          {
+            model: this.reply,
+            include: [
+              {
+                model: this.user,
+              },
+            ],
+          },
+        ],
+      }]
+      
     });
     return response;
   }
