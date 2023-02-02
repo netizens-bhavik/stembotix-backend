@@ -293,7 +293,6 @@ class QuizService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    console.log(quizData);
     return { totalCount: quizData.count, records: data };
   }
 
