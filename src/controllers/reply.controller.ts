@@ -10,13 +10,13 @@ class Replycontroller {
       const replyDetail = req.body;
       const user = req.user;
       const file = req.files;
-      const{comment_id}=req.params
+      const { comment_id } = req.params;
 
       const response: Reply = await this.replyService.addReply({
         replyDetail,
         user: user,
         file,
-        comment_id
+        comment_id,
       });
       res
         .status(200)
@@ -62,10 +62,14 @@ class Replycontroller {
     try {
       const { reply_id } = req.params;
       const replyDetail = req.body;
+
       const file = req.files;
       replyDetail['id'] = reply_id;
 
-      const response = await this.replyService.updateReply(replyDetail, file);
+      const response = await this.replyService.updateReply({
+        replyDetail,
+        file,
+      });
       res
         .status(200)
         .send({ response: response, message: 'Reply update Successfully' });

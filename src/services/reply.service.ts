@@ -72,10 +72,10 @@ class ReplyService {
   //   });
   //   return { totalCount: replyData.count, records: data };
   // }
-  public async updateReply(
+  public async updateReply({
     replyDetail,
-    file
-  ): Promise<{ count: number; rows: Reply[] }> {
+    file,
+  }): Promise<{ count: number; rows: Reply[] }> {
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
       const thumbnail = file;
@@ -85,7 +85,7 @@ class ReplyService {
         .join('/')}`;
     }
 
-    const updateComment = await this.comment.update(
+    const updateReply = await this.reply.update(
       {
         ...replyDetail,
       },
@@ -96,8 +96,7 @@ class ReplyService {
         returning: true,
       }
     );
-
-    return { count: updateComment[0], rows: updateComment[1] };
+    return { count: updateReply[0], rows: updateReply[1] };
   }
   public async deleteReply({
     reply_id,

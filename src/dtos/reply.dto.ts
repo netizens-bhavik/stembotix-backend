@@ -10,3 +10,8 @@ export class ReplyDto {
   @IsString()
   public thumbnail: string;
 }
+export class ReplyDTO{
+  @IsString()
+  public reply: string;
+
+}

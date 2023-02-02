@@ -3,10 +3,9 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import { ReplyDto } from '@dtos/reply.dto';
+import { ReplyDTO, ReplyDto } from '@dtos/reply.dto';
 import uploadFiles from '@/rest/fileUpload';
 import Replycontroller from '@/controllers/reply.controller';
-
 
 class ReplyRoute implements Routes {
   public path = '/reply';
@@ -44,9 +43,6 @@ class ReplyRoute implements Routes {
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
       ],
-
-      validationMiddleware(ReplyDto, 'body'),
-
       this.replyController.updateReply
     );
 
@@ -55,7 +51,6 @@ class ReplyRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.replyController.deleteReply
     );
-
   }
 }
 export default ReplyRoute;
