@@ -21,15 +21,15 @@ class CourseService {
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
-    // pagination
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
+        // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -62,7 +62,8 @@ class CourseService {
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -75,6 +76,7 @@ class CourseService {
       where: DB.Sequelize.and({ deletedAt: null }),
     });
     const data: (Course | undefined)[] = await this.course.findAll({
+
       where: DB.Sequelize.and({
         deletedAt: null,
         title: {
@@ -188,28 +190,29 @@ class CourseService {
     const response: Course = await this.comment.findAll({
       where: {
         course_id: courseId,
-        
       },
-        include: [
-          {
-            model: this.reply,
-            include: 
-              {
-                model: this.user,
-              },
+      include: [
+        {
+          model: this.reply,
+          include: {
+            model: this.user,
           },
-          {
-            model:this.user
-          }
-        ],      
-    });
+        },
+        {
+          model: this.user,
+        },
+      ],
+      order: [['createdAt', 'DESC']]
+    });    
     return response;
   }
   public async updateCourse({
     courseDetails,
     file,
     trainer,
+    courseId
   }): Promise<{ count: number; rows: Course[] }> {
+    // console.log(trainer)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
     const record = await this.trainer.findOne({
@@ -261,9 +264,6 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          // where: {
-          //   user_id: trainer.id,
-          // },
         },
       ],
     });
@@ -291,7 +291,7 @@ class CourseService {
 
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || "DESC"
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -347,8 +347,6 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          // through: [],
-          // where: { user_id: trainer.id },
         },
       ],
     });

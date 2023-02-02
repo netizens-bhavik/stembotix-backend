@@ -109,6 +109,7 @@ class CourseController {
         courseDetails,
         file,
         trainer,
+        courseId
       });
       res.status(200).send(response);
     } catch (error) {

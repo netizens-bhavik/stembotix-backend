@@ -1,5 +1,6 @@
 import DB from '@databases';
 import { LikeDislike } from '@/interfaces/likedislike.interface';
+import { HttpException } from '@/exceptions/HttpException';
 
 export type LikeDislikeType = {
   record: LikeDislike;
@@ -11,7 +12,9 @@ class LikeDislikeService {
   public user = DB.User;
   public likedislike = DB.LikeDislike;
 
-  public async addLikeDislike(likeDislikeDetails): Promise<LikeDislikeType> {
+  public async addLikeDislikeOnComment(
+    likeDislikeDetails
+  ): Promise<LikeDislikeType> {
     let message = 'Like Successfuly';
     const [record, isCreated] = await this.likedislike.findOrCreate({
       where: {
@@ -28,8 +31,9 @@ class LikeDislikeService {
     return { record, message };
   }
 
-
-  public async addLikeDislikeOnReply(likeDislikeDetail): Promise<LikeDislikeType> {
+  public async addLikeDislikeOnReply(
+    likeDislikeDetail
+  ): Promise<LikeDislikeType> {
     let message = 'Like Successfuly';
     const [record, isCreated] = await this.likedislike.findOrCreate({
       where: {
@@ -45,14 +49,15 @@ class LikeDislikeService {
     }
     return { record, message };
   }
-  
-  public async viewLike(
+
+  public async viewLikeonComment(
     queryObject,
     comment_id
   ): Promise<{ totalCount: number; likes: (LikeDislike | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -66,15 +71,16 @@ class LikeDislikeService {
     });
     const data: (LikeDislike | undefined)[] = await this.likedislike.findAll({
       where: DB.Sequelize.and({ comment_id: comment_id }),
-      //   include: [{ model: this.comment }],
 
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    if (likeData.count === 0) {
+      throw new HttpException(404, 'No like exist');
+    }
     return { totalCount: likeData.count, likes: data };
   }
-
 
   public async viewLikeOnReply(
     queryObject,
@@ -82,7 +88,8 @@ class LikeDislikeService {
   ): Promise<{ totalCount: number; likes: (LikeDislike | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -96,7 +103,6 @@ class LikeDislikeService {
     });
     const data: (LikeDislike | undefined)[] = await this.likedislike.findAll({
       where: DB.Sequelize.and({ reply_id: reply_id }),
-      //   include: [{ model: this.comment }],
 
       limit: pageSize,
       offset: pageNo,

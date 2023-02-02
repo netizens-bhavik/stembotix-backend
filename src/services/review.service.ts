@@ -12,24 +12,24 @@ class ReviewService {
   public async createReview(reviewDetail, user): Promise<ReviewDTO> {
     if (reviewDetail.type === 'product') {
       const review = await this.review.findOne({
-        where: { product_id: reviewDetail.idDetail },
+        where: { product_id: reviewDetail.postId },
       });
       if (review) throw new HttpException(400, 'You already Reviewed');
       return await this.review.create({
         ...reviewDetail,
         userId: user.id,
-        product_id: reviewDetail.idDetail,
+        product_id: reviewDetail.postId,
       });
     } else if (reviewDetail.type === 'course') {
       const newReview = await this.review.findOne({
-        where: { course_id: reviewDetail.idDetail },
+        where: { course_id: reviewDetail.postId },
       });
       if (newReview) throw new HttpException(400, 'You already Reviewed');
 
       return await this.review.create({
         ...reviewDetail,
         userId: user.id,
-        course_id: reviewDetail.idDetail,
+        course_id: reviewDetail.postId,
       });
     }
   }
@@ -38,7 +38,8 @@ class ReviewService {
     id
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -73,27 +74,27 @@ class ReviewService {
     reviewDetail,
     review_id
   ): Promise<{ count: number; review: (Review | undefined)[] }> {
-
     const updateReview = await this.review.update(
       {
-        ...reviewDetail
+        ...reviewDetail,
       },
       {
-        where:{
-            id:review_id
+        where: {
+          id: review_id,
+        },
+      }
+    );
+
+    return { count: updateReview[0], review: updateReview[1] };
+  }
+  public async deleteReview(review_id): Promise<{ count: number }> {
+    const res: number = await this.review.destroy({
+      where: {
+        id: review_id,
       },
-    }
-    )
-  
-  return { count: updateReview[0], review: updateReview[1] };
-}
-public async deleteReview(review_id): Promise<{ count: number }> {
-  const res: number = await this.review.destroy({
-    where: {
-      id:review_id
-    },
-  });
-  return { count: res };
-}
+    });
+
+    return { count: res };
+  }
 }
 export default ReviewService;

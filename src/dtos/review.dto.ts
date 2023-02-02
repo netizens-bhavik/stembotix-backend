@@ -9,7 +9,7 @@ export class ReviewDTO {
   rating: number;
 
   @IsString()
-  idDetail: string;
+  postId: string;
 
   @IsString()
   type: string;

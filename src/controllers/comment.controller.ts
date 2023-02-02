@@ -53,7 +53,6 @@ class CommentController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const user = req.user;
       const response: { totalCount: number; records: (Comment | undefined)[] } =
         await this.commentService.viewComment(
@@ -63,7 +62,6 @@ class CommentController {
             pageNo,
             sortBy,
             order,
-            queryObject,
           },
           { user }
         );

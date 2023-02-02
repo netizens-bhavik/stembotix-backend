@@ -9,10 +9,10 @@ class LikeDislikeController {
   public user = DB.User;
   public comment = DB.Comment;
 
-  public addLike = async (req: Request, res: Response, next: NextFunction) => {
+  public addLikeDislikeOnComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
-      const response = await this.likeDislikeService.addLikeDislike({
+      const response = await this.likeDislikeService.addLikeDislikeOnComment({
         comment_id: req.params.comment_id,
         user: user,
       });
@@ -22,7 +22,7 @@ class LikeDislikeController {
     }
   };
   
-  public addLikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
+  public addLikeDislikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
       const response = await this.likeDislikeService.addLikeDislikeOnReply({
@@ -35,7 +35,7 @@ class LikeDislikeController {
     }
   };
 
-  public listLike = async (req: Request, res: Response, next: NextFunction) => {
+  public  viewLikeonComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { comment_id } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
@@ -43,14 +43,14 @@ class LikeDislikeController {
       const response: {
         totalCount: number;
         likes: (LikeDislike | undefined)[];
-      } = await this.likeDislikeService.viewLike(queryObject, comment_id);
+      } = await this.likeDislikeService. viewLikeonComment(queryObject, comment_id);
       res.status(200).send(response);
     } catch (error) {
       next(error);
     }
   };
 
-  public listLikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
+  public viewLikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { reply_id } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;

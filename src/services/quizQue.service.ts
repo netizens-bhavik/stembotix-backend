@@ -67,13 +67,14 @@ class QuizQueAnsService {
   //   return { totalCount: response, records: response.rows };
   // }
 
-  public async getQuizQueAnsByIdAdmin(
+  public async  getQuizQueAnsByIdAdmin(
     quizId: string,
     queryObject
   ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
-    // pagination
+    const order = queryObject.order || 'DESC'
+    // === 'ASC' ? 'ASC' : 'DESC';
+        // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search

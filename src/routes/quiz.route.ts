@@ -37,6 +37,11 @@ class QuizRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.quizController.getQuizByIdAdmin
     );
+    // this.router.get(
+    //   `${this.path}/:quizId`,
+    //   passport.authenticate('jwt', { session: false }),
+    //   this.quizController.getQuizByIds
+    // );
 
     //get single quiz by quizId
     this.router.get(

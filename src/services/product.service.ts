@@ -14,7 +14,8 @@ class ProductService {
   ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -58,6 +59,7 @@ class ProductService {
         },
       ],
     });
+
     return { totalCount: productsRecord.count, records: data };
   }
 
@@ -66,7 +68,8 @@ class ProductService {
   ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -122,7 +125,8 @@ class ProductService {
 
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -245,9 +249,6 @@ class ProductService {
           id: productDetails.id,
         },
       },
-      // where: {
-      //   id: user.id,
-      // },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
     if (file) {
@@ -279,9 +280,6 @@ class ProductService {
       include: [
         {
           model: this.user,
-          // where: {
-          //   id: user.id,
-          // },
         },
       ],
     });
@@ -311,7 +309,6 @@ class ProductService {
       include: [
         {
           model: this.user,
-          // where: { id: user.id },
         },
       ],
     });
