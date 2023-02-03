@@ -51,6 +51,17 @@ class CourseService {
             },
           ],
         },
+        {
+          model: DB.CurriculumSection,
+          include: [
+            {
+              model: DB.CurriCulumVideo,
+            },
+            {
+              model: DB.Quiz,
+            },
+          ],
+        },
       ],
 
       limit: pageSize,

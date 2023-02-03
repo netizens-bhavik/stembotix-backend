@@ -83,12 +83,12 @@ class ProductService {
     });
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
-        { deletedAt: null },
-        {
-          title: {
-            [searchCondition]: search,
-          },
-        }
+        { title: { [searchCondition]: search } }
+        // DB.Sequelize.or(
+        //   { title: { [searchCondition]: search } },
+        //   // { category: { [searchCondition]: search } },
+        //   { price: { [searchCondition]: search } }
+        // )
       ),
       limit: pageSize,
       offset: pageNo,

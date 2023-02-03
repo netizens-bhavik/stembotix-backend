@@ -36,7 +36,6 @@ class ReplyService {
     const response: Reply = await this.reply.findOne({
       where: {
         id: replyId,
-
       },
     });
     return response;

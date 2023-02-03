@@ -538,7 +538,7 @@ paths:
         content:
           application/json:
             schema:
-              
+
       responses:
         200:
           description: 'OK'
@@ -1032,10 +1032,59 @@ paths:
                       $ref: '#/components/schemas/quizlistRes'
         500:
           description: 'Server Error'
+  /quiz/{quizId}:
+    put:
+      tags:
+        - quiz
+      summary: Update quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateQuiztitleReq'
+
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Quiz Added Successfully.
+                  data:
+                    $ref: '#/components/schemas/updateQuizRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - quiz
+      parameters:
+        - in: path
+          name: Quiz ID
+          type: string
+          required: true
+          description: Unique ID associated with a quiz
+      summary: Remove quiz
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
   get/quiz:
     get:
       tags:
-        - get quiz 
+        - quiz question and answers
       summary: View Quiz by user
       responses:
         200:
@@ -1056,7 +1105,7 @@ paths:
   getAll/quiz:
     get:
       tags:
-        - get quiz 
+        - quiz question and answers
       summary: View all Quiz
       responses:
         200:
@@ -1077,7 +1126,7 @@ paths:
   get/admin:
     get:
       tags:
-        - get quiz by admin
+        - quiz question and answers
       summary: View Quiz by admin
       responses:
         200:
@@ -1705,7 +1754,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -1893,32 +1942,32 @@ components:
         amount:
           type: integer
           example: 5565
-        payment_id: 
+        payment_id:
           type: string
           example: pay_LAITsL3NDw4xXs
-        razorpay_order_id: 
+        razorpay_order_id:
           type: string
           example: order_LAITVWDmrW23cF
-        razorpay_signature: 
+        razorpay_signature:
           type: string
           example: 345714bd95053d61299a774f62ce88176d53c4c3e4c680d86eb21ca7920c4688
-        createdAt: 
+        createdAt:
           type: string
           example: 2023-01-30T06:54:43.757Z
-        updatedAt: 
+        updatedAt:
           type: string
           example: 2023-01-30T06:54:43.757Z
-        deletedAt: 
+        deletedAt:
           type: [string, null]
           example: null
-        UserId: 
+        UserId:
           type: string
           example: a73a96df-679f-4217-a738-a9264c795395
         OrderItems:
           type: array
           items:
             $ref: '#/components/schemas/OrderItem'
-        
+
     OrderItem:
       type: object
       properties:
@@ -1936,7 +1985,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -1953,7 +2002,7 @@ components:
           type: [string, null]
           example: null
         Course:
-          $ref: '#/components/schemas/Courses'     
+          $ref: '#/components/schemas/Courses'
     Courses:
       type: object
       properties:
@@ -1989,7 +2038,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2012,7 +2061,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2071,7 +2120,7 @@ components:
         role_id:
           type: string
           example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
-         
+
     # Quiz
     quiztitleReq:
       type: object
@@ -2082,7 +2131,22 @@ components:
         curriculum_id:
           type: string
           example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
-
+    updateQuiztitleReq:
+      type: object
+      properties:
+        title:
+          type: string
+          example: how are u
+    updateQuizRes:
+      type: object
+      properties:
+        count:
+          type: number
+          example: 1
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/quiztitleRes'
     quiztitleRes:
       type: object
       properties:
@@ -2100,11 +2164,11 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
-          
+
     quizlistRes:
       type: object
       properties:
@@ -2119,7 +2183,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2141,7 +2205,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2239,7 +2303,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2337,7 +2401,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2369,7 +2433,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2401,7 +2465,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2425,7 +2489,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2449,7 +2513,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
@@ -2473,10 +2537,7 @@ components:
           example: 2022-12-09T04:17:17.962Z
         updatedAt:
           type: string
-          example: 2022-12-09T04:17:17.962Z 
+          example: 2022-12-09T04:17:17.962Z
         deletedAt:
           type: [string, null]
           example: null
-      
-    
-

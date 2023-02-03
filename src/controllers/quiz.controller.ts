@@ -142,9 +142,7 @@ class QuizController {
       quizDetail['id'] = quizId;
 
       const update = await this.quizService.updateQuiz(quizDetail, trainer);
-      res
-        .status(200)
-        .send({ response: update, message: 'Quiz Added Successfully' });
+      res.status(200).send(update);
     } catch (err) {
       next(err);
     }

@@ -66,6 +66,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     })
     Course.hasOne(models.CartItem);
+    Course.hasMany(models.Comment, {
+      foreignKey: 'course_id',
+      targetKey: 'id',
+    });
   };
 
   return Course;
