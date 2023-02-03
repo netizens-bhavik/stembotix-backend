@@ -21,7 +21,7 @@ class CompleteQuizRoute implements Routes {
       this.completeQuizController.createCompleteQuiz
     );
     this.router.get(
-      `${this.path}/:quiz_id`,
+      `${this.path}/:quizId`,
       passport.authenticate('jwt', { session: false }),
       this.completeQuizController.getCompleteQuizById
     );

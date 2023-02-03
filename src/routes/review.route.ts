@@ -26,19 +26,19 @@ class ReviewRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/:id`,
+      `${this.path}/:postid`,
       passport.authenticate('jwt', { session: false }),
       this.reviewController.getReview
     );
 
     this.router.put(
-      `${this.path}/:review_id`,
+      `${this.path}/:reviewId`,
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(ReviewDto, 'body'),
       this.reviewController.updateReview
     );
     this.router.delete(
-      `${this.path}/:review_id`,
+      `${this.path}/:reviewId`,
       passport.authenticate('jwt', { session: false }),
       this.reviewController.deleteReview
     );

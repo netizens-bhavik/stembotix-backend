@@ -4,6 +4,7 @@ import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
 import { API_BASE, API_SECURE_BASE } from '@config';
 import { makeValidator } from 'envalid';
+import sequelize from 'sequelize';
 
 class CourseService {
   public course = DB.Course;
@@ -12,6 +13,7 @@ class CourseService {
   public coursesTrainers = DB.CoursesTrainers;
   public comment = DB.Comment;
   public reply = DB.Reply;
+  public likedislike = DB.LikeDislike;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -23,7 +25,7 @@ class CourseService {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // === 'ASC' ? 'ASC' : 'DESC';
-        // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -76,7 +78,6 @@ class CourseService {
       where: DB.Sequelize.and({ deletedAt: null }),
     });
     const data: (Course | undefined)[] = await this.course.findAll({
-
       where: DB.Sequelize.and({
         deletedAt: null,
         title: {
@@ -191,26 +192,51 @@ class CourseService {
       where: {
         course_id: courseId,
       },
+      // attributes: [
+      //   [
+      //     sequelize.fn('COUNT', sequelize.col('LikeDislike.id')),
+      //     'like_count',
+      //   ],
+      // ],
+      // attributes:  Object.keys(this.comment.attributes).concat([
+      //   [sequelize.fn('COUNT',sequelize.col('LikeDislike.id')),"msg_count"]
+      // ]),
       include: [
         {
           model: this.reply,
-          include: {
-            model: this.user,
-          },
+          include: [
+            {
+              model: this.user,
+            },
+            // {
+            //   model: this.likedislike,
+            // },
+          ],
         },
         {
           model: this.user,
         },
+
+        {
+          model: this.likedislike,
+          // attributes: [
+          //   [
+          //     sequelize.fn('count', sequelize.col('company_users.id')),
+          //     'user_count',
+          //   ],
+          // ],
+        },
       ],
-      order: [['createdAt', 'DESC']]
-    });    
+      order: [['createdAt', 'DESC']],
+      group:["Comment.id"]
+    });
     return response;
   }
   public async updateCourse({
     courseDetails,
     file,
     trainer,
-    courseId
+    courseId,
   }): Promise<{ count: number; rows: Course[] }> {
     // console.log(trainer)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
@@ -291,7 +317,7 @@ class CourseService {
 
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order || "DESC"
+    const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;

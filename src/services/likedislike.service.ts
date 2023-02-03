@@ -76,9 +76,7 @@ class LikeDislikeService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    if (likeData.count === 0) {
-      throw new HttpException(404, 'No like exist');
-    }
+
     return { totalCount: likeData.count, likes: data };
   }
 

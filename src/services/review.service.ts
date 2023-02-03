@@ -35,7 +35,7 @@ class ReviewService {
   }
   public async getReview(
     queryObject,
-    id
+    postid
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -51,10 +51,10 @@ class ReviewService {
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
-          course_id: id,
+          course_id: postid,
         },
         {
-          product_id: id,
+          product_id: postid,
         }
       ),
       include: [
@@ -72,7 +72,7 @@ class ReviewService {
   }
   public async updateReview(
     reviewDetail,
-    review_id
+    reviewId
   ): Promise<{ count: number; review: (Review | undefined)[] }> {
     const updateReview = await this.review.update(
       {
@@ -80,17 +80,17 @@ class ReviewService {
       },
       {
         where: {
-          id: review_id,
+          id: reviewId,
         },
       }
     );
 
     return { count: updateReview[0], review: updateReview[1] };
   }
-  public async deleteReview(review_id): Promise<{ count: number }> {
+  public async deleteReview(reviewId): Promise<{ count: number }> {
     const res: number = await this.review.destroy({
       where: {
-        id: review_id,
+        id: reviewId,
       },
     });
 

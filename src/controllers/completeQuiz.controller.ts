@@ -9,10 +9,10 @@ class CompleteQuizController {
     next: NextFunction
   ) => {
     try {
-      const { quiz_id } = req.body;
+      const { quizid } = req.body;
       const user = req.user;
       const response = await this.completeQuizService.createCompleteQuiz(
-        quiz_id,
+        quizid,
         user
       );
       res.status(200).send(response);
@@ -27,9 +27,9 @@ class CompleteQuizController {
     next: NextFunction
   ) => {
     try {
-      const { quiz_id } = req.params;
+      const { quizid } = req.params;
       const response = await this.completeQuizService.getCompleteQuizById(
-        quiz_id
+        quizid
       );
       res.status(200).send(response);
     } catch (error) {

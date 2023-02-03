@@ -18,7 +18,7 @@ class ReplyRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/:comment_id`,
+      `${this.path}/:commentId`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
@@ -27,7 +27,7 @@ class ReplyRoute implements Routes {
       this.replyController.addReply
     );
     this.router.get(
-      `${this.path}/:reply_id`,
+      `${this.path}/:replyId`,
       passport.authenticate('jwt', { session: false }),
       this.replyController.getReplyById
     );
@@ -38,7 +38,7 @@ class ReplyRoute implements Routes {
     //   this.replyController.viewReply
     // );
     this.router.put(
-      `${this.path}/:reply_id`,
+      `${this.path}/:replyId`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
@@ -47,7 +47,7 @@ class ReplyRoute implements Routes {
     );
 
     this.router.delete(
-      `${this.path}/:reply_id`,
+      `${this.path}/:replyId`,
       passport.authenticate('jwt', { session: false }),
       this.replyController.deleteReply
     );

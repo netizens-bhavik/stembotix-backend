@@ -27,13 +27,13 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const id = req.params.id;
+      const postid = req.params.id;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         review: (Review | undefined)[];
-      } = await this.reviewSevice.getReview(queryObject, id);
+      } = await this.reviewSevice.getReview(queryObject, postid);
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -46,9 +46,9 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const {review_id} = req.params;
+      const {reviewId} = req.params;
       const reviewDetail = req.body;
-      const response = await this.reviewSevice.updateReview(reviewDetail, review_id);
+      const response = await this.reviewSevice.updateReview(reviewDetail, reviewId);
       res
         .status(200)
         .send({ response: response, message: 'Review update Successfully' });
@@ -62,9 +62,9 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const {review_id} = req.params;
+      const {reviewId} = req.params;
       const response: { count: number } = await this.reviewSevice.deleteReview(
-        review_id
+        reviewId
       );
       res
         .status(200)

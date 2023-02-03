@@ -13,7 +13,7 @@ class LikeDislikeController {
     try {
       const user = req.user;
       const response = await this.likeDislikeService.addLikeDislikeOnComment({
-        comment_id: req.params.comment_id,
+        comment_id: req.params.commentId,
         user: user,
       });
       res.status(200).send(response);
@@ -26,7 +26,7 @@ class LikeDislikeController {
     try {
       const user = req.user;
       const response = await this.likeDislikeService.addLikeDislikeOnReply({
-        reply_id: req.params.reply_id,
+        reply_id: req.params.replyId,
         user: user,
       });
       res.status(200).send(response);
@@ -37,13 +37,13 @@ class LikeDislikeController {
 
   public  viewLikeonComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { comment_id } = req.params;
+      const { commentId } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         likes: (LikeDislike | undefined)[];
-      } = await this.likeDislikeService. viewLikeonComment(queryObject, comment_id);
+      } = await this.likeDislikeService. viewLikeonComment(queryObject, commentId);
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -52,13 +52,13 @@ class LikeDislikeController {
 
   public viewLikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { reply_id } = req.params;
+      const { replyId } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         likes: (LikeDislike | undefined)[];
-      } = await this.likeDislikeService.viewLikeOnReply(queryObject, reply_id);
+      } = await this.likeDislikeService.viewLikeOnReply(queryObject, replyId);
       res.status(200).send(response);
     } catch (error) {
       next(error);

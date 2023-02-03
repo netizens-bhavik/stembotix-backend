@@ -10,13 +10,13 @@ class Replycontroller {
       const replyDetail = req.body;
       const user = req.user;
       const file = req.files;
-      const { comment_id } = req.params;
+      const { commentId } = req.params;
 
       const response: Reply = await this.replyService.addReply({
         replyDetail,
         user: user,
         file,
-        comment_id,
+        commentId,
       });
       res
         .status(200)
@@ -31,8 +31,8 @@ class Replycontroller {
     next: NextFunction
   ) => {
     try {
-      const { reply_id } = req.params;
-      const response: Reply = await this.replyService.getReplyById(reply_id);
+      const { replyId } = req.params;
+      const response: Reply = await this.replyService.getReplyById(replyId);
       res.status(200).send(response);
     } catch (err) {
       next(err);
@@ -83,11 +83,11 @@ class Replycontroller {
     next: NextFunction
   ) => {
     try {
-      const { reply_id } = req.params;
+      const { replyId } = req.params;
       const trainer = req.user;
 
       const response: { count: number } = await this.replyService.deleteReply({
-        reply_id,
+        replyId,
         trainer,
       });
       res

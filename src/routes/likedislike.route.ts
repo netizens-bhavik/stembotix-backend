@@ -15,25 +15,25 @@ class LikeDislikeRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/:comment_id`,
+      `${this.path}/:commentId`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.addLikeDislikeOnComment
     );
 
     this.router.post(
-      `${this.path}/reply/:reply_id`,
+      `${this.path}/reply/:replyId`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.addLikeDislikeOnReply
     );
 
     this.router.get(
-      `${this.path}/:comment_id/like`,
+      `${this.path}/:commentId/like`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.  viewLikeonComment
     );
 
     this.router.get(
-      `${this.path}/reply/:reply_id/like`,
+      `${this.path}/reply/:replyId/like`,
       passport.authenticate('jwt', { session: false }),
       this.likedislikeController.viewLikeOnReply
     );

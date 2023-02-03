@@ -1,3 +1,5 @@
+import DB from "@/databases";
+
 module.exports = (sequelize, Sequelize) => {
   const Comment = sequelize.define(
     'Comment',
@@ -17,11 +19,19 @@ module.exports = (sequelize, Sequelize) => {
       },
       thumbnail: {
         type: Sequelize.STRING,
-        allowNull:true
+        allowNull: true,
       },
     },
     { paranoid: true }
   );
+  // Comment.getLike = async function () {
+  //   return DB.LikeDislike;
+  // };
+  // LikeDislike.findAll({
+  //   where:{
+
+  //   }
+  // })
   Comment.associate = (models) => {
     Comment.belongsTo(models.Course, {
       foreignKey: 'course_id',
@@ -35,10 +45,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'comment_id',
       targetKey: 'id',
     });
-    Comment.hasOne(models.LikeDislike,{
+    Comment.hasMany(models.LikeDislike, {
       foreignKey: 'comment_id',
       targetKey: 'id',
-    })
+    });
   };
   return Comment;
 };

@@ -19,7 +19,7 @@ class CurriculumVideoRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/:curriculum_id/video`,
+      `${this.path}/:curriculumId/video`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.single('tutorial'),

@@ -22,7 +22,7 @@ class CurriculumVideoService {
     }
 
     const fetchSection = await this.curriculumSection.findOne({
-      where: { id: curriculumId.curriculum_id },
+      where: { id: curriculumId.curriculumId },
     });
 
     if (!fetchSection) {

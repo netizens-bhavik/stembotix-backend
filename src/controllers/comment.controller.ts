@@ -14,14 +14,14 @@ class CommentController {
   ) => {
     try {
       const commentDetail = req.body;
-      const { course_id } = req.params;
+      const { courseId } = req.params;
       const user = req.user;
       const file = req.files;
       const response: Comment = await this.commentService.addComment({
         commentDetail,
         user: user,
         file,
-        course_id,
+        courseId,
       });
       res
         .status(200)
@@ -37,9 +37,9 @@ class CommentController {
     next: NextFunction
   ) => {
     try {
-      const { comment_id } = req.params;
+      const { commentId } = req.params;
       const response: Comment = await this.commentService.getCommentById(
-        comment_id
+        commentId
       );
       res.status(200).send(response);
     } catch (err) {
@@ -77,10 +77,10 @@ class CommentController {
     next: NextFunction
     ) => {
       try {
-      const { comment_id } = req.params;
+      const { commentId } = req.params;
       const commentDetail = req.body;
       const file = req.files;
-      commentDetail['id'] = comment_id;
+      commentDetail['id'] = commentId;
 
       const response = await this.commentService.updateComment({
         commentDetail,
@@ -100,12 +100,12 @@ class CommentController {
     next: NextFunction
   ) => {
     try {
-      const { comment_id } = req.params;
+      const { commentId } = req.params;
       const trainer = req.user;
 
       const response: { count: number } =
         await this.commentService.deleteComment({
-          comment_id,
+          commentId,
           trainer,
         });
       res

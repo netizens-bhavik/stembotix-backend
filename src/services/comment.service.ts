@@ -12,12 +12,13 @@ class CommentService {
   public reply = DB.Reply;
   public user = DB.User;
   public course = DB.Course;
+  public likedislike = DB.LikeDislike;
 
   public async addComment({
     commentDetail,
     user,
     file,
-    course_id,
+    courseId,
   }): Promise<Comment> {
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
@@ -30,17 +31,25 @@ class CommentService {
     const newComment = await this.comment.create({
       comment: commentDetail.comment.trim(),
       title: commentDetail.title,
-      course_id: course_id,
+      course_id: courseId,
       userId: user.id,
       thumbnail: thumbnailPath,
     });
     return newComment;
   }
 
-  public async getCommentById(comment_id: string): Promise<Comment> {
+  public async getCommentById(commentId: string): Promise<Comment> {
     const response: Comment = await this.comment.findOne({
       where: {
-        id: comment_id,
+        id: commentId,
+        include: [
+          {
+            model: this.likedislike,
+            // where:{
+            //   comment_id:commentId
+            // }
+          },
+        ],
       },
     });
     return response;
@@ -51,9 +60,9 @@ class CommentService {
   ): Promise<{ totalCount: number; records: (Comment | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order || 'DESC'
+    const order = queryObject.order || 'DESC';
     // === 'ASC' ? 'ASC' : 'DESC';
-        // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -77,13 +86,13 @@ class CommentService {
         {
           model: this.reply,
           include: {
-            model:this.user,
-            attributes:['firstName','lastName','id']
+            model: this.user,
+            attributes: ['firstName', 'lastName', 'id'],
           },
         },
         {
           model: this.user,
-          attributes: ['firstName', 'lastName','id'],
+          attributes: ['firstName', 'lastName', 'id'],
         },
       ],
 
@@ -122,12 +131,12 @@ class CommentService {
   }
 
   public async deleteComment({
-    comment_id,
+    commentId,
     trainer,
   }): Promise<{ count: number; row: Comment[] }> {
     const res: number = await this.comment.destroy({
       where: {
-        id: comment_id,
+        id: commentId,
       },
     });
     return { count: res, row: res[1] };

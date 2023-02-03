@@ -14,7 +14,7 @@ class ReplyService {
     replyDetail,
     file,
     user,
-    comment_id,
+    commentId,
   }): Promise<Reply> {
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
@@ -26,16 +26,17 @@ class ReplyService {
     }
     const newReply = await this.reply.create({
       reply: replyDetail.reply.trim(),
-      comment_id: comment_id,
+      comment_id: commentId,
       userId: user.id,
       thumbnail: thumbnailPath,
     });
     return newReply;
   }
-  public async getReplyById(reply_id: string): Promise<Reply> {
+  public async getReplyById(replyId: string): Promise<Reply> {
     const response: Reply = await this.reply.findOne({
       where: {
-        id: reply_id,
+        id: replyId,
+
       },
     });
     return response;
@@ -99,12 +100,12 @@ class ReplyService {
     return { count: updateReply[0], rows: updateReply[1] };
   }
   public async deleteReply({
-    reply_id,
+    replyId,
     trainer,
   }): Promise<{ count: number; row: Reply[] }> {
     const res: number = await this.reply.destroy({
       where: {
-        id: reply_id,
+        id: replyId,
       },
     });
     return { count: res, row: res[1] };
