@@ -12,12 +12,13 @@ class CommentService {
   public reply = DB.Reply;
   public user = DB.User;
   public course = DB.Course;
+  public likedislike = DB.LikeDislike;
 
   public async addComment({
     commentDetail,
     user,
     file,
-    course_id,
+    courseId,
   }): Promise<Comment> {
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
@@ -30,27 +31,37 @@ class CommentService {
     const newComment = await this.comment.create({
       comment: commentDetail.comment.trim(),
       title: commentDetail.title,
-      course_id: course_id,
+      course_id: courseId,
       userId: user.id,
       thumbnail: thumbnailPath,
     });
     return newComment;
   }
 
-  public async getCommentById(comment_id: string): Promise<Comment> {
+  public async getCommentById(commentId: string): Promise<Comment> {
     const response: Comment = await this.comment.findOne({
       where: {
-        id: comment_id,
+        id: commentId,
+        include: [
+          {
+            model: this.likedislike,
+            // where:{
+            //   comment_id:commentId
+            // }
+          },
+        ],
       },
     });
     return response;
   }
   public async viewComment(
-    queryObject
+    queryObject,
+    user
   ): Promise<{ totalCount: number; records: (Comment | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -74,6 +85,14 @@ class CommentService {
       include: [
         {
           model: this.reply,
+          include: {
+            model: this.user,
+            attributes: ['firstName', 'lastName', 'id'],
+          },
+        },
+        {
+          model: this.user,
+          attributes: ['firstName', 'lastName', 'id'],
         },
       ],
 
@@ -87,14 +106,13 @@ class CommentService {
     commentDetail,
     file,
   }): Promise<{ count: number; rows: Comment[] }> {
-    const thumbnail = file;
-
-    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
+    let thumbnailPath = null;
+    if (!_.isEmpty(file)) {
+      const thumbnail = file;
+      thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
         .split('/')
         .splice(-2)
         .join('/')}`;
-      commentDetail.thumbnail = thumbnailPath;
     }
 
     const updateComment = await this.comment.update(
@@ -113,12 +131,12 @@ class CommentService {
   }
 
   public async deleteComment({
-    comment_id,
+    commentId,
     trainer,
   }): Promise<{ count: number; row: Comment[] }> {
     const res: number = await this.comment.destroy({
       where: {
-        id: comment_id,
+        id: commentId,
       },
     });
     return { count: res, row: res[1] };

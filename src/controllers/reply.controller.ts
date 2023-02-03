@@ -10,13 +10,13 @@ class Replycontroller {
       const replyDetail = req.body;
       const user = req.user;
       const file = req.files;
-      const{comment_id}=req.params
+      const { commentId } = req.params;
 
       const response: Reply = await this.replyService.addReply({
         replyDetail,
         user: user,
         file,
-        comment_id
+        commentId,
       });
       res
         .status(200)
@@ -31,28 +31,28 @@ class Replycontroller {
     next: NextFunction
   ) => {
     try {
-      const { reply_id } = req.params;
-      const response: Reply = await this.replyService.getReplyById(reply_id);
+      const { replyId } = req.params;
+      const response: Reply = await this.replyService.getReplyById(replyId);
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-  public viewReply = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: { totalCount: number; records: (Reply | undefined)[] } =
-        await this.replyService.viewReply(queryObject);
-      res.status(200).send(response);
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public viewReply = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
+  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  //     const response: { totalCount: number; records: (Reply | undefined)[] } =
+  //       await this.replyService.viewReply(queryObject);
+  //     res.status(200).send(response);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 
   public updateReply = async (
     req: Request,
@@ -62,10 +62,14 @@ class Replycontroller {
     try {
       const { reply_id } = req.params;
       const replyDetail = req.body;
+
       const file = req.files;
       replyDetail['id'] = reply_id;
 
-      const response = await this.replyService.updateReply(replyDetail, file);
+      const response = await this.replyService.updateReply({
+        replyDetail,
+        file,
+      });
       res
         .status(200)
         .send({ response: response, message: 'Reply update Successfully' });
@@ -79,11 +83,11 @@ class Replycontroller {
     next: NextFunction
   ) => {
     try {
-      const { reply_id } = req.params;
+      const { replyId } = req.params;
       const trainer = req.user;
 
       const response: { count: number } = await this.replyService.deleteReply({
-        reply_id,
+        replyId,
         trainer,
       });
       res

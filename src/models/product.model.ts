@@ -56,6 +56,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'product_id',
       otherKey: 'userId',
     });
+    Product.hasMany(models.Review, {
+      foreignKey: 'product_id',
+      targetKey: 'id',
+    });
     Product.hasOne(models.CartItem);
   };
   return Product;

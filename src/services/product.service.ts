@@ -14,7 +14,8 @@ class ProductService {
   ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -58,6 +59,7 @@ class ProductService {
         },
       ],
     });
+
     return { totalCount: productsRecord.count, records: data };
   }
 
@@ -66,7 +68,8 @@ class ProductService {
   ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -117,12 +120,13 @@ class ProductService {
     user,
     queryObject,
   }): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
-    if (user.Role.roleName === 'student' || !user.isEmailVerified)
+    if (user.Role.roleName === 'Student' || !user.isEmailVerified)
       throw new HttpException(401, 'Unauthorized');
 
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -171,7 +175,7 @@ class ProductService {
   }
 
   public async addProduct({ productDetails, file, user }): Promise<Product> {
-    if (user.Role.roleName === 'student' || !user.isEmailVerified) {
+    if (user.Role.roleName === 'Student' || !user.isEmailVerified) {
       throw new HttpException(403, 'Access Forbidden');
     }
 
@@ -236,7 +240,7 @@ class ProductService {
     file,
     user,
   }): Promise<{ count: number; rows: Product[] }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(403, 'Access Forbidden');
     const record = await this.user.findOne({
       include: {
@@ -245,9 +249,6 @@ class ProductService {
           id: productDetails.id,
         },
       },
-      // where: {
-      //   id: user.id,
-      // },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
     if (file) {
@@ -272,16 +273,13 @@ class ProductService {
   }
 
   public async deleteProduct({ user, productId }): Promise<{ count: number }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(401, 'Unauthorized');
     const courseRecord: Product = await this.product.findOne({
       where: { id: productId },
       include: [
         {
           model: this.user,
-          // where: {
-          //   id: user.id,
-          // },
         },
       ],
     });
@@ -302,7 +300,7 @@ class ProductService {
   }
 
   public async togglePublish({ user, productId }): Promise<{ count: number }> {
-    if (user.Role.roleName === 'student')
+    if (user.Role.roleName === 'Student')
       throw new HttpException(403, 'Forbidden Resource');
     const courseRecord = await this.product.findOne({
       where: {
@@ -311,7 +309,6 @@ class ProductService {
       include: [
         {
           model: this.user,
-          // where: { id: user.id },
         },
       ],
     });

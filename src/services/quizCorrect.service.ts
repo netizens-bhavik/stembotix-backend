@@ -1,3 +1,4 @@
+import { HttpException } from '@/exceptions/HttpException';
 import { QuizCorrect } from '@/interfaces/quizCorrect.interface';
 import DB from '@databases';
 
@@ -90,6 +91,7 @@ class QuizCorrectService {
       where: { quiz_id: quizId },
       attributes: ['score', 'total_que'],
     });
+    if (!response) throw new HttpException(404, 'No score Exist');
     return response;
   }
 }

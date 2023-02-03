@@ -30,7 +30,7 @@ class CreateUser {
           ...userData,
           role_id: roleRes.id,
         });
-        if (userData.role.match(/admin/i)) {
+        if (userData.role.match(/Admin/i)) {
           await this.trainers.create({
             user_id: userInstance.id,
           });

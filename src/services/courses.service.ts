@@ -4,22 +4,27 @@ import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
 import { API_BASE, API_SECURE_BASE } from '@config';
 import { makeValidator } from 'envalid';
+import sequelize from 'sequelize';
 
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
   public user = DB.User;
   public coursesTrainers = DB.CoursesTrainers;
+  public comment = DB.Comment;
+  public reply = DB.Reply;
+  public likedislike = DB.LikeDislike;
 
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
   public async viewCourses(
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -27,7 +32,6 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -60,7 +64,8 @@ class CourseService {
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -170,7 +175,60 @@ class CourseService {
             },
           ],
         },
+        {
+          model: this.comment,
+          include: [
+            {
+              model: this.reply,
+            },
+          ],
+        },
       ],
+    });
+    return response;
+  }
+  public async getCommentByCourseId(courseId: string): Promise<Course> {
+    const response: Course = await this.comment.findAll({
+      where: {
+        course_id: courseId,
+      },
+      // attributes: [
+      //   [
+      //     sequelize.fn('COUNT', sequelize.col('LikeDislike.id')),
+      //     'like_count',
+      //   ],
+      // ],
+      // attributes:  Object.keys(this.comment.attributes).concat([
+      //   [sequelize.fn('COUNT',sequelize.col('LikeDislike.id')),"msg_count"]
+      // ]),
+      include: [
+        {
+          model: this.reply,
+          include: [
+            {
+              model: this.user,
+            },
+            // {
+            //   model: this.likedislike,
+            // },
+          ],
+        },
+        {
+          model: this.user,
+        },
+
+        {
+          model: this.likedislike,
+          // attributes: [
+          //   [
+          //     sequelize.fn('count', sequelize.col('company_users.id')),
+          //     'user_count',
+          //   ],
+          // ],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+      group:["Comment.id"]
     });
     return response;
   }
@@ -178,7 +236,9 @@ class CourseService {
     courseDetails,
     file,
     trainer,
+    courseId,
   }): Promise<{ count: number; rows: Course[] }> {
+    // console.log(trainer)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
     const record = await this.trainer.findOne({
@@ -230,9 +290,6 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          // where: {
-          //   user_id: trainer.id,
-          // },
         },
       ],
     });
@@ -260,7 +317,7 @@ class CourseService {
 
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -316,8 +373,6 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          // through: [],
-          // where: { user_id: trainer.id },
         },
       ],
     });

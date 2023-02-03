@@ -20,7 +20,7 @@ class CommentRoute implements Routes {
   private initializeRoutes() {
 
     this.router.post(
-      `${this.path}/:course_id`,
+      `${this.path}/:courseId`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
@@ -28,7 +28,7 @@ class CommentRoute implements Routes {
       this.commentController.addComment
     );
     this.router.get(
-      `${this.path}/:comment_id`,
+      `${this.path}/:commentId`,
       passport.authenticate('jwt', { session: false }),
       this.commentController.getCommentById
     );
@@ -38,7 +38,7 @@ class CommentRoute implements Routes {
       this.commentController.viewComment
     );
     this.router.put(
-      `${this.path}/:comment_id`,
+      `${this.path}/:commentId`,
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
@@ -49,9 +49,9 @@ class CommentRoute implements Routes {
       this.commentController.updateComment
     );
     this.router.delete(
-      `${this.path}/:comment_id`,
+      `${this.path}/:commentId`,
       passport.authenticate('jwt', { session: false }),
-      this.commentController.deleteComment
+      this.commentController.   deleteComment
     );
 
     // this.router

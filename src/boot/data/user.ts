@@ -5,6 +5,6 @@ const userData = {
   password: 'admin@123',
   date_of_birth: '07-11-2000',
   isEmailVerified: true,
-  role: 'admin',
+  role: 'Admin',
 };
 export default userData;
