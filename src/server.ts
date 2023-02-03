@@ -18,6 +18,7 @@ import AnswerRoute from './routes/quizCorrect.route';
 import QuizQueRoute from './routes/quizQue.route';
 import QuizScoreRoute from './routes/quizScore.route';
 import ReplyRoute from './routes/reply.route';
+import ReviewRoute from './routes/review.route';
 
 validateEnv();
 
@@ -40,6 +41,7 @@ validateEnv();
     new AnswerRoute(),
     new QuizScoreRoute(),
     new CompleteQuizRoute(),
+    new ReviewRoute()
   ]);
   app.listen();
 

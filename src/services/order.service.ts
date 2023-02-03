@@ -33,7 +33,9 @@ class OrderService {
           },
         ],
       },
+      order:[['createdAt','DESC']]
     });
+    if (!data) throw new HttpException(404,"No order exist")
     return data;
   }
   public async addOrder(userId: string, amount: number) {

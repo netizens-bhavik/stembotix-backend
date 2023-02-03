@@ -9,7 +9,7 @@ class UserService {
   public users = DB.User;
 
   public isAdmin(userData): boolean {
-    return userData.role === 'admin';
+    return userData.role === 'Admin';
   }
 
   public async findAllUser(
@@ -66,7 +66,7 @@ class UserService {
     userId: string,
     userData: RegisterUserDto
   ): Promise<User> {
-    if (!(loggedUser.id === userId || loggedUser.role === 'admin'))
+    if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
       throw new HttpException(403, 'Access Forbidden');
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
@@ -80,7 +80,7 @@ class UserService {
   }
 
   public async deleteUser(loggedUser, userId: string): Promise<User> {
-    if (!(loggedUser.id === userId || loggedUser.role === 'admin'))
+    if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
       throw new HttpException(403, 'Access Forbidden');
     if (isEmpty(userId)) throw new HttpException(400, "User doesn't existId");
 

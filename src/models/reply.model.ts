@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     { paranoid: true }
   );
-  Reply.assocaite = (models) => {
+  Reply.associate = (models) => {
     Reply.belongsTo(models.Comment, {
       foreignKey: 'comment_id',
       targetKey: 'id',
@@ -29,6 +29,10 @@ module.exports = (sequelize, Sequelize) => {
     // Reply.hasMany(models.Comment,{
     //   foreignKey:"comment_id"
     // })
+    Reply.hasOne(models.LikeDislike,{
+      foreignKey: 'reply_id',
+      targetKey: 'id',
+    })
   };
   return Reply;
 };

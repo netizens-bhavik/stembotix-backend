@@ -9,7 +9,7 @@ class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
   public curriculumSection = DB.CurriculumSection;
   public isTrainer(user): boolean {
-    return user.role === 'trainer' || user.role === 'admin';
+    return user.role === 'Instructor' || user.role === 'Admin';
   }
   public async addVideo({
     curriculumVideoDetails,
@@ -22,7 +22,7 @@ class CurriculumVideoService {
     }
 
     const fetchSection = await this.curriculumSection.findOne({
-      where: { id: curriculumId.curriculum_id },
+      where: { id: curriculumId.curriculumId },
     });
 
     if (!fetchSection) {
@@ -51,7 +51,8 @@ class CurriculumVideoService {
   ): Promise<{ totalCount: number; records: (CurriCulumVideo | undefined)[] }> {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -93,8 +94,6 @@ class CurriculumVideoService {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const { tutorial } = file;
-
     const filePath = `${API_BASE}/media/${file?.path
       .split('/')
       .splice(-2)

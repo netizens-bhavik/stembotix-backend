@@ -69,14 +69,29 @@ class QuizController {
       next(err);
     }
   };
+  // public getQuizByIds = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
+  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  //     const { quizId } = req.params;
+  //     const user = req.user;
+  //     const response: { totalCount: number; records: (Quiz | undefined)[] } =
+  //       await this.quizService.getQuizByIds(quizId, queryObject);
+  //     res.status(200).send(response);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // };
   public getQuizById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const { quizId } = req.params;
       const user = req.user;
       const response = await this.quizService.getQuizById(quizId, user);
@@ -85,7 +100,7 @@ class QuizController {
       next(err);
     }
   };
-  //   public getQuizById = async (
+  //   public getQuizByIds = async (
   //   req: Request,
   //   res: Response,
   //   next: NextFunction
@@ -166,7 +181,7 @@ class QuizController {
       });
       res
         .status(200)
-        .send({ response: response, message: 'Quiz Added Successfully' });
+        .send({ response: response, message: 'Quiz Deleted Successfully' });
     } catch (error) {
       next(error);
     }
@@ -208,16 +223,3 @@ class QuizController {
 }
 export default QuizController;
 
-// exports.completeQuiz = async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     // Update the quiz and set completed to true
-//     await Quiz.update(
-//       { completed: true, completedAt: new Date() },
-//       { where: { id } }
-//     );
-//     res.send({ message: 'Quiz completed' });
-//   } catch (error) {
-//     res.status(500).send({ error: 'Error completing quiz' });
-//   }
-// };

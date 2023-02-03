@@ -14,10 +14,7 @@ class QuizScoreService {
     });
     const newScore = await this.quizScore.create({
       user,
-    });
-    // let defaultScore = 0;
-    // for (let i = 0; i <= defaultScore; i++)
-    //   if (is_selected_option === true) return newScore;
+    })
     return record;
   }
 }

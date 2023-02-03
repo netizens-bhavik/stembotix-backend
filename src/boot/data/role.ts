@@ -1,8 +1,8 @@
 const rolesData = [
-  { roleName: "admin" },
-  { roleName: "student" },
-  { roleName: "trainer" },
-  { roleName: "company" },
+  { roleName: "Admin" },
+  { roleName: "Student" },
+  { roleName: "Instructor" },
+  { roleName: "Institute" },
 ];
 
 export default rolesData;

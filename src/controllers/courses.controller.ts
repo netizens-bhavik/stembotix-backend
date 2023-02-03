@@ -81,6 +81,19 @@ class CourseController {
       next(error);
     }
   };
+  public getCommentByCourseId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { courseId } = req.params;
+      const response: Course = await this.courseService.getCommentByCourseId(courseId);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
   public updateCourse = async (
     req: Request,
     res: Response,
@@ -96,6 +109,7 @@ class CourseController {
         courseDetails,
         file,
         trainer,
+        courseId
       });
       res.status(200).send(response);
     } catch (error) {

@@ -5,7 +5,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import { AddCourseDTO } from '@/dtos/course.dto';
-import {uploadFiles} from '@/rest/fileUpload';
+import { uploadFiles } from '@/rest/fileUpload';
 
 class CourseRoute implements Routes {
   public path = '/courses';
@@ -37,6 +37,11 @@ class CourseRoute implements Routes {
     this.router.get(
       `${this.path}/:courseId`,
       this.courseController.getCourseById
+    );
+    // View all comment by course id 
+    this.router.get(
+      `${this.path}/:courseId/comments`,
+      this.courseController.getCommentByCourseId
     );
     // add course (by trainer only)
     this.router.post(

@@ -90,11 +90,23 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    User.hasMany(models.Order);
-    User.hasMany(models.CompleteQuiz, {
-      foreignKey: 'user_id',
+    User.hasOne(models.Review, {
+      foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.Reply, {
+      foreignKey: 'userId',
+      sourceKey: 'id',
+    });
+    User.hasMany(models.Order);
+    User.hasMany(models.CompleteQuiz, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    User.hasOne(models.LikeDislike,{
+      foreignKey: 'userId',
+      targetKey: 'id',
+    })
   };
 
   User.prototype.validPassword = (password) => {
