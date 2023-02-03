@@ -84,9 +84,10 @@ class CurriculumSectionService {
         include: [
           {
             model: this.curriculumVideo,
-          },{
-            model:DB.Quiz
-          }
+          },
+          {
+            model: DB.Quiz,
+          },
         ],
 
         limit: pageSize,

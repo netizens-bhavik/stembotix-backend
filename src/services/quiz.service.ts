@@ -18,7 +18,6 @@ class QuizService {
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
   public completeQuiz = DB.CompleteQuiz;
-
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
   }
@@ -106,9 +105,10 @@ class QuizService {
   //     return { totalCount: response.count, records: response.rows };
   //   }
   public async getQuizByIdAdmin(
-    quizId: string,
+    quizId,
     queryObject
   ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
+    // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
