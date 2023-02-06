@@ -51,6 +51,17 @@ class CourseService {
             },
           ],
         },
+        {
+          model: DB.CurriculumSection,
+          include: [
+            {
+              model: DB.CurriCulumVideo,
+            },
+            {
+              model: DB.Quiz,
+            },
+          ],
+        },
       ],
 
       limit: pageSize,
@@ -216,7 +227,6 @@ class CourseService {
     });
     return response;
   }
-
   public async updateCourse({
     courseDetails,
     file,

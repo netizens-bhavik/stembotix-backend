@@ -28,20 +28,19 @@ class App {
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
 
   constructor(routes: Routes[]) {
-      this.app = express();
-      this.env = NODE_ENV || 'development';
-      this.port = PORT || 3000;
-      this.app.set('view engine', 'ejs');
-      this.app.set('views', path.join(__dirname, '/view'));
-      this.connectToDatabase();
-      this.initializeSwagger();
-      this.initializeMiddlewares();
-      this.bootFiles.init();
-      this.initializeRoutes(routes);
-      this.initializeErrorHandling();
-      this.httpServer = http.createServer(this.app);
-      this.httpsServer = https.createServer(this.getCredentials(), this.app);
-  
+    this.app = express();
+    this.env = NODE_ENV || 'development';
+    this.port = PORT || 3000;
+    this.app.set('view engine', 'ejs');
+    this.app.set('views', path.join(__dirname, '/view'));
+    this.connectToDatabase();
+    this.initializeSwagger();
+    this.initializeMiddlewares();
+    this.bootFiles.init();
+    this.initializeRoutes(routes);
+    this.initializeErrorHandling();
+    this.httpServer = http.createServer(this.app);
+    this.httpsServer = https.createServer(this.getCredentials(), this.app);
   }
   public getCredentials() {
     this.credentials.key = readFileSync(

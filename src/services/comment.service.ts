@@ -73,6 +73,7 @@ class CommentService {
     const commentData = await this.comment.findAndCountAll({
       where: { deleted_at: null },
     });
+
     const data: (Comment | undefined)[] = await this.comment.findAll({
       where: DB.Sequelize.and(
         { deleted_at: null },
@@ -114,6 +115,15 @@ class CommentService {
         .splice(-2)
         .join('/')}`;
     }
+    // const thumbnail = file;
+
+    // if (thumbnail) {
+    //   const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
+    //     .split('/')
+    //     .splice(-2)
+    //     .join('/')}`;
+    //   commentDetail.thumbnail = thumbnailPath;
+    // }
 
     const updateComment = await this.comment.update(
       {
