@@ -198,11 +198,31 @@ class CourseService {
     });
     return response;
   }
-  public async getCommentByCourseId(courseId: string): Promise<Course> {
+  public async getCommentByCourseId(
+    courseId,
+    queryObject
+  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    //sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const response = await this.comment.findAll({
-      where: {
-        course_id: courseId,
-      },
+      where: DB.Sequelize.and(
+        { course_id: courseId },
+        {
+          title: {
+            [searchCondition]: search,
+          },
+        }
+      ),
 
       include: [
         {
@@ -223,8 +243,55 @@ class CourseService {
           ],
         },
       ],
-      order: [['createdAt', 'DESC']],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
+    return { totalCount: response.count, records: response };
+  }
+  public async getReplyByCommentId(
+    commentId,
+    queryObject
+  ): Promise<{
+    totalCount: number;
+    records: (Course | undefined)[];
+  }> {
+    //sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.reply.findAll({
+      where: DB.Sequelize.and(
+        {
+          comment_id: commentId,
+        },
+        {
+          reply: {
+            [searchCondition]: search,
+          },
+        }
+      ),
+
+      include: [
+        {
+          model: this.user,
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+
+    return { totalCount: response.count, records: response };
+
     return response;
   }
   public async updateCourse({
@@ -233,7 +300,6 @@ class CourseService {
     trainer,
     courseId,
   }): Promise<{ count: number; rows: Course[] }> {
-    // console.log(trainer)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
     const record = await this.trainer.findOne({

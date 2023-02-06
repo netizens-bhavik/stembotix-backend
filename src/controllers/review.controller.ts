@@ -27,7 +27,7 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const postid = req.params.id;
+      const { postid } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
@@ -46,9 +46,12 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const {reviewId} = req.params;
+      const { reviewId } = req.params;
       const reviewDetail = req.body;
-      const response = await this.reviewSevice.updateReview(reviewDetail, reviewId);
+      const response = await this.reviewSevice.updateReview(
+        reviewDetail,
+        reviewId
+      );
       res
         .status(200)
         .send({ response: response, message: 'Review update Successfully' });
@@ -62,7 +65,7 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const {reviewId} = req.params;
+      const { reviewId } = req.params;
       const response: { count: number } = await this.reviewSevice.deleteReview(
         reviewId
       );

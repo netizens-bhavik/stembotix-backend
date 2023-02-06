@@ -45,9 +45,6 @@ class CommentService {
         include: [
           {
             model: this.likedislike,
-            // where:{
-            //   comment_id:commentId
-            // }
           },
         ],
       },
@@ -59,7 +56,7 @@ class CommentService {
     user
   ): Promise<{ totalCount: number; records: (Comment | undefined)[] }> {
     // sorting
-    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'created_at';
     const order = queryObject.order || 'DESC';
     // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
@@ -78,7 +75,7 @@ class CommentService {
       where: DB.Sequelize.and(
         { deleted_at: null },
         {
-          comment: {
+          title: {
             [searchCondition]: search,
           },
         }

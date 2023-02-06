@@ -38,10 +38,16 @@ class CourseRoute implements Routes {
       `${this.path}/:courseId`,
       this.courseController.getCourseById
     );
-    // View all comment by course id 
+    // View all comment by courseId 
     this.router.get(
       `${this.path}/:courseId/comments`,
       this.courseController.getCommentByCourseId
+    );
+        // View all reply by commentId 
+
+    this.router.get(
+      `${this.path}/:commentId/replies`,
+      this.courseController.getReplyByCommentId
     );
     // add course (by trainer only)
     this.router.post(
