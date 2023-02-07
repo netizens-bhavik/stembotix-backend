@@ -27,13 +27,13 @@ class ReviewController {
     next: NextFunction
   ) => {
     try {
-      const { postid } = req.params;
+      const { postId } = req.params;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         review: (Review | undefined)[];
-      } = await this.reviewSevice.getReview(queryObject, postid);
+      } = await this.reviewSevice.getReview(queryObject, postId);
       res.status(200).send(response);
     } catch (error) {
       next(error);

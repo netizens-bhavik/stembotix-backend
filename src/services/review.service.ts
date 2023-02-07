@@ -35,7 +35,7 @@ class ReviewService {
   }
   public async getReview(
     queryObject,
-    postid
+    postId
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -46,10 +46,10 @@ class ReviewService {
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
-          course_id: postid,
+          course_id: postId,
         },
         {
-          product_id: postid,
+          product_id: postId,
         }
       ),
       include: [
