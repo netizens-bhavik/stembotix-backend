@@ -10,30 +10,46 @@ class ReviewService {
   public review = DB.Review;
 
   public async createReview(reviewDetail, user): Promise<ReviewDTO> {
-    if (reviewDetail.type === 'course') {
-      const review = await this.review.findOne({
-        where: { course_id: reviewDetail.postId },
+    const courseData = await this.course.findOne({
+      where: { id: reviewDetail.postId },
+    });
+    if (courseData) {
+      const reviewData = await this.review.findOne({
+        where: {
+          course_id: reviewDetail.postId,
+          user_id: user.id,
+        },
       });
-      if (review) throw new HttpException(400, 'You already Reviewed');
-      return await this.review.create({
+      if (reviewData) throw new HttpException(400, 'You already Reviewed');
+      const review = await this.review.create({
         ...reviewDetail,
         userId: user.id,
         course_id: reviewDetail.postId,
       });
-    } else if (reviewDetail.type === 'product') {
-      const newReview = await this.review.findOne({
-        where: { product_id: reviewDetail.postId },
+      return review;
+    }
+    if (!courseData) {
+      const productid = await this.product.findOne({
+        where: { id: reviewDetail.postId },
       });
-      if (newReview) throw new HttpException(400, 'You already Reviewed');
-
-      return await this.review.create({
-        ...reviewDetail,
-        userId: user.id,
-        product_id: reviewDetail.postId,
-      });
+      if (productid) {
+        const reviewData = await this.review.findOne({
+          where: {
+            product_id: reviewDetail.postId,
+            user_id: user.id,
+          },
+        });
+        if (reviewData) throw new HttpException(400, 'You already Reviewed');
+        const newreview = await this.review.create({
+          ...reviewDetail,
+          userId: user.id,
+          product_id: reviewDetail.postId,
+        });
+        return newreview;
+      }
     }
   }
-  public async getReview(
+  public async getReviewByAdmin(
     queryObject,
     postId
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
@@ -61,6 +77,28 @@ class ReviewService {
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: reviewData.count, review: reviewData.rows };
+  }
+
+  public async getReview(
+    postId
+  ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
+    const reviewData = await this.review.findAndCountAll({
+      where: DB.Sequelize.or(
+        {
+          course_id: postId,
+        },
+        {
+          product_id: postId,
+        }
+      ),
+      include: [
+        {
+          model: this.user,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
     });
     return { totalCount: reviewData.count, review: reviewData.rows };
   }

@@ -26,6 +26,12 @@ class ReviewRoute implements Routes {
     );
 
     this.router.get(
+      `/admin${this.path}/:postId`,
+      passport.authenticate('jwt', { session: false }),
+      this.reviewController.getReviewByAdmin
+    );
+
+    this.router.get(
       `${this.path}/:postId`,
       passport.authenticate('jwt', { session: false }),
       this.reviewController.getReview

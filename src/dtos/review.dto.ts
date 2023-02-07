@@ -11,8 +11,8 @@ export class ReviewDTO {
   @IsString()
   postId: string;
 
-  @IsString()
-  type: string;
+  // @IsString()
+  // type: string;
 }
 export class ReviewDto{
   @IsString()

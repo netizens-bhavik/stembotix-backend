@@ -19,11 +19,16 @@ class CourseRoute implements Routes {
 
   private initializeRoutes() {
     // view all courses with pagination (without bearer)
-    this.router.get(`${this.path}`, this.courseController.viewCourses);
+    this.router.get(
+      `${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseController.viewCourses
+    );
 
     // view all courses by admin with pagination (without bearer)
     this.router.get(
       `${this.path}/admin`,
+      passport.authenticate('jwt', { session: false }),
       this.courseController.viewCoursesAdmin
     );
 
@@ -36,17 +41,32 @@ class CourseRoute implements Routes {
     // view single course details
     this.router.get(
       `${this.path}/:courseId`,
+      passport.authenticate('jwt', { session: false }),
       this.courseController.getCourseById
     );
-    // View all comment by courseId 
+    // View all comment by courseId
+    this.router.get(
+      `/admin${this.path}/:courseId/comments`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseController.getCommentByCourseIdAdmin
+    );
+
     this.router.get(
       `${this.path}/:courseId/comments`,
+      passport.authenticate('jwt', { session: false }),
       this.courseController.getCommentByCourseId
     );
-        // View all reply by commentId 
+    // View all reply by commentId
+
+    this.router.get(
+      `/admin${this.path}/:commentId/replies`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseController.getReplyByCommentIdAdmin
+    );
 
     this.router.get(
       `${this.path}/:commentId/replies`,
+      passport.authenticate('jwt', { session: false }),
       this.courseController.getReplyByCommentId
     );
     // add course (by trainer only)

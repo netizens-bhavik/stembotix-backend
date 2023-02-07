@@ -198,7 +198,7 @@ class CourseService {
     });
     return response;
   }
-  public async getCommentByCourseId(
+  public async getCommentByCourseIdAdmin(
     courseId,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
@@ -214,7 +214,7 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.comment.findAll({
+    const response = await this.comment.findAndCountAll({
       where: DB.Sequelize.and(
         { course_id: courseId },
         {
@@ -233,6 +233,7 @@ class CourseService {
         },
         {
           model: this.reply,
+          separate: true,
           include: [
             {
               model: this.user,
@@ -247,9 +248,39 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return { totalCount: response.count, records: response };
+    return { totalCount: response.count, records: response.rows };
   }
-  public async getReplyByCommentId(
+  public async getCommentByCourseId(
+    courseId
+  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    const response = await this.comment.findAndCountAll({
+      where: { course_id: courseId },
+
+      include: [
+        {
+          model: this.user,
+        },
+        {
+          model: this.likedislike,
+        },
+        {
+          model: this.reply,
+          separate: true,
+          include: [
+            {
+              model: this.user,
+            },
+            {
+              model: this.likedislike,
+            },
+          ],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    return { totalCount: response.count, records: response.rows };
+  }
+  public async getReplyByCommentIdAdmin(
     commentId,
     queryObject
   ): Promise<{
@@ -268,7 +299,7 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.reply.findAll({
+    const response = await this.reply.findAndCountAll({
       where: DB.Sequelize.and(
         {
           comment_id: commentId,
@@ -290,9 +321,27 @@ class CourseService {
       order: [[`${sortBy}`, `${order}`]],
     });
 
-    return { totalCount: response.count, records: response };
+    return { totalCount: response.count, records: response.rows };
+  }
 
-    return response;
+  public async getReplyByCommentId(commentId): Promise<{
+    totalCount: number;
+    records: (Course | undefined)[];
+  }> {
+    const response = await this.reply.findAndCountAll({
+      where: {
+        comment_id: commentId,
+      },
+
+      include: [
+        {
+          model: this.user,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    return { totalCount: response.count, records: response.rows };
   }
   public async updateCourse({
     courseDetails,
