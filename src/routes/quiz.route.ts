@@ -82,7 +82,7 @@ class QuizRoute implements Routes {
       this.quizController.deleteQuiz
     );
     this.router.get(
-      `${this.path}/copmleteQuiz/:quizId`,
+      `${this.path}/completeQuiz/:quizId`,
       passport.authenticate('jwt', { session: false }),
       this.quizController.createQuizCompletetion
     );

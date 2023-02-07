@@ -10,32 +10,32 @@ class ReviewService {
   public review = DB.Review;
 
   public async createReview(reviewDetail, user): Promise<ReviewDTO> {
-    if (reviewDetail.type === 'product') {
+    if (reviewDetail.type === 'course') {
       const review = await this.review.findOne({
-        where: { product_id: reviewDetail.postId },
+        where: { course_id: reviewDetail.postId },
       });
       if (review) throw new HttpException(400, 'You already Reviewed');
       return await this.review.create({
         ...reviewDetail,
         userId: user.id,
-        product_id: reviewDetail.postId,
+        course_id: reviewDetail.postId,
       });
-    } else if (reviewDetail.type === 'course') {
+    } else if (reviewDetail.type === 'product') {
       const newReview = await this.review.findOne({
-        where: { course_id: reviewDetail.postId },
+        where: { product_id: reviewDetail.postId },
       });
       if (newReview) throw new HttpException(400, 'You already Reviewed');
 
       return await this.review.create({
         ...reviewDetail,
         userId: user.id,
-        course_id: reviewDetail.postId,
+        product_id: reviewDetail.postId,
       });
     }
   }
   public async getReview(
     queryObject,
-    postid
+    postId
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -43,18 +43,13 @@ class ReviewService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-    // Search
-    const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-      : ['', DB.Sequelize.Op.ne];
-
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
-          course_id: postid,
+          course_id: postId,
         },
         {
-          product_id: postid,
+          product_id: postId,
         }
       ),
       include: [
@@ -67,7 +62,6 @@ class ReviewService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-
     return { totalCount: reviewData.count, review: reviewData.rows };
   }
   public async updateReview(
@@ -82,9 +76,9 @@ class ReviewService {
         where: {
           id: reviewId,
         },
+        returning: true,
       }
     );
-
     return { count: updateReview[0], review: updateReview[1] };
   }
   public async deleteReview(reviewId): Promise<{ count: number }> {

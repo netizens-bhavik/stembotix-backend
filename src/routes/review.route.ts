@@ -26,7 +26,7 @@ class ReviewRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/:postid`,
+      `${this.path}/:postId`,
       passport.authenticate('jwt', { session: false }),
       this.reviewController.getReview
     );

@@ -29,6 +29,7 @@
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
     "dotenv": "16.0.1",
+    "eiows": "^4.1.2",
     "ejs": "3.1.8",
     "envalid": "7.3.1",
     "express": "4.18.1",
@@ -47,9 +48,11 @@
     "pg-hstore": "2.3.4",
     "razorpay": "2.8.4",
     "sequelize": "6.21.3",
+    "socket.io": "^4.5.4",
     "swagger-jsdoc": "6.2.1",
     "swagger-ui-express": "^4.6.0",
     "uuid": "9.0.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.4.0",
     "winston": "3.8.1",
     "winston-daily-rotate-file": "4.7.1"
   },
@@ -91,5 +94,9 @@
     "tsc-alias": "1.7.0",
     "tsconfig-paths": "4.0.0",
     "typescript": "4.7.4"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
   }
 }
