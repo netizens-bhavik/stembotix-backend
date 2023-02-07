@@ -87,8 +87,31 @@ class CourseController {
     next: NextFunction
   ) => {
     try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const { courseId } = req.params;
-      const response: Course = await this.courseService.getCommentByCourseId(courseId);
+      const response: {
+        totalCount: number;
+        records: (Course | undefined)[];
+      } = await this.courseService.getCommentByCourseId(courseId, queryObject);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public getReplyByCommentId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { commentId } = req.params;
+      const response: {
+        totalCount: number;
+        records: (Course | undefined)[];
+      } = await this.courseService.getReplyByCommentId(commentId, queryObject);
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -109,7 +132,7 @@ class CourseController {
         courseDetails,
         file,
         trainer,
-        courseId
+        courseId,
       });
       res.status(200).send(response);
     } catch (error) {

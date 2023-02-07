@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
   Review.associate = (models) => {
     Review.belongsTo(models.Course, {
       foreignKey: 'course_id',
-      targetKey: 'id',
+      sourceKey: 'id',
     });
     Review.belongsTo(models.Product, {
       foreignKey: 'product_id',

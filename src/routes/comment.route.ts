@@ -53,13 +53,6 @@ class CommentRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.commentController.   deleteComment
     );
-
-    // this.router
-    //   .post(`${this.path}/uploadFile/:type`,
-    //     passport.authenticate('jwt', { session: false }),
-    //     thumbnailUploadMiddleware,
-    //     this.commentController.uploadImage
-    //   );
   }
 }
 export default CommentRoute;

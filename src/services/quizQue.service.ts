@@ -3,6 +3,13 @@ import { Quiz } from '@/interfaces/quiz.interface';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import { HttpException } from '@/exceptions/HttpException';
 
+export type updateQuizQueAns = {
+  updateQuizQueAns: string;
+  options: string;
+};
+
+import { capitalize } from '@/utils/util';
+
 class QuizQueAnsService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -23,7 +30,7 @@ class QuizQueAnsService {
     quizData.options?.forEach((element) => {
       const obj = {
         QuizQueId: newQuizQue.id,
-        option: element.option,
+        option: capitalize(element.option),
         is_correct: element.is_correct,
         question: newQuizQue.question,
       };
@@ -67,14 +74,14 @@ class QuizQueAnsService {
   //   return { totalCount: response, records: response.rows };
   // }
 
-  public async  getQuizQueAnsByIdAdmin(
+  public async getQuizQueAnsByIdAdmin(
     quizId: string,
     queryObject
   ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order || 'DESC'
+    const order = queryObject.order || 'DESC';
     // === 'ASC' ? 'ASC' : 'DESC';
-        // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -106,44 +113,41 @@ class QuizQueAnsService {
     quizQueAnsDetail,
     trainer,
     quizQueId
-  ): Promise<{ count: number; rows: Quiz[] }> {
+  ): Promise<updateQuizQueAns> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
-    try {
-      const { options } = quizQueAnsDetail;
-      const updateQuizQueAns = await this.quizQue.update(
+    const { options } = quizQueAnsDetail;
+    const updateQuizQueAns = await this.quizQue.update(
+      {
+        ...quizQueAnsDetail,
+      },
+      {
+        where: {
+          id: quizQueId,
+        },
+        returning: true,
+      }
+    );
+    const res = await this.quizAns.findAll({
+      where: { quiz_que_id: quizQueId },
+    });
+
+    options?.forEach(async (element, index) => {
+      await this.quizAns.update(
         {
-          ...quizQueAnsDetail,
+          option: capitalize(element.option),
+          is_correct: element.is_correct,
         },
         {
           where: {
-            id: quizQueId,
+            id: res[index].id,
           },
           returning: true,
         }
       );
-      const res = await this.quizAns.findAll({
-        where: { quiz_que_id: quizQueId },
-      });
+    });
 
-      options?.forEach(async (element, index) => {
-        await this.quizAns.update(
-          {
-            option: element.option,
-            is_correct: element.is_correct,
-          },
-          {
-            where: {
-              id: res[index].id,
-            },
-            returning: true,
-          }
-        );
-      });
-      return { count: updateQuizQueAns[0], rows: updateQuizQueAns[1] };
-    } catch (error) {
-      return error;
-    }
+    return {updateQuizQueAns,options}
   }
 
   public async deleteQuizQueAns({

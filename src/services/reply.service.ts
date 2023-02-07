@@ -32,46 +32,7 @@ class ReplyService {
     });
     return newReply;
   }
-  public async getReplyById(replyId: string): Promise<Reply> {
-    const response: Reply = await this.reply.findOne({
-      where: {
-        id: replyId,
-      },
-    });
-    return response;
-  }
 
-  // public async viewReply(
-  //   queryObject,
-  // ): Promise<{ totalCount: number; records: (Reply | undefined)[] }> {
-  //   // sorting
-  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-  //   const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
-  //   // pagination
-  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-  //   // Search
-  //   const [search, searchCondition] = queryObject.search
-  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-  //     : ['', DB.Sequelize.Op.ne];
-
-  //   const replyData = await this.reply.findAndCountAll({
-  //     where: { deleted_at: null },
-  //   });
-  //   const data: (Reply | undefined)[] = await this.comment.findAll({
-  //     where: DB.Sequelize.and({ deleted_at: null }),
-  //     include: [
-  //       {
-  //         model: this.reply,
-  //       },
-  //     ],
-
-  //     limit: pageSize,
-  //     offset: pageNo,
-  //     order: [[`${sortBy}`, `${order}`]],
-  //   });
-  //   return { totalCount: replyData.count, records: data };
-  // }
   public async updateReply({
     replyDetail,
     file,

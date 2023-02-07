@@ -198,49 +198,100 @@ class CourseService {
     });
     return response;
   }
-  public async getCommentByCourseId(courseId: string): Promise<Course> {
-    const response: Course = await this.comment.findAll({
-      where: {
-        course_id: courseId,
-      },
-      // attributes: [
-      //   [
-      //     sequelize.fn('COUNT', sequelize.col('LikeDislike.id')),
-      //     'like_count',
-      //   ],
-      // ],
-      // attributes:  Object.keys(this.comment.attributes).concat([
-      //   [sequelize.fn('COUNT',sequelize.col('LikeDislike.id')),"msg_count"]
-      // ]),
+  public async getCommentByCourseId(
+    courseId,
+    queryObject
+  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    //sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.comment.findAll({
+      where: DB.Sequelize.and(
+        { course_id: courseId },
+        {
+          title: {
+            [searchCondition]: search,
+          },
+        }
+      ),
+
       include: [
+        {
+          model: this.user,
+        },
+        {
+          model: this.likedislike,
+        },
         {
           model: this.reply,
           include: [
             {
               model: this.user,
             },
-            // {
-            //   model: this.likedislike,
-            // },
+            {
+              model: this.likedislike,
+            },
           ],
         },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: response.count, records: response };
+  }
+  public async getReplyByCommentId(
+    commentId,
+    queryObject
+  ): Promise<{
+    totalCount: number;
+    records: (Course | undefined)[];
+  }> {
+    //sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // === 'ASC' ? 'ASC' : 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.reply.findAll({
+      where: DB.Sequelize.and(
+        {
+          comment_id: commentId,
+        },
+        {
+          reply: {
+            [searchCondition]: search,
+          },
+        }
+      ),
+
+      include: [
         {
           model: this.user,
         },
-
-        {
-          model: this.likedislike,
-          // attributes: [
-          //   [
-          //     sequelize.fn('count', sequelize.col('company_users.id')),
-          //     'user_count',
-          //   ],
-          // ],
-        },
       ],
-      order: [['createdAt', 'DESC']],
-      group:["Comment.id"]
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
+
+    return { totalCount: response.count, records: response };
+
     return response;
   }
   public async updateCourse({
@@ -249,7 +300,6 @@ class CourseService {
     trainer,
     courseId,
   }): Promise<{ count: number; rows: Course[] }> {
-    // console.log(trainer)
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, 'Forbidden Resource');
     const record = await this.trainer.findOne({
@@ -294,6 +344,7 @@ class CourseService {
 
     return { count: updateCourse[0], rows: updateCourse[1] };
   }
+
   public async deleteCourse({ trainer, courseId }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
     const courseRecord: Course = await this.course.findOne({
@@ -366,6 +417,11 @@ class CourseService {
           where: {
             trainer_id: trainerRecord.trainer_id,
           },
+          include: [
+            {
+              model: this.user,
+            },
+          ],
         },
       ],
     });

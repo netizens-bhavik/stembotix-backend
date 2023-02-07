@@ -25,34 +25,6 @@ class Replycontroller {
       next(error);
     }
   };
-  public getReplyById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { replyId } = req.params;
-      const response: Reply = await this.replyService.getReplyById(replyId);
-      res.status(200).send(response);
-    } catch (err) {
-      next(err);
-    }
-  };
-  // public viewReply = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
-  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
-  //     const response: { totalCount: number; records: (Reply | undefined)[] } =
-  //       await this.replyService.viewReply(queryObject);
-  //     res.status(200).send(response);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
 
   public updateReply = async (
     req: Request,
@@ -60,11 +32,11 @@ class Replycontroller {
     next: NextFunction
   ) => {
     try {
-      const { reply_id } = req.params;
+      const { replyId} = req.params;
       const replyDetail = req.body;
 
       const file = req.files;
-      replyDetail['id'] = reply_id;
+      replyDetail['id'] = replyId;
 
       const response = await this.replyService.updateReply({
         replyDetail,

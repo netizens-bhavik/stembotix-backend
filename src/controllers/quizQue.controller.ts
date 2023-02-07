@@ -78,7 +78,7 @@ class QuizQueAnsController {
       );
       res
         .status(200)
-        .send({ response: update, message: 'Question Update Successfully' });
+        .send({ response: update, message: 'Question Answer Update Successfully' });
     } catch (err) {
       next(err);
     }
