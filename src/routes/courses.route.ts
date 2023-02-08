@@ -19,11 +19,7 @@ class CourseRoute implements Routes {
 
   private initializeRoutes() {
     // view all courses with pagination (without bearer)
-    this.router.get(
-      `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
-      this.courseController.viewCourses
-    );
+    this.router.get(`${this.path}`, this.courseController.viewCourses);
 
     // view all courses by admin with pagination (without bearer)
     this.router.get(
@@ -53,7 +49,6 @@ class CourseRoute implements Routes {
 
     this.router.get(
       `${this.path}/:courseId/comments`,
-      passport.authenticate('jwt', { session: false }),
       this.courseController.getCommentByCourseId
     );
     // View all reply by commentId
@@ -66,7 +61,6 @@ class CourseRoute implements Routes {
 
     this.router.get(
       `${this.path}/:commentId/replies`,
-      passport.authenticate('jwt', { session: false }),
       this.courseController.getReplyByCommentId
     );
     // add course (by trainer only)

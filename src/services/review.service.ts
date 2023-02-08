@@ -2,6 +2,7 @@ import { ReviewDTO } from '@/dtos/review.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { Review } from '@/interfaces/review.interface';
 import DB from '@databases';
+import { clearConfigCache } from 'prettier';
 
 class ReviewService {
   public user = DB.User;
@@ -59,10 +60,18 @@ class ReviewService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
           course_id: postId,
+          review: {
+            [searchCondition]: search,
+          },
         },
         {
           product_id: postId,
@@ -82,8 +91,13 @@ class ReviewService {
   }
 
   public async getReview(
-    postId
+    postId,
+    queryObject
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
+    // Pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
@@ -98,6 +112,8 @@ class ReviewService {
           model: this.user,
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
       order: [['createdAt', 'DESC']],
     });
     return { totalCount: reviewData.count, review: reviewData.rows };
@@ -105,7 +121,7 @@ class ReviewService {
   public async updateReview(
     reviewDetail,
     reviewId
-  ): Promise<{ count: number; review: (Review | undefined)[] }> {
+  ): Promise<{ count: number; review: Review[] }> {
     const updateReview = await this.review.update(
       {
         ...reviewDetail,

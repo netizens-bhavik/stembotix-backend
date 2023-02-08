@@ -6,7 +6,6 @@ import ReviewController from '@/controllers/review.controller';
 import validationMiddleware from '@middlewares/validation.middleware';
 import { ReviewDto, ReviewDTO } from '@/dtos/review.dto';
 
-
 class ReviewRoute implements Routes {
   public path = '/review';
   public router = Router();
@@ -50,4 +49,4 @@ class ReviewRoute implements Routes {
     );
   }
 }
-export default ReviewRoute
+export default ReviewRoute;
