@@ -14,6 +14,7 @@ class CourseService {
   public comment = DB.Comment;
   public reply = DB.Reply;
   public likedislike = DB.LikeDislike;
+  public review = DB.Review;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -24,7 +25,6 @@ class CourseService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -62,6 +62,10 @@ class CourseService {
             },
           ],
         },
+        {
+          model: this.review,
+          attributes: ['id', 'rating', 'userId'],
+        },
       ],
 
       limit: pageSize,
@@ -76,7 +80,6 @@ class CourseService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -205,8 +208,7 @@ class CourseService {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
-    // pagination
+   // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -290,8 +292,7 @@ class CourseService {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
-    // pagination
+   // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -472,6 +473,7 @@ class CourseService {
             },
           ],
         },
+        
       ],
     });
     return { totalCount: coursesCount.count, records: courses };
