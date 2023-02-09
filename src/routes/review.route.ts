@@ -6,7 +6,6 @@ import ReviewController from '@/controllers/review.controller';
 import validationMiddleware from '@middlewares/validation.middleware';
 import { ReviewDto, ReviewDTO } from '@/dtos/review.dto';
 
-
 class ReviewRoute implements Routes {
   public path = '/review';
   public router = Router();
@@ -23,6 +22,12 @@ class ReviewRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(ReviewDTO, 'body'),
       this.reviewController.addReview
+    );
+
+    this.router.get(
+      `/admin${this.path}/:postId`,
+      passport.authenticate('jwt', { session: false }),
+      this.reviewController.getReviewByAdmin
     );
 
     this.router.get(
@@ -44,4 +49,4 @@ class ReviewRoute implements Routes {
     );
   }
 }
-export default ReviewRoute
+export default ReviewRoute;

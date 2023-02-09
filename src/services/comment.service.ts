@@ -51,6 +51,7 @@ class CommentService {
     });
     return response;
   }
+  
   public async viewComment(
     queryObject,
     user
@@ -112,15 +113,6 @@ class CommentService {
         .splice(-2)
         .join('/')}`;
     }
-    // const thumbnail = file;
-
-    // if (thumbnail) {
-    //   const thumbnailPath = `${API_BASE}/media/${thumbnail.thumbnail[0].path
-    //     .split('/')
-    //     .splice(-2)
-    //     .join('/')}`;
-    //   commentDetail.thumbnail = thumbnailPath;
-    // }
 
     const updateComment = await this.comment.update(
       {
