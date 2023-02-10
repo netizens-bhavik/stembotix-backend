@@ -29,6 +29,7 @@ class QuizRoute implements Routes {
     //get single quiz by curriculumId
     this.router.get(
       `${this.path}/section/:curriculumId`,
+      passport.authenticate('jwt', { session: false }),
       this.quizController.getQuizBycurriculumId
     );
     //get single quiz by quizId admin

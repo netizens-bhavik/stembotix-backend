@@ -2,23 +2,20 @@ import { IsNumber, IsString, Max } from 'class-validator';
 
 export class ReviewDTO {
   @IsString()
-  review: string;
+  public review: string;
 
   @IsNumber()
   @Max(5)
-  rating: number;
+  public rating: number;
 
   @IsString()
-  postId: string;
-
-  @IsString()
-  type: string;
+  public postId: string;
 }
-export class ReviewDto{
+export class ReviewDto {
   @IsString()
-  review: string;
+  public review: string;
 
   @IsNumber()
   @Max(5)
-  rating: number;
+  public rating: number;
 }

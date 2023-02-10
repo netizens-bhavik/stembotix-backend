@@ -21,7 +21,7 @@ class ReviewController {
       next(error);
     }
   };
-  public getReview = async (
+  public getReviewByAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -33,7 +33,25 @@ class ReviewController {
       const response: {
         totalCount: number;
         review: (Review | undefined)[];
-      } = await this.reviewSevice.getReview(queryObject, postId);
+      } = await this.reviewSevice.getReviewByAdmin(queryObject, postId);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public getReview = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { pageRecord, pageNo } = req.query;
+      const queryObject = { pageRecord, pageNo };
+      const { postId } = req.params;
+      const response: {
+        totalCount: number;
+        review: (Review | undefined)[];
+      } = await this.reviewSevice.getReview(postId, queryObject);
       res.status(200).send(response);
     } catch (error) {
       next(error);

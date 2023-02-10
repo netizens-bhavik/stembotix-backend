@@ -81,7 +81,7 @@ class CourseController {
       next(error);
     }
   };
-  public getCommentByCourseId = async (
+  public getCommentByCourseIdAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -93,13 +93,32 @@ class CourseController {
       const response: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.getCommentByCourseId(courseId, queryObject);
+      } = await this.courseService.getCommentByCourseIdAdmin(
+        courseId,
+        queryObject
+      );
       res.status(200).send(response);
     } catch (error) {
       next(error);
     }
   };
-  public getReplyByCommentId = async (
+  public getCommentByCourseId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { courseId } = req.params;
+      const response: {
+        totalCount: number;
+        records: (Course | undefined)[];
+      } = await this.courseService.getCommentByCourseId(courseId);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public getReplyByCommentIdAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -111,7 +130,23 @@ class CourseController {
       const response: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.getReplyByCommentId(commentId, queryObject);
+      } = await this.courseService.getReplyByCommentIdAdmin(commentId, queryObject);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public getReplyByCommentId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { commentId } = req.params;
+      const response: {
+        totalCount: number;
+        records: (Course | undefined)[];
+      } = await this.courseService.getReplyByCommentId(commentId);
       res.status(200).send(response);
     } catch (error) {
       next(error);
