@@ -195,9 +195,9 @@ class ProductService {
 
     const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
-    const readStream = getFileStream(uploadedFile.Key);
-    readStream.pipe(file);
-    console.log(readStream);
+    // const readStream = getFileStream(uploadedFile.Key);
+    // readStream.pipe(file);
+    // console.log(readStream);
 
     const newProduct = await this.product.create({
       ...productDetails,

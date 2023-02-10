@@ -17,9 +17,6 @@ export class ProductDto {
   @IsString()
   public description: string
 
-  // @IsString()
-  // public tag: string
-
   @IsString()
   public weight: string
 
