@@ -2,6 +2,7 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { API_BASE } from '@config';
 import { Product } from '@/interfaces/product.interface';
+import { getFileStream, uploadFileS3 } from '@utils/s3/s3Uploads';
 
 class ProductService {
   public product = DB.Product;
@@ -193,9 +194,15 @@ class ProductService {
       .splice(-2)
       .join('/')}`;
 
+    const uploadedFile = await uploadFileS3(file); // Upload of s3
+    // console.log(uploadedFile);
+    const readStream = getFileStream(uploadedFile.Key);
+    readStream.pipe(file);
+    console.log(readStream);
+
     const newProduct = await this.product.create({
       ...productDetails,
-      thumbnail: filePath,
+      thumbnail: uploadedFile.Location,
     });
     const addProductDimension = await this.productDimension.create({
       product_id: newProduct.id,
@@ -210,7 +217,8 @@ class ProductService {
       category: newProduct.category,
       description: newProduct.description,
       status: newProduct.status,
-      thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
+      // thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
+      thumbnail: uploadedFile.Location,
       sku: newProduct.sku,
       weight: addProductDimension.weight,
       dimension: addProductDimension.dimension,
