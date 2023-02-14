@@ -59,7 +59,6 @@ class CommentService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'created_at';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;

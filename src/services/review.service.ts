@@ -1,6 +1,7 @@
 import { ReviewDTO } from '@/dtos/review.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { Review } from '@/interfaces/review.interface';
+import { capitalize } from '@/utils/util';
 import DB from '@databases';
 import { clearConfigCache } from 'prettier';
 
@@ -56,7 +57,6 @@ class ReviewService {
   ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'ASC' ? 'ASC' : 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -65,13 +65,14 @@ class ReviewService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const [user, userCondition] = queryObject.user
+      ? [`%${queryObject.user}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
           course_id: postId,
-          review: {
-            [searchCondition]: search,
-          },
         },
         {
           product_id: postId,
@@ -80,6 +81,18 @@ class ReviewService {
       include: [
         {
           model: this.user,
+          where: DB.Sequelize.or(
+            {
+              firstName: {
+                [searchCondition]: search,
+              },
+            },
+            {
+              lastName: {
+                [searchCondition]: search,
+              },
+            }
+          ),
         },
       ],
 
