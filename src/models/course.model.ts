@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       price: {
-        type: Sequelize.DECIMAL(10,2),
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
       level: {
@@ -61,13 +61,17 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
-    Course.hasMany(models.Comment,{
+    Course.hasMany(models.Comment, {
       foreignKey: 'course_id',
       targetKey: 'id',
-    })
+    });
     Course.hasOne(models.CartItem);
     Course.hasMany(models.Comment, {
       foreignKey: 'course_id',
+      targetKey: 'id',
+    });
+    Course.hasOne(models.OrderItem, {
+      foreignkey: 'course_id',
       targetKey: 'id',
     });
   };

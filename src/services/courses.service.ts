@@ -15,6 +15,8 @@ class CourseService {
   public reply = DB.Reply;
   public likedislike = DB.LikeDislike;
   public review = DB.Review;
+  public orderitem = DB.OrderItem;
+  public cartitem = DB.CartItem;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -164,7 +166,7 @@ class CourseService {
     };
   }
   public async getCourseById(courseId: string): Promise<Course> {
-    const response: Course = await this.course.findOne({
+    const response = await this.course.findOne({
       where: {
         id: courseId,
       },
@@ -208,7 +210,7 @@ class CourseService {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -292,7 +294,7 @@ class CourseService {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -397,8 +399,10 @@ class CourseService {
 
   public async deleteCourse({ trainer, courseId }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
-    const courseRecord: Course = await this.course.findOne({
-      where: { id: courseId },
+    const courseRecord: Course = await this.course.findAll({
+      where: DB.Sequelize.and({
+        id: courseId,
+      }),
       include: [
         {
           model: this.trainer,
@@ -412,12 +416,21 @@ class CourseService {
         400,
         'This course is published and can not be deleted. First unpublish this course and then delete it'
       );
-    const res: number = await this.course.destroy({
+    const res = await this.course.destroy({
       where: {
         id: courseId,
       },
     });
-
+    await this.orderitem.destroy({
+      where:{
+        course_id:courseId
+      }
+    })
+    await this.cartitem.destroy({
+      where:{
+        course_id:courseId
+      }
+    })
     return { count: res };
   }
   public async listCourses({
@@ -473,7 +486,6 @@ class CourseService {
             },
           ],
         },
-        
       ],
     });
     return { totalCount: coursesCount.count, records: courses };

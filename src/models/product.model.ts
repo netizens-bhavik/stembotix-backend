@@ -61,6 +61,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Product.hasOne(models.CartItem);
+    Product.hasOne(models.OrderItem, {
+      foreignkey: 'product_id',
+      targetKey: 'id',
+    });
   };
   return Product;
 };
