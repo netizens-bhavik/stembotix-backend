@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { API_BASE } from '@config';
 import { Product } from '@/interfaces/product.interface';
 import { getFileStream, uploadFileS3 } from '@utils/s3/s3Uploads';
+import AWS from 'aws-sdk';
 
 class ProductService {
   public product = DB.Product;
@@ -26,11 +27,11 @@ class ProductService {
       : ['', DB.Sequelize.Op.ne];
 
     const productsRecord = await this.product.findAndCountAll({
-      // where: { status: 'Published' },
+      where: { status: 'Published' },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
-        // { status: 'Published' },
+        { status: 'Published' },
         {
           title: {
             [searchCondition]: search,
@@ -70,7 +71,7 @@ class ProductService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -187,21 +188,36 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
-
-    const filePath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-
     const uploadedFile = await uploadFileS3(file); // Upload of s3
+    console.log('bvdhsgfh', uploadedFile);
+
+    // const filePath = `${API_BASE}/media/${file.path
+    //   .split('/')
+    //   .splice(-2)
+    //   .join('/')}`;
+    // var files = file;
+    // var fileName = file.filename;
+    // var albumPhotosKey = encodeURIComponent(file.path) + '/';
+
+    // var photoKey = albumPhotosKey + fileName;
+
+    // // Use S3 ManagedUpload class as it supports multipart uploads
+    // var upload = new AWS.S3.ManagedUpload({
+    //   params: {
+    //     Bucket: 'stem-botix',
+    //     Key: photoKey,
+    //     Body: JSON.stringify(files),
+    //   },
+    // });
+    // const result = await upload.promise();
+    // console.log(result);
+
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
-    const readStream = getFileStream(uploadedFile.Key);
-    readStream.pipe(file);
-    console.log(readStream);
 
     const newProduct = await this.product.create({
       ...productDetails,
-      thumbnail: uploadedFile.Location,
+      thumbnail: uploadedFile,
     });
     const addProductDimension = await this.productDimension.create({
       product_id: newProduct.id,
@@ -216,8 +232,8 @@ class ProductService {
       category: newProduct.category,
       description: newProduct.description,
       status: newProduct.status,
-      // thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
-      thumbnail: uploadedFile.Location,
+      thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
+      // thumbnail: uploadedFile.Location,
       sku: newProduct.sku,
       weight: addProductDimension.weight,
       dimension: addProductDimension.dimension,
