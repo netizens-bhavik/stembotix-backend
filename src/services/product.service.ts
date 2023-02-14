@@ -209,7 +209,7 @@ class ProductService {
     // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
 
-    const uploadedFile = await uploadFileS3(file); // Upload of s3
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
 
     const newProduct = await this.product.create({
       ...productDetails,
