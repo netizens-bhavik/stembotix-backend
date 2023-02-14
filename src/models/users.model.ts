@@ -103,10 +103,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    User.hasOne(models.LikeDislike,{
+    User.hasOne(models.LikeDislike, {
       foreignKey: 'userId',
       targetKey: 'id',
-    })
+    });
   };
 
   User.prototype.validPassword = (password) => {

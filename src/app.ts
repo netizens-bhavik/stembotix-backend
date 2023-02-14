@@ -18,6 +18,9 @@ import path from 'path';
 import http, { Server } from 'http';
 import https, { Server as SecureServer } from 'https';
 import { readFileSync } from 'fs';
+import socketIO from './index';
+import init from './index';
+
 class App {
   public app: express.Application;
   public env: string;
@@ -26,6 +29,7 @@ class App {
   public httpServer: Server;
   public httpsServer: SecureServer;
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
+  public socket: any;
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -60,6 +64,8 @@ class App {
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });
+    this.socket = init(this.httpServer);
+    this.app.set('socket', this.socket);
   }
 
   public getServer() {
