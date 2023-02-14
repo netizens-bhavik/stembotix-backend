@@ -28,13 +28,11 @@ class LikeDislikeRoute implements Routes {
 
     this.router.get(
       `${this.path}/:commentId/like`,
-      passport.authenticate('jwt', { session: false }),
-      this.likedislikeController.  viewLikeonComment
+      this.likedislikeController.viewLikeonComment
     );
 
     this.router.get(
       `${this.path}/reply/:replyId/like`,
-      passport.authenticate('jwt', { session: false }),
       this.likedislikeController.viewLikeOnReply
     );
   }

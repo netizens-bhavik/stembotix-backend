@@ -26,11 +26,11 @@ class ProductService {
       : ['', DB.Sequelize.Op.ne];
 
     const productsRecord = await this.product.findAndCountAll({
-      // where: { status: 'Published' },
+      where: { status: 'Published' },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
-        // { status: 'Published' },
+        { status: 'Published' },
         {
           title: {
             [searchCondition]: search,
@@ -195,9 +195,9 @@ class ProductService {
 
     const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
-    const readStream = getFileStream(uploadedFile.Key);
-    readStream.pipe(file);
-    console.log(readStream);
+    // const readStream = getFileStream(uploadedFile.Key);
+    // readStream.pipe(file);
+    // console.log(readStream);
 
     const newProduct = await this.product.create({
       ...productDetails,

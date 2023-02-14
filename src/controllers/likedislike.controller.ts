@@ -9,7 +9,11 @@ class LikeDislikeController {
   public user = DB.User;
   public comment = DB.Comment;
 
-  public addLikeDislikeOnComment = async (req: Request, res: Response, next: NextFunction) => {
+  public addLikeDislikeOnComment = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = req.user;
       const response = await this.likeDislikeService.addLikeDislikeOnComment({
@@ -21,8 +25,12 @@ class LikeDislikeController {
       next(error);
     }
   };
-  
-  public addLikeDislikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
+
+  public addLikeDislikeOnReply = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = req.user;
       const response = await this.likeDislikeService.addLikeDislikeOnReply({
@@ -35,30 +43,34 @@ class LikeDislikeController {
     }
   };
 
-  public  viewLikeonComment = async (req: Request, res: Response, next: NextFunction) => {
+  public viewLikeonComment = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { commentId } = req.params;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         likes: (LikeDislike | undefined)[];
-      } = await this.likeDislikeService. viewLikeonComment(queryObject, commentId);
+      } = await this.likeDislikeService.viewLikeonComment(commentId);
       res.status(200).send(response);
     } catch (error) {
       next(error);
     }
   };
 
-  public viewLikeOnReply = async (req: Request, res: Response, next: NextFunction) => {
+  public viewLikeOnReply = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { replyId } = req.params;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         likes: (LikeDislike | undefined)[];
-      } = await this.likeDislikeService.viewLikeOnReply(queryObject, replyId);
+      } = await this.likeDislikeService.viewLikeOnReply(replyId);
       res.status(200).send(response);
     } catch (error) {
       next(error);
