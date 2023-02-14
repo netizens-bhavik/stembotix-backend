@@ -18,11 +18,13 @@ import path from 'path';
 import http, { Server } from 'http';
 import https, { Server as SecureServer } from 'https';
 import { readFileSync } from 'fs';
+import socketServer from './socket';
 class App {
   public app: express.Application;
   public env: string;
   public port: string | number;
   public bootFiles = new BootFiles();
+  public socket: any;
   public httpServer: Server;
   public httpsServer: SecureServer;
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
@@ -54,12 +56,14 @@ class App {
     return this.credentials;
   }
   public listen() {
-    this.httpServer.listen(this.port, () => {
+    this.httpServer = this.app.listen(this.port, () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} ========`);
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });
+    this.socket = socketServer(this.httpServer);
+    this.app.set('socket', this.socket);
   }
 
   public getServer() {
