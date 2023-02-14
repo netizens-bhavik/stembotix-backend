@@ -70,6 +70,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
+    // Course.has
   };
 
   return Course;
