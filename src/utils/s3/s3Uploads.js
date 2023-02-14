@@ -14,26 +14,27 @@ const s3 = new S3({
 });
 
 // UPLOAD FILE TO S3
-function uploadFileS3(files) {
-  console.log(files);
-  // console.log(files.trailer);
-  // const fileStream = fs.createReadStream(file[0].path);
+// const uploadParam = Object.values(files).map((file, index) => {
+//   const obj = file[0];
+//   return {
+//     Bucket: bucketName,
+//     Body: obj.path,
+//     Key: obj.filename,
+//   };
+// });
+// // return s3.upload(uploadParams).promise();
+// return Promise.all(uploadParam.map((param) => console.log(param)));
+// =======
+function uploadFileS3(file) {
+  const fileStream = fs.createReadStream(file.path);
 
-  // const uploadParams = {
-  //   Bucket: bucketName,
-  //   Body: fileStream,
-  //   Key: file.filename,
-  // };
-  const uploadParam = Object.values(files).map((file, index) => {
-    const obj = file[0];
-    return {
-      Bucket: bucketName,
-      Body: obj.path,
-      Key: obj.filename,
-    };
-  });
-  // return s3.upload(uploadParams).promise();
-  return Promise.all(uploadParam.map((param) => console.log(param)));
+  const uploadParams = {
+    Bucket: bucketName,
+    Body: fileStream,
+    Key: file.filename,
+  };
+
+  return s3.upload(uploadParams).promise();
 }
 
 // DOWNLOAD FILE FROM S3
