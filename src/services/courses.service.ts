@@ -5,6 +5,7 @@ import { Course } from '@/interfaces/course.interface';
 import { API_BASE, API_SECURE_BASE } from '@config';
 import { makeValidator } from 'envalid';
 import sequelize from 'sequelize';
+import { uploadFileS3 } from '@/utils/s3/s3Uploads';
 
 class CourseService {
   public course = DB.Course;
@@ -132,6 +133,7 @@ class CourseService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const { trailer, thumbnail } = file;
+    const ab = { trailer, thumbnail };
     const trailerPath = `${API_BASE}/media/${trailer[0].path
       .split('/')
       .splice(-2)
@@ -140,6 +142,10 @@ class CourseService {
       .split('/')
       .splice(-2)
       .join('/')}`;
+    console.log(file);
+
+    const uploadedFile = await uploadFileS3(ab); // Upload of s3
+    console.log('bvdhsgfh', uploadedFile);
 
     const newCourse = await this.course.create({
       ...courseDetails,

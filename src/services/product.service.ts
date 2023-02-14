@@ -182,11 +182,32 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
+    const uploadedFile = await uploadFileS3(file); // Upload of s3
+    console.log('bvdhsgfh', uploadedFile);
 
-    const filePath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+    // const filePath = `${API_BASE}/media/${file.path
+    //   .split('/')
+    //   .splice(-2)
+    //   .join('/')}`;
+    // var files = file;
+    // var fileName = file.filename;
+    // var albumPhotosKey = encodeURIComponent(file.path) + '/';
+
+    // var photoKey = albumPhotosKey + fileName;
+
+    // // Use S3 ManagedUpload class as it supports multipart uploads
+    // var upload = new AWS.S3.ManagedUpload({
+    //   params: {
+    //     Bucket: 'stem-botix',
+    //     Key: photoKey,
+    //     Body: JSON.stringify(files),
+    //   },
+    // });
+    // const result = await upload.promise();
+    // console.log(result);
+
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
+    // console.log(uploadedFile);
 
     const uploadedFile = await uploadFileS3(file); // Upload of s3
 
