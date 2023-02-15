@@ -16,6 +16,8 @@ class CourseService {
   public reply = DB.Reply;
   public likedislike = DB.LikeDislike;
   public review = DB.Review;
+  public orderitem = DB.OrderItem;
+  public cartitem = DB.CartItem;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -282,6 +284,7 @@ class CourseService {
               model: this.likedislike,
             },
           ],
+          order: [['createdAt', 'DESC']],
         },
       ],
       order: [['createdAt', 'DESC']],
@@ -322,6 +325,9 @@ class CourseService {
         {
           model: this.user,
         },
+        {
+          model: this.likedislike,
+        },
       ],
       limit: pageSize,
       offset: pageNo,
@@ -343,6 +349,9 @@ class CourseService {
       include: [
         {
           model: this.user,
+        },
+        {
+          model: this.likedislike,
         },
       ],
       order: [['createdAt', 'DESC']],
@@ -418,12 +427,21 @@ class CourseService {
         400,
         'This course is published and can not be deleted. First unpublish this course and then delete it'
       );
-    const res: number = await this.course.destroy({
+    const res = await this.course.destroy({
       where: {
         id: courseId,
       },
     });
-
+    await this.orderitem.destroy({
+      where: {
+        course_id: courseId,
+      },
+    });
+    await this.cartitem.destroy({
+      where: {
+        course_id: courseId,
+      },
+    });
     return { count: res };
   }
   public async listCourses({
