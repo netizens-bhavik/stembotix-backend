@@ -11,6 +11,8 @@ class ProductService {
   public productDimension = DB.ProductDimensionMap;
   public orderitem = DB.OrderItem;
   public cartitem = DB.CartItem;
+  public review = DB.Review;
+
 
   public async viewProducts(
     queryObject
@@ -58,7 +60,9 @@ class ProductService {
         },
         {
           model: this.productDimension,
-        },
+        },{
+          model:this.review
+        }
       ],
     });
 
@@ -83,9 +87,7 @@ class ProductService {
       where: { deletedAt: null },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
-      where: DB.Sequelize.and(
-        { title: { [searchCondition]: search } }
-      ),
+      where: DB.Sequelize.and({ title: { [searchCondition]: search } }),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -198,7 +200,7 @@ class ProductService {
     // // Use S3 ManagedUpload class as it supports multipart uploads
     // var upload = new AWS.S3.ManagedUpload({
     //   params: {
-    //     Bucket: 'stem-botix',
+    //     Bucket: 'stem-botix',  
     //     Key: photoKey,
     //     Body: JSON.stringify(files),
     //   },

@@ -423,6 +423,7 @@ class CourseService {
 
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     if (courseRecord.status === 'Published')
+    
       throw new HttpException(
         400,
         'This course is published and can not be deleted. First unpublish this course and then delete it'
