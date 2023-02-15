@@ -87,7 +87,9 @@ class ProductService {
       where: { deletedAt: null },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
-      where: DB.Sequelize.and({ title: { [searchCondition]: search } }),
+      where: DB.Sequelize.and(
+        { title: { [searchCondition]: search } }
+      ),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
