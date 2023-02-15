@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const OrderItem = sequelize.define(
-    "OrderItem",
+    'OrderItem',
     {
       id: {
         type: Sequelize.UUID,
@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
       },
       item_type: {
-        type: Sequelize.ENUM(["Product", "Course"]),
+        type: Sequelize.ENUM(['Product', 'Course']),
       },
       quantity: {
         type: Sequelize.INTEGER,
