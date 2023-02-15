@@ -28,7 +28,6 @@ class App {
   public httpServer: Server;
   public httpsServer: SecureServer;
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
-  public socket: any;
 
   constructor(routes: Routes[]) {
     this.app = express();
