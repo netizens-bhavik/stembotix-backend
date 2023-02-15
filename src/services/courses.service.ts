@@ -2,9 +2,16 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
-import { API_BASE, API_SECURE_BASE } from '@config';
-import { makeValidator } from 'envalid';
-import sequelize from 'sequelize';
+import { API_BASE, API_SECURE_BASE, CLIENT_URL } from '@config';
+// const sgMail = require('@sendgrid/mail');
+import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from '@config';
+import EmailService from './email.service';
+import {
+  Mail,
+  MailPayload,
+  MailPayloads,
+} from '@/interfaces/mailPayload.interface';
+import { token } from 'morgan';
 
 class CourseService {
   public course = DB.Course;
@@ -17,6 +24,9 @@ class CourseService {
   public review = DB.Review;
   public orderitem = DB.OrderItem;
   public cartitem = DB.CartItem;
+  public cart = DB.Cart;
+  public order = DB.Order;
+  public emailService = new EmailService();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -121,13 +131,14 @@ class CourseService {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
+    const adminRecord = await this.user.findAll({
+      where: { role: 'Admin' },
+    });
     const trainerRecord = await this.trainer.findOne({
       where: {
         user_id: user.id,
       },
     });
-
     if (!trainerRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
 
@@ -148,7 +159,18 @@ class CourseService {
     });
 
     newCourse.addTrainer(trainerRecord);
-
+    if (newCourse) {
+      const mailData: Mail = {
+        templateData: {
+          course: newCourse.title,
+        },
+        mailData: {
+          from: user.email,
+          to: adminRecord[0].email,
+        },
+      };
+      this.emailService.emailData(mailData);
+    }
     return {
       id: newCourse.id,
       status: newCourse.status,
@@ -399,38 +421,82 @@ class CourseService {
 
   public async deleteCourse({ trainer, courseId }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
-    const courseRecord: Course = await this.course.findAll({
-      where: DB.Sequelize.and({
+    const courseRecord: Course = await this.course.findOne({
+      where: {
         id: courseId,
-      }),
+      },
       include: [
         {
           model: this.trainer,
         },
       ],
     });
-
+    const adminRecord = await this.user.findAll({
+      where: { role: 'Admin' },
+    });
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
-    if (courseRecord.status === 'Published')
+    if (courseRecord.status === 'Published') {
+      const mailData: Mail = {
+        templateData: {
+          course: courseRecord.title,
+        },
+        mailData: {
+          from: trainer.email,
+          to: adminRecord[0].email,
+        },
+      };
+      this.emailService.emailsData(mailData);
+
       throw new HttpException(
         400,
-        'This course is published and can not be deleted. First unpublish this course and then delete it'
+        'This course is published and can not be deleted. Please unpublished this course first with the help of Admin'
       );
+    }
+    const responses = await this.orderitem.findAll({
+      where: {
+        course_id: courseId,
+      },
+      include: [
+        {
+          model: this.order,
+          attributes: ['UserId'],
+          include: {
+            model: this.user,
+            attributes: ['email'],
+          },
+        },
+      ],
+    });
+    let users: string[] = [];
+    await responses.map((index) => {
+      users.push(index.Order.User.email as string);
+    });
     const res = await this.course.destroy({
       where: {
         id: courseId,
       },
     });
     await this.orderitem.destroy({
-      where:{
-        course_id:courseId
-      }
-    })
+      where: {
+        course_id: courseId,
+      },
+    });
     await this.cartitem.destroy({
-      where:{
-        course_id:courseId
-      }
-    })
+      where: {
+        course_id: courseId,
+      },
+    });
+    if (res === 1) {
+      const mailerData: MailPayloads = {
+        templateData: {
+          course: courseRecord.title,
+        },
+        mailerData: {
+          to: users,
+        },
+      };
+      this.emailService.sendMail(mailerData);
+    }
     return { count: res };
   }
   public async listCourses({
