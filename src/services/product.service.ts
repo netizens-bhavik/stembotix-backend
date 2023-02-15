@@ -23,7 +23,6 @@ class ProductService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -91,11 +90,6 @@ class ProductService {
     const data: (Product | undefined)[] = await this.product.findAll({
       where: DB.Sequelize.and(
         { title: { [searchCondition]: search } }
-        // DB.Sequelize.or(
-        //   { title: { [searchCondition]: search } },
-        //   // { category: { [searchCondition]: search } },
-        //   { price: { [searchCondition]: search } }
-        // )
       ),
       limit: pageSize,
       offset: pageNo,
@@ -133,7 +127,6 @@ class ProductService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-    // === 'DESC' ? 'DESC' : 'ASC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -205,9 +198,8 @@ class ProductService {
 
     // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
-    // const readStream = getFileStream(uploadedFile.Key);
-    // readStream.pipe(file);
-    // console.log(readStream);
+
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
 
     const newProduct = await this.product.create({
       ...productDetails,

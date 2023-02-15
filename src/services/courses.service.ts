@@ -143,6 +143,7 @@ class CourseService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const { trailer, thumbnail } = file;
+    const ab = { trailer, thumbnail };
     const trailerPath = `${API_BASE}/media/${trailer[0].path
       .split('/')
       .splice(-2)
@@ -151,6 +152,10 @@ class CourseService {
       .split('/')
       .splice(-2)
       .join('/')}`;
+    console.log(file);
+
+    // const uploadedFile = await uploadFileS3(ab); // Upload of s3
+    // console.log('bvdhsgfh', uploadedFile);
 
     const newCourse = await this.course.create({
       ...courseDetails,
@@ -300,6 +305,7 @@ class CourseService {
               model: this.likedislike,
             },
           ],
+          order: [['createdAt', 'DESC']],
         },
       ],
       order: [['createdAt', 'DESC']],
@@ -340,6 +346,9 @@ class CourseService {
         {
           model: this.user,
         },
+        {
+          model: this.likedislike,
+        },
       ],
       limit: pageSize,
       offset: pageNo,
@@ -361,6 +370,9 @@ class CourseService {
       include: [
         {
           model: this.user,
+        },
+        {
+          model: this.likedislike,
         },
       ],
       order: [['createdAt', 'DESC']],
