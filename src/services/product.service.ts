@@ -3,16 +3,20 @@ import { HttpException } from '@exceptions/HttpException';
 import { API_BASE } from '@config';
 import { Product } from '@/interfaces/product.interface';
 import { getFileStream, uploadFileS3 } from '@utils/s3/s3Uploads';
+import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
+import EmailService from './email.service';
 
 class ProductService {
   public product = DB.Product;
   public user = DB.User;
   public productTag = DB.ProductTagMap;
   public productDimension = DB.ProductDimensionMap;
+  public emailService = new EmailService();
   public orderitem = DB.OrderItem;
   public cartitem = DB.CartItem;
-  public review = DB.Review;
-
+  public cart = DB.Cart;
+  public order = DB.Order;
+  public review = DB.Review
 
   public async viewProducts(
     queryObject
@@ -177,6 +181,9 @@ class ProductService {
     if (user.Role.roleName === 'Student' || !user.isEmailVerified) {
       throw new HttpException(403, 'Access Forbidden');
     }
+    const adminRecord = await this.user.findAll({
+      where: { role: 'Admin' },
+    });
 
     const userRecord = await this.user.findOne({
       where: {
@@ -186,29 +193,11 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
-    const uploadedFile = await uploadFileS3(file); // Upload of s3
-    console.log('bvdhsgfh', uploadedFile);
 
-    // const filePath = `${API_BASE}/media/${file.path
-    //   .split('/')
-    //   .splice(-2)
-    //   .join('/')}`;
-    // var files = file;
-    // var fileName = file.filename;
-    // var albumPhotosKey = encodeURIComponent(file.path) + '/';
-
-    // var photoKey = albumPhotosKey + fileName;
-
-    // // Use S3 ManagedUpload class as it supports multipart uploads
-    // var upload = new AWS.S3.ManagedUpload({
-    //   params: {
-    //     Bucket: 'stem-botix',  
-    //     Key: photoKey,
-    //     Body: JSON.stringify(files),
-    //   },
-    // });
-    // const result = await upload.promise();
-    // console.log(result);
+    const filePath = `${API_BASE}/media/${file.path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
 
     // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
@@ -217,7 +206,7 @@ class ProductService {
 
     const newProduct = await this.product.create({
       ...productDetails,
-      thumbnail: uploadedFile.Location,
+      thumbnail: filePath,
     });
     const addProductDimension = await this.productDimension.create({
       product_id: newProduct.id,
@@ -225,6 +214,18 @@ class ProductService {
       dimension: productDetails.dimension,
     });
     newProduct.addUser(userRecord);
+    if (newProduct) {
+      const mailData: Mail = {
+        templateData: {
+          product: newProduct.title,
+        },
+        mailData: {
+          from: user.email,
+          to: adminRecord[0].email,
+        },
+      };
+      this.emailService.mailsData(mailData);
+    }
     return {
       id: newProduct.id,
       title: newProduct.title,
@@ -232,7 +233,8 @@ class ProductService {
       category: newProduct.category,
       description: newProduct.description,
       status: newProduct.status,
-      thumbnail: uploadedFile.Location,
+      // thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
+      thumbnail: filePath,
       sku: newProduct.sku,
       weight: addProductDimension.weight,
       dimension: addProductDimension.dimension,
@@ -297,7 +299,7 @@ class ProductService {
   public async deleteProduct({ user, productId }): Promise<{ count: number }> {
     if (user.Role.roleName === 'Student')
       throw new HttpException(401, 'Unauthorized');
-    const courseRecord: Product = await this.product.findOne({
+    const productRecord: Product = await this.product.findOne({
       where: { id: productId },
       include: [
         {
@@ -305,13 +307,47 @@ class ProductService {
         },
       ],
     });
+    const adminRecord = await this.user.findAll({
+      where: { role: 'Admin' },
+    });
 
-    if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
-    if (courseRecord.status === 'Published')
+    if (!productRecord) throw new HttpException(403, 'Forbidden Resource');
+    if (productRecord.status === 'Published') {
+      const mailData: Mail = {
+        templateData: {
+          product: productRecord.title,
+        },
+        mailData: {
+          from: user.email,
+          to: adminRecord[0].email,
+        },
+      };
+      this.emailService.emailsdata(mailData);
+
       throw new HttpException(
         400,
-        'This product is published and can not be deleted. First unpublish this product and then delete it.'
+        'This course is published and can not be deleted. Please unpublished this course first with the help of Admin'
       );
+    }
+    const responses = await this.orderitem.findAll({
+      where: {
+        product_id: productId,
+      },
+      include: [
+        {
+          model: this.order,
+          attributes: ['UserId'],
+          include: {
+            model: this.user,
+            attributes: ['email'],
+          },
+        },
+      ],
+    });
+    let users: string[] = [];
+    await responses.map((index) => {
+      users.push(index.Order.User.email as string);
+    });
     const res: number = await this.product.destroy({
       where: {
         id: productId,
@@ -327,7 +363,17 @@ class ProductService {
         product_id: productId,
       },
     });
-
+    if (res === 1) {
+      const mailerData: MailPayloads = {
+        templateData: {
+          product: productRecord.title,
+        },
+        mailerData: {
+          to: users,
+        },
+      };
+      this.emailService.sendMails(mailerData);
+    }
     return { count: res };
   }
 
