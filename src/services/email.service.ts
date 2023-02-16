@@ -3,7 +3,11 @@ import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from '@config';
 import { Options, MailOptions } from 'nodemailer/lib/smtp-transport';
 import path from 'path';
 import * as ejs from 'ejs';
-import { MailPayload } from '@/interfaces/mailPayload.interface';
+import {
+  Mail,
+  MailPayload,
+  MailPayloads,
+} from '@/interfaces/mailPayload.interface';
 
 const transporterOptions: Options = {
   service: 'gmail',
@@ -45,6 +49,169 @@ class EmailService {
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
             to: mailerData.to,
             subject: 'Account verification',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+
+  public async sendMail(payload: MailPayloads) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/deletedCoursemail.ejs');
+      const { templateData, mailerData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailerData.to,
+            subject: 'Delete Course',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async sendMails(payload: MailPayloads) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/deletedProductmail.ejs');
+      const { templateData, mailerData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailerData.to,
+            subject: 'Delete Product',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async emailData(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/publishedCoursemail.ejs');
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Published Added Course',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async mailsData(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/publishedProductmail.ejs');
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Published Added product',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async emailsData(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/unpublishedCoursemail.ejs');
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Unpublished Course',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async emailsdata(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/unpublishedProductmail.ejs');
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Unpublished Product',
             html: data,
           });
           this.terminateConnection();

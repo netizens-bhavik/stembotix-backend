@@ -19,7 +19,7 @@ class ProductRoute implements Routes {
 
   private initializeRoutes() {
     // view all courses with pagination (without bearer)
-    this.router.get(`${this.path}`, this.productController.viewCourses);
+    this.router.get(`${this.path}`, this.productController.viewProducts);
 
     // view all product by admin with pagination (without bearer)
     this.router.get(
