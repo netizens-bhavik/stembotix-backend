@@ -143,7 +143,7 @@ class CourseService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const { trailer, thumbnail } = file;
-    const ab = { trailer, thumbnail };
+    // const ab = { trailer, thumbnail };
     const trailerPath = `${API_BASE}/media/${trailer[0].path
       .split('/')
       .splice(-2)
@@ -153,6 +153,9 @@ class CourseService {
       .splice(-2)
       .join('/')}`;
     console.log(file);
+
+    // const uploadedFile = await uploadFileS3(ab); // Upload of s3
+    // console.log('bvdhsgfh', uploadedFile);
 
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
     // console.log('bvdhsgfh', uploadedFile);

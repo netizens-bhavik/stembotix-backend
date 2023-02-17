@@ -16,7 +16,7 @@ class ProductService {
   public cartitem = DB.CartItem;
   public cart = DB.Cart;
   public order = DB.Order;
-  public review = DB.Review;
+  public review = DB.Review
 
   public async viewProducts(
     queryObject
@@ -64,10 +64,9 @@ class ProductService {
         },
         {
           model: this.productDimension,
-        },
-        {
-          model: this.review,
-        },
+        },{
+          model:this.review
+        }
       ],
     });
 
@@ -92,7 +91,9 @@ class ProductService {
       where: { deletedAt: null },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
-      where: DB.Sequelize.and({ title: { [searchCondition]: search } }),
+      where: DB.Sequelize.and(
+        { title: { [searchCondition]: search } }
+      ),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -202,22 +203,6 @@ class ProductService {
     // var files = file;
     // var fileName = file.filename;
     // var albumPhotosKey = encodeURIComponent(file.path) + '/';
-
-    // var photoKey = albumPhotosKey + fileName;
-
-    // // Use S3 ManagedUpload class as it supports multipart uploads
-    // var upload = new AWS.S3.ManagedUpload({
-    //   params: {
-    //     Bucket: 'stem-botix',
-    //     Key: photoKey,
-    //     Body: JSON.stringify(files),
-    //   },
-    // });
-    // const result = await upload.promise();
-    // console.log(result);
-
-    // const uploadedFile = await uploadFileS3(file); // Upload of s3
-    // console.log(uploadedFile);
 
     // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);
