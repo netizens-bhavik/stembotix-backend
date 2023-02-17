@@ -1,5 +1,3 @@
-import DB from "@/databases";
-
 module.exports = (sequelize, Sequelize) => {
   const Comment = sequelize.define(
     'Comment',
