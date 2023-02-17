@@ -5,7 +5,7 @@ import ProductService from '@/services/product.service';
 class ProductController {
   public productService = new ProductService();
 
-  public viewCourses = async (
+  public viewProducts = async (
     req: Request,
     res: Response,
     next: NextFunction

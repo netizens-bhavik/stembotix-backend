@@ -3,7 +3,8 @@ import type { Server as httpServer } from 'http';
 
 const initEvents = (io: Server) => {
   io.on('connection', (socket) => {
-    console.log(`⚡: ${socket.id} user just connected!`);
+    console.log(`⚡: user just connected!`);
+    // */${socket.id}
     socket.on('get-data', (data) => console.log('data', data));
 
     socket.on('disconnect', () => {

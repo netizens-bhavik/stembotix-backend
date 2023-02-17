@@ -16,6 +16,7 @@ class ProductService {
   public cartitem = DB.CartItem;
   public cart = DB.Cart;
   public order = DB.Order;
+  public review = DB.Review
 
   public async viewProducts(
     queryObject
@@ -63,7 +64,9 @@ class ProductService {
         },
         {
           model: this.productDimension,
-        },
+        },{
+          model:this.review
+        }
       ],
     });
 
