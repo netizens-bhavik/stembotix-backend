@@ -33,9 +33,9 @@ class OrderService {
           },
         ],
       },
-      order:[['createdAt','DESC']]
+      order: [['createdAt', 'DESC']],
     });
-    if (!data) throw new HttpException(404,"No order exist")
+    if (!data) throw new HttpException(404, 'No order exist');
     return data;
   }
   public async addOrder(userId: string, amount: number) {
@@ -95,6 +95,7 @@ class OrderService {
     }
 
     // Generating order and cart item mapping
+
     const items = await this.cartItem.findAll({
       where: { id: cartItems },
       include: {
@@ -102,7 +103,7 @@ class OrderService {
         include: { model: this.user },
       },
     });
-    if (!items) throw new HttpException(404, 'Cart Items not found');
+    // if (!items) throw new HttpException(404, 'Cart Items not found');
     const isOwnItems = items.every((item) => item.Cart.User.id === userId);
     if (!isOwnItems) throw new HttpException(403, 'Invalid Cart Items');
 

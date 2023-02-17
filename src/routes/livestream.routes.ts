@@ -33,12 +33,12 @@ class LiveStreamRoute implements Routes {
     );
     this.router.get(
       `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
+      // passport.authenticate('jwt', { session: false }),
       this.liveStreamController.viewLiveStream
     );
     this.router.get(
       `${this.path}/:livestreamId`,
-      passport.authenticate('jwt', { session: false }),
+      // passport.authenticate('jwt', { session: false }),
       this.liveStreamController.viewLiveStreamById
     );
 
@@ -67,6 +67,11 @@ class LiveStreamRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.liveStreamController.viewLiveStreamAdmin
     );
+    this.router.get(
+      `${this.path}/list`,
+      // passport.authenticate('jwt', { session: false }),
+      this.liveStreamController.listLiveEvent
+      )
   }
 }
 
