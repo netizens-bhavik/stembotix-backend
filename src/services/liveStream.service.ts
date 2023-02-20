@@ -9,6 +9,7 @@ class LiveStreamService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
   public trainer = DB.Trainer;
+  public subscribeEvent = DB.SubscribeEvent;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -65,24 +66,22 @@ class LiveStreamService {
     livestreamDetails,
     file,
     trainer,
-    livestreamId,
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
 
     const record = await this.liveStream.findOne({
       where: {
-        id: livestreamId,
+        id: livestreamDetails.id,
       },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
-    const { thumbnail } = file;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+    const thumbnail = file;
+    const thumbnailPath = `${API_BASE}/media/${thumbnail.path
       .split('/')
       .splice(-2)
       .join('/')}`;
-
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
@@ -90,7 +89,7 @@ class LiveStreamService {
       },
       {
         where: {
-          id: livestreamId,
+          id: livestreamDetails.id,
         },
         returning: true,
       }
@@ -105,15 +104,25 @@ class LiveStreamService {
     if (!this.isTrainer(trainer))
       throw new HttpException(401, "You don't have Authority to Delete Event");
 
-    const record = await this.liveStream.findOne({
+    let record = await this.liveStream.findOne({
       where: {
         id: livestreamId,
       },
+      include: [
+        {
+          model: this.subscribeEvent,
+        },
+      ],
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(402, 'No Record Found');
     const res = await this.liveStream.destroy({
       where: {
-        id: livestreamId,
+        id: record.id,
+      },
+    });
+    await this.subscribeEvent.destroy({
+      where: {
+        livestreamId: livestreamId,
       },
     });
     if (res === 1) {

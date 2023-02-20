@@ -63,14 +63,14 @@ class LiveStreamController {
     try {
       const { livestreamId } = req.params;
       const livestreamDetails = req.body;
-      const file = req.files;
+      const file = req.file;
+      console.log(file)
       const trainer = req.user;
       livestreamDetails['id'] = livestreamId;
       const response = await this.liveStreamService.updateLiveStream({
         livestreamDetails,
         file,
         trainer,
-        livestreamId,
       });
       res.status(200).send(response);
     } catch (error) {

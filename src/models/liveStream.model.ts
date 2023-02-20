@@ -33,7 +33,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       thumbnail: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull:false
       },
       link: {
         type: Sequelize.STRING,
@@ -45,11 +45,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       is_active: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
       },
       is_completed: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
       },
     },
     { paranoid: true }

@@ -1,7 +1,6 @@
 import { Time } from 'aws-sdk/clients/codedeploy';
 
 export interface LiveStream {
-  id: string;
   title: string;
   subscriptionPrice: number;
   description: string;
