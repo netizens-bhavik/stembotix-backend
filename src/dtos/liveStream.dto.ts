@@ -1,12 +1,8 @@
+import { Time } from 'aws-sdk/clients/codedeploy';
+import { time } from 'aws-sdk/clients/frauddetector';
 import { Type } from 'class-transformer';
 // import 'reflect-metadata';
-import {
-  IsString,
-  IsNumber,
-  Min,
-  IsDateString,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsNumber, Min, IsDateString } from 'class-validator';
 
 export class LiveStreamDTO {
   @IsString()
@@ -23,17 +19,15 @@ export class LiveStreamDTO {
   public description: string;
 
   @IsDateString()
-  public startDate: Date;
+  public Date: Date;
 
-  @IsDateString()
-  public endDate: Date;
+  @IsString()
+  public startTime: Time;
+
+  @IsString()
+  public endTime: Time;
 
   @IsString()
   public link: string;
 
-  @IsString()
-  public is_active: string;
-
-  @IsString()
-  public is_completed: string;
 }
