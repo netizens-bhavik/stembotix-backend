@@ -35,6 +35,12 @@ class SubscripeLiveStreamRoute implements Routes {
       ],
       this.subscribeController.verifySubscription
     );
+
+    this.router.get(
+      `${this.path}/:livestreamId`,
+      passport.authenticate('jwt', { session: false }),
+      this.subscribeController.getVerifiedSubscriptionUser
+    );
   }
 }
 

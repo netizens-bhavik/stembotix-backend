@@ -27,7 +27,4 @@ export class LiveStreamDTO {
   @IsString()
   public endTime: Time;
 
-  @IsString()
-  public link: string;
-
 }
