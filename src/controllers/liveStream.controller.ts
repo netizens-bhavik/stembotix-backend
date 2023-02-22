@@ -64,7 +64,6 @@ class LiveStreamController {
       const { livestreamId } = req.params;
       const livestreamDetails = req.body;
       const file = req.file;
-      console.log(file);
       const trainer = req.user;
       livestreamDetails['id'] = livestreamId;
       const response = await this.liveStreamService.updateLiveStream({

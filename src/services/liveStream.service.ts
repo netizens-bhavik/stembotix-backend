@@ -78,14 +78,16 @@ class LiveStreamService {
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
     const thumbnail = file;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+    if (thumbnail) {
+      const thumbnailPath = `${API_BASE}/media/${thumbnail.path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+      livestreamDetails.thumbnail = thumbnailPath;
+    }
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
-        thumbnail: thumbnailPath,
       },
       {
         where: {
