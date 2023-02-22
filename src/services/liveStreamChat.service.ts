@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
 import crypto from 'crypto';
+import { API_BASE } from '@/config';
 
 class LiveStreamChatService {
   public user = DB.User;
@@ -12,8 +13,9 @@ class LiveStreamChatService {
 
   public async sendLiveStreamChat(
     livestreamId: string,
-    message: string,
-    loggedUser: any
+    messageDetails: string,
+    loggedUser,
+    file
   ): Promise<any> {
     const subscribeEvent = await this.subscribeEvent.findOne({
       where: { user_id: loggedUser.id, livestream_id: livestreamId },
@@ -23,9 +25,16 @@ class LiveStreamChatService {
     }
     const loggedUserId = loggedUser.id;
     const subscribeEventId = subscribeEvent.id;
-
+    const thumbnail = file;
+    if (thumbnail) {
+      const thumbnailPath = `${API_BASE}/media/${thumbnail.path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+      subscribeEvent.thumbnail = thumbnailPath;
+    }
     const sendLiveStreamChatMsg = await this.liveStreamChat.create({
-      messages: message,
+      messages: messageDetails,
       userId: loggedUserId,
       subscribeEventId: subscribeEventId,
       livestreamId: livestreamId,
@@ -62,7 +71,6 @@ class LiveStreamChatService {
       message: 'Message deleted successfully',
     };
   }
-
   public async getLiveStreamChatMsg(
     livestreamId: string,
     loggedUser,

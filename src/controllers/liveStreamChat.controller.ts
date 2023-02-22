@@ -39,14 +39,16 @@ class LiveStreamChatController {
   ) => {
     try {
       const { livestreamId } = req.params;
-      const { message } = req.body;
+      const messageDetails = req.body;
+      const file = req.file;
       const loggedUser = req.user;
 
       const liveStreamChatResponse: LiveStreamChat =
         await this.liveStreamchatService.sendLiveStreamChat(
           livestreamId,
-          message,
-          loggedUser
+          messageDetails,
+          loggedUser,
+          file
         );
 
       res.status(200).json({
