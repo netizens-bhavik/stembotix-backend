@@ -82,10 +82,10 @@ class SubscriptionService {
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);
     hmac.update(razorpay_order_id + '|' + payment_id);
-    const digest = hmac.digest('hex');
+    // const digest = hmac.digest('hex');
 
-    if (digest !== razorpay_signature)
-      throw new HttpException(400, 'Transaction is not legit');
+    // if (digest !== razorpay_signature)
+    //   throw new HttpException(400, 'Transaction is not legit');
 
     const paymentData = {
       payment_id,

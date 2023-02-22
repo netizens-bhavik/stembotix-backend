@@ -26,5 +26,4 @@ export class LiveStreamDTO {
 
   @IsString()
   public endTime: Time;
-
 }
