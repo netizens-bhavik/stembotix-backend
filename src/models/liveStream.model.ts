@@ -33,7 +33,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       thumbnail: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull:false
       },
       categories: {
         type: Sequelize.TEXT,
