@@ -10,6 +10,13 @@ export interface LiveStream {
   date: Date;
   startTime: Time;
   endTime: Time;
-  link: string;
   categories: string;
+}
+
+export interface Subscribe {
+  subscriptionPrice: number;
+  payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+  livestreamId: string;
 }

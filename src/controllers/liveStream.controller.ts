@@ -12,7 +12,7 @@ class LiveStreamController {
     try {
       const liveStreamDetails = req.body;
       const trainer = req.user;
-      const file = req.files;
+      const file = req.file;
       const response = await this.liveStreamService.createLiveStream({
         liveStreamDetails,
         user: trainer,
@@ -64,7 +64,6 @@ class LiveStreamController {
       const { livestreamId } = req.params;
       const livestreamDetails = req.body;
       const file = req.file;
-      console.log(file)
       const trainer = req.user;
       livestreamDetails['id'] = livestreamId;
       const response = await this.liveStreamService.updateLiveStream({
