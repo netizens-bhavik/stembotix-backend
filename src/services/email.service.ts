@@ -61,15 +61,17 @@ class EmailService {
     }
   }
 
-  public async sendMail(payload: MailPayloads) {
+  public async sendMailDeleteCourse(payload: MailPayloads) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/deletedCoursemail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/deletedCoursemail.ejs'
+      );
       const { templateData, mailerData } = payload;
-
       ejs.renderFile(pathToView, templateData, async (err, data) => {
         if (err) return err;
         try {
@@ -88,13 +90,46 @@ class EmailService {
       return err;
     }
   }
-  public async sendMails(payload: MailPayloads) {
+  public async sendEventstartMail(payload: MailPayloads) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/deletedProductmail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/verificationEmail.ejs'
+      );
+      const { templateData, mailerData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailerData.to,
+            subject: 'Live Event Schedule',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async sendMailDeleteProduct(payload: MailPayloads) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/deletedProductmail.ejs'
+      );
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
@@ -115,13 +150,16 @@ class EmailService {
       return err;
     }
   }
-  public async emailData(payload: Mail) {
+  public async sendMailPublishCourse(payload: Mail) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/publishedCoursemail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/publishedCoursemail.ejs'
+      );
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
@@ -142,13 +180,16 @@ class EmailService {
       return err;
     }
   }
-  public async mailsData(payload: Mail) {
+  public async sendMailPublishProduct(payload: Mail) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/publishedProductmail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/publishedProductmail.ejs'
+      );
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
@@ -169,13 +210,16 @@ class EmailService {
       return err;
     }
   }
-  public async emailsData(payload: Mail) {
+  public async sendMailunPublishcourse(payload: Mail) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/unpublishedCoursemail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/unpublishedCoursemail.ejs'
+      );
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
@@ -196,13 +240,16 @@ class EmailService {
       return err;
     }
   }
-  public async emailsdata(payload: Mail) {
+  public async sendMailunPublishproduct(payload: Mail) {
     try {
       await this.createConnection();
       await this.transporter.verify();
 
       // Mailing Data assignment
-      const pathToView = path.resolve(__dirname, '../view/unpublishedProductmail.ejs');
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/unpublishedProductmail.ejs'
+      );
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {

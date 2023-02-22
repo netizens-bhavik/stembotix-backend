@@ -7,7 +7,20 @@ const initEvents = (io: Server) => {
     console.log(`⚡: user just connected!`);
     // */${socket.id}
     socket.on('get-data', (data) => console.log('data', data));
+    socket.on('join', (roomId) => {
+      const selectedRoom = io.sockets.adapter.rooms[roomId];
+      const numberOfClients = selectedRoom ? selectedRoom.length : 0;
 
+      if (numberOfClients == 0) {
+        console.log(`Creating room ${roomId} `);
+        socket.join(roomId);
+        socket.emit('room_created', roomId);
+      } else if (numberOfClients >= 1) {
+        console.log(`Joining room ${roomId}  `);
+        socket.join(roomId);
+        socket.emit('room_joined', roomId);
+      }
+    });
     socket.on('message', (data) => {
       io.emit('messageResponse', data);
     });
