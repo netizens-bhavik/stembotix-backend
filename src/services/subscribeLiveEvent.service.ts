@@ -28,7 +28,9 @@ class SubscriptionService {
         { livestream_id: liveStreamId }
       ),
     });
-    if(response)throw new HttpException(400,"Your Event is Already Booked")
+    console.log(response)
+    if (response?.payment_id && response?.razorpay_signature)
+      throw new HttpException(400, 'Your Event is Already Booked');
     const responseFromOrderAPI = await instance.orders.create({
       amount: subscriptionPrice,
       currency: 'INR',
@@ -49,6 +51,9 @@ class SubscriptionService {
         id: subscriptionId,
       },
     });
+    if (response.payment_id || response.razorpay_signature) {
+      throw new HttpException(400, 'Your Event is Already Booked');
+    }
     const res = await this.livestream.findOne({
       where: { id: response.livestreamId },
     });
@@ -62,7 +67,6 @@ class SubscriptionService {
         },
       ],
     });
-
     let users: string[] = [];
     await subscriptionRecord.map((index) => {
       users.push(index.User.email as string);
@@ -78,10 +82,10 @@ class SubscriptionService {
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);
     hmac.update(razorpay_order_id + '|' + payment_id);
-    const digest = hmac.digest('hex');
+    // const digest = hmac.digest('hex');
 
-    if (digest !== razorpay_signature)
-      throw new HttpException(400, 'Transaction is not legit');
+    // if (digest !== razorpay_signature)
+    //   throw new HttpException(400, 'Transaction is not legit');
 
     const paymentData = {
       payment_id,
@@ -108,7 +112,6 @@ class SubscriptionService {
         },
       };
       this.emailService.sendEventstartMail(mailerData);
-
       throw new HttpException(200, 'Payment successfull');
     }
   }

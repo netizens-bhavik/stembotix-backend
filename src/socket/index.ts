@@ -1,5 +1,8 @@
 import { Server } from 'socket.io';
 import type { Server as httpServer } from 'http';
+import path from 'path';
+import fs from 'fs';
+import { API_BASE } from '@/config';
 
 let users = [];
 const initEvents = (io: Server) => {
@@ -27,20 +30,30 @@ const initEvents = (io: Server) => {
     socket.on('typing', (data) =>
       socket.broadcast.emit('typingResponse', data)
     );
-    socket.on('newUser', (data) => {
-      users.push(data);
-      io.emit('newUserResponse', users);
-    });
+    socket.on('upload', (file) => {
+      const folderpath = path.resolve(__dirname, '../public/chatImage');
+      fs.mkdirSync(folderpath, { recursive: true });
+      const fileType = file.type.split('/');
+      const fileName = `chat-${Date.now()}.${fileType[1]}`;
+      if (fs.existsSync(folderpath)) {
+        fs.writeFile(`${folderpath}/${fileName}`, file.file, (err) => {});
+        const filePath = `${API_BASE}/media/chatImage/${fileName}`;
 
-    socket.on('disconnect', () => {
-      console.log('🔥: A user disconnected');
+      }
+      socket.on('newUser', (data) => {
+        users.push(data);
+        io.emit('newUserResponse', users);
+      });
+      socket.on('disconnect', () => {
+        console.log('🔥: A user disconnected');
+      });
     });
   });
 };
 
 const init = (server: httpServer) => {
   const io = new Server(server, {
-    maxHttpBufferSize: 1e8,
+    maxHttpBufferSize: 10e6,
     pingTimeout: 60000,
     cors: {
       origin: '*',
