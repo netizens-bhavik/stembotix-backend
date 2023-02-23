@@ -65,7 +65,6 @@ class LiveStreamChatService {
       message: 'Message deleted successfully',
     };
   }
-
   public async getLiveStreamChatMsg(
     livestreamId: string,
     loggedUser,

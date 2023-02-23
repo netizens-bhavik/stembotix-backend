@@ -83,7 +83,7 @@ const fetchActiveLiveStreamUsers = async (livestreamId) => {
 
 const init = (server: httpServer) => {
   const io = new Server(server, {
-    maxHttpBufferSize: 1e8,
+    maxHttpBufferSize: 10e6,
     pingTimeout: 60000,
     cors: {
       origin: '*',
