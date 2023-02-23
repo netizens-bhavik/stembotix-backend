@@ -40,6 +40,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'subscribeEventId',
       targetKey: 'id',
     });
+    SubscribeEvent.hasMany(models.LiveStreamChatLogs, {
+      foreignKey: 'subscribeEventId',
+      targetKey: 'id',
+    });
   };
   return SubscribeEvent;
 };

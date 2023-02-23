@@ -1,5 +1,10 @@
 import { Server } from 'socket.io';
 import type { Server as httpServer } from 'http';
+import LiveStreamChatServiceLogs from '@/services/livestreamchatlogs.service';
+import LiveStreamChatService from '@/services/liveStreamChat.service';
+
+const liveStreamchatlogsService = new LiveStreamChatServiceLogs();
+const liveStreamchatService = new LiveStreamChatService();
 
 let users = [];
 const initEvents = (io: Server) => {
@@ -7,35 +12,73 @@ const initEvents = (io: Server) => {
     console.log(`⚡: user just connected!`);
     // */${socket.id}
     socket.on('get-data', (data) => console.log('data', data));
-    socket.on('join', (roomId) => {
-      const selectedRoom = io.sockets.adapter.rooms[roomId];
-      const numberOfClients = selectedRoom ? selectedRoom.length : 0;
+    socket.on('join', async (data) => {
+      console.log('🔥: A user joined', data);
+      try {
+        if (data.roomId && data.userId) {
+          console.log('in if');
+          await liveStreamchatlogsService.newUserJoined({
+            livestreamId: data.roomId,
+            userId: data.userId,
+            socketId: socket.id,
+          });
 
-      if (numberOfClients == 0) {
-        console.log(`Creating room ${roomId} `);
-        socket.join(roomId);
-        socket.emit('room_created', roomId);
-      } else if (numberOfClients >= 1) {
-        console.log(`Joining room ${roomId}  `);
-        socket.join(roomId);
-        socket.emit('room_joined', roomId);
+          socket.join(data.roomId);
+
+          io.emit(
+            'latestActiveUsers',
+            await fetchActiveLiveStreamUsers(data.roomId)
+          );
+        } else {
+          console.log('something went wrong');
+        }
+      } catch (err) {
+        console.log(err);
       }
     });
-    socket.on('message', (data) => {
-      io.emit('messageResponse', data);
+    socket.on('message', async (data) => {
+      try {
+        // await liveStreamchatService.sendLiveStreamChat(
+        //   data.livestreamId,
+        //   data.message,
+        //   data.loggedUser
+        // );
+        io.emit('messageResponse', data);
+      } catch (err) {
+        console.log(err);
+      }
     });
     socket.on('typing', (data) =>
       socket.broadcast.emit('typingResponse', data)
     );
-    socket.on('newUser', (data) => {
-      users.push(data);
-      io.emit('newUserResponse', users);
+    socket.on('newUser', async (data) => {
+      // users.push(data);
+      // await liveStreamchatlogsService.newUserJoined({
+      //   ...data,
+      //   socketId: socket.id,
+      // });
+      // io.emit(
+      //   'latestActiveUsers',
+      //   await fetchActiveLiveStreamUsers(data.livestreamId)
+      // );
     });
 
-    socket.on('disconnect', () => {
+    // change user status to offline when user disconnect
+    socket.on('disconnect', async () => {
       console.log('🔥: A user disconnected');
+      await liveStreamchatlogsService.userDisconnected({ socketId: socket.id });
     });
   });
+};
+
+const fetchActiveLiveStreamUsers = async (livestreamId) => {
+  try {
+    const dataresponce =
+      await liveStreamchatlogsService.fetchActiveLiveStreamUsers(livestreamId);
+    return dataresponce;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const init = (server: httpServer) => {
