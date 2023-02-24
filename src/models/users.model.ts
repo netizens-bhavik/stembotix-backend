@@ -119,6 +119,21 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.LiveStreamChatLogs, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+
+    User.hasMany(models.InstituteInstructor, {
+      foreignKey: 'InstructorId',
+      targetKey: 'id',
+      as: 'Instructor',
+    });
+    User.hasMany(models.InstituteInstructor, {
+      foreignKey: 'InstituteId',
+      targetKey: 'id',
+      as: 'Institute',
+    });
   };
 
   User.prototype.validPassword = (password) => {

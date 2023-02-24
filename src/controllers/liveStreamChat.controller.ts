@@ -18,11 +18,7 @@ class LiveStreamChatController {
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
 
       const liveStreamChatResponse: LiveStreamChat =
-        await this.liveStreamchatService.getLiveStreamChatMsg(
-          livestreamId,
-          loggedUser,
-          queryObject
-        );
+        await this.liveStreamchatService.getLiveStreamChatMsg(livestreamId);
 
       res.status(200).json({
         message: 'LiveStreamChat messages fetched successfully',
@@ -39,16 +35,14 @@ class LiveStreamChatController {
   ) => {
     try {
       const { livestreamId } = req.params;
-      const messageDetails = req.body;
-      const file = req.file;
+      const { message } = req.body;
       const loggedUser = req.user;
 
       const liveStreamChatResponse: LiveStreamChat =
         await this.liveStreamchatService.sendLiveStreamChat(
           livestreamId,
-          messageDetails,
-          loggedUser,
-          file
+          message,
+          loggedUser
         );
 
       res.status(200).json({
