@@ -33,7 +33,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       thumbnail: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false,
       },
       categories: {
         type: Sequelize.TEXT,
@@ -58,6 +58,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Livestream.hasMany(models.LiveStreamChat, {
+      foreignKey: 'livestreamId',
+      targetKey: 'id',
+    });
+    Livestream.hasMany(models.LiveStreamChatLogs, {
       foreignKey: 'livestreamId',
       targetKey: 'id',
     });

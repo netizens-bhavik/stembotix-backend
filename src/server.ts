@@ -11,7 +11,7 @@ import CurriculumSectionRoute from './routes/curriculumSection.route';
 import CurriculumVideoRoute from './routes/curriculumVideo.route';
 import FileUploadRoute from './routes/fileUploads.route';
 import LikeDislikeRoute from './routes/likedislike.route';
-import LiveStreamRoute from './routes/livestream.routes';
+import LiveStreamRoute from './routes/livestream.route';
 import OrderRoute from './routes/order.route';
 import ProductRoute from './routes/product.route';
 import QuizRoute from './routes/quiz.route';
@@ -22,6 +22,7 @@ import ReplyRoute from './routes/reply.route';
 import ReviewRoute from './routes/review.route';
 import SubscripeLiveStreamRoute from './routes/subscribeLiveStream.route';
 import LiveStreamChatRoute from './routes/liveStreamChat.route';
+import InstituteInstroctorRoute from './routes/instituteinstructor.route';
 
 validateEnv();
 
@@ -48,5 +49,6 @@ const app = new App([
   new LiveStreamRoute(),
   new SubscripeLiveStreamRoute(),
   new LiveStreamChatRoute(),
+  new InstituteInstroctorRoute(),
 ]);
 app.listen();
