@@ -4,6 +4,7 @@ import { isEmpty } from '@utils/util';
 import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
 import crypto from 'crypto';
 import { API_BASE } from '@/config';
+import { LiveStreamChat } from '@/interfaces/liveStramChat.interface';
 
 class LiveStreamChatService {
   public user = DB.User;
@@ -12,11 +13,11 @@ class LiveStreamChatService {
   public liveStreamChat = DB.LiveStreamChat;
 
   public async sendLiveStreamChat(
-    livestreamId: string,
-    messageDetails: string,
+    livestreamId,
+    messageDetails,
     loggedUser,
     file
-  ): Promise<any> {
+  ): Promise<LiveStreamChat> {
     const subscribeEvent = await this.subscribeEvent.findOne({
       where: { user_id: loggedUser.id, livestream_id: livestreamId },
     });
@@ -48,7 +49,7 @@ class LiveStreamChatService {
     };
   }
 
-  public async deleteLiveStreamChat(message_id, loggedUser): Promise<any> {
+  public async deleteLiveStreamChat(message_id, loggedUser): Promise<LiveStreamChat> {
     const liveStreamChat = await this.liveStreamChat.findOne({
       where: { id: message_id },
     });
@@ -72,10 +73,10 @@ class LiveStreamChatService {
     };
   }
   public async getLiveStreamChatMsg(
-    livestreamId: string,
+    livestreamId,
     loggedUser,
     queryObject
-  ): Promise<any> {
+  ): Promise<LiveStreamChat> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
