@@ -65,27 +65,17 @@ class LiveStreamChatService {
       message: 'Message deleted successfully',
     };
   }
-  public async getLiveStreamChatMsg(
-    livestreamId: string,
-    loggedUser,
-    queryObject
-  ): Promise<any> {
-    const subscribeEvent = await this.subscribeEvent.findOne({
-      where: { user_id: loggedUser.id, livestream_id: livestreamId },
-    });
-    if (!subscribeEvent) {
-      throw new HttpException(404, 'User not subscribed to this LiveStream');
-    }
-
+  public async getLiveStreamChatMsg(livestreamId: string): Promise<any> {
     const getLiveStreamChatMsg = await this.liveStreamChat.findAndCountAll({
       where: { livestreamId: livestreamId, deletedAt: null },
       include: [
         {
           model: this.user,
-          attributes: ['id', 'firstName', 'lastName', 'email'],
+          // attributes: ['id', 'firstName', 'lastName', 'email'],
         },
       ],
-      attributes: ['id', 'messages', 'userId', 'subscribeEventId'],
+      attributes: ['id', 'messages', 'userId', 'createdAt'],
+      order: [['createdAt', 'ASC']],
     });
     if (!getLiveStreamChatMsg) {
       throw new HttpException(500, 'Something went wrong');

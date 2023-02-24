@@ -57,7 +57,14 @@ class LiveStreamChatLogsService {
       { isOnline: false },
       { where: { socketId } }
     );
-    return liveStreamChatLogsData;
+
+    //get liveStreamId from liveStreamChatLogsData
+    const liveStreamChatLogs = await this.liveStreamChatLogs.findOne({
+      where: { socketId },
+      attributes: ['livestreamId'],
+    });
+
+    return liveStreamChatLogs?.livestreamId;
   }
 
   public async fetchActiveLiveStreamUsers(livestreamId) {
@@ -69,7 +76,7 @@ class LiveStreamChatLogsService {
       include: [
         {
           model: this.user,
-          attributes: ['id', 'first_name', 'last_name', 'email', 'role'],
+          // attributes: ['id', 'first_name', 'last_name', 'email', 'role'],
         },
       ],
     });

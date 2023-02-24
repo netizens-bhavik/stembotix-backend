@@ -18,11 +18,7 @@ class LiveStreamChatController {
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
 
       const liveStreamChatResponse: LiveStreamChat =
-        await this.liveStreamchatService.getLiveStreamChatMsg(
-          livestreamId,
-          loggedUser,
-          queryObject
-        );
+        await this.liveStreamchatService.getLiveStreamChatMsg(livestreamId);
 
       res.status(200).json({
         message: 'LiveStreamChat messages fetched successfully',

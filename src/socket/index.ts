@@ -13,10 +13,10 @@ const initEvents = (io: Server) => {
     // */${socket.id}
     socket.on('get-data', (data) => console.log('data', data));
     socket.on('join', async (data) => {
-      console.log('🔥: A user joined', data);
+      // console.log('🔥: A user joined', data);
       try {
         if (data.roomId && data.userId) {
-          console.log('in if');
+          //console.log('🔥: A user joined', data);
           await liveStreamchatlogsService.newUserJoined({
             livestreamId: data.roomId,
             userId: data.userId,
@@ -29,8 +29,11 @@ const initEvents = (io: Server) => {
             'latestActiveUsers',
             await fetchActiveLiveStreamUsers(data.roomId)
           );
-        } else {
-          console.log('something went wrong');
+
+          io.emit(
+            'messageResponse',
+            await liveStreamchatService.getLiveStreamChatMsg(data.roomId)
+          );
         }
       } catch (err) {
         console.log(err);
@@ -38,35 +41,57 @@ const initEvents = (io: Server) => {
     });
     socket.on('message', async (data) => {
       try {
-        // await liveStreamchatService.sendLiveStreamChat(
-        //   data.livestreamId,
-        //   data.message,
-        //   data.loggedUser
-        // );
-        io.emit('messageResponse', data);
+        await liveStreamchatService.sendLiveStreamChat(
+          data.livestreamId,
+          data.message,
+          data.loggedUser
+        );
+
+        io.emit(
+          'messageResponse',
+          await liveStreamchatService.getLiveStreamChatMsg(data.livestreamId)
+        );
       } catch (err) {
         console.log(err);
       }
     });
-    socket.on('typing', (data) =>
-      socket.broadcast.emit('typingResponse', data)
-    );
+    socket.on('typing', (data) => {
+      socket.broadcast.emit('typingResponse', data);
+    });
+    socket.on('stop typing', (data) => {
+      socket.broadcast.emit('stop typing', data);
+    });
     socket.on('newUser', async (data) => {
       // users.push(data);
       // await liveStreamchatlogsService.newUserJoined({
       //   ...data,
       //   socketId: socket.id,
       // });
-      // io.emit(
-      //   'latestActiveUsers',
-      //   await fetchActiveLiveStreamUsers(data.livestreamId)
-      // );
+      // if (data.roomId && data.userId) {
+      //   await liveStreamchatlogsService.newUserJoined({
+      //     livestreamId: data.roomId,
+      //     userId: data.userId,
+      //     socketId: socket.id,
+      //   });
+      //   io.emit(
+      //     'latestActiveUsers',
+      //     await fetchActiveLiveStreamUsers(data.livestreamId)
+      //   );
+      // }
     });
 
     // change user status to offline when user disconnect
     socket.on('disconnect', async () => {
       console.log('🔥: A user disconnected');
-      await liveStreamchatlogsService.userDisconnected({ socketId: socket.id });
+      const livestreamId = await liveStreamchatlogsService.userDisconnected({
+        socketId: socket.id,
+      });
+      if (livestreamId) {
+        io.emit(
+          'latestActiveUsers',
+          await fetchActiveLiveStreamUsers(livestreamId)
+        );
+      }
     });
   });
 };
