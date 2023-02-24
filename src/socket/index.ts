@@ -1,8 +1,10 @@
 import { Server } from 'socket.io';
 import type { Server as httpServer } from 'http';
-import path from 'path';
-import fs from 'fs';
-import { API_BASE } from '@/config';
+import LiveStreamChatServiceLogs from '@/services/livestreamchatlogs.service';
+import LiveStreamChatService from '@/services/liveStreamChat.service';
+
+const liveStreamchatlogsService = new LiveStreamChatServiceLogs();
+const liveStreamchatService = new LiveStreamChatService();
 
 let users = [];
 const initEvents = (io: Server) => {
@@ -10,45 +12,98 @@ const initEvents = (io: Server) => {
     console.log(`⚡: user just connected!`);
     // */${socket.id}
     socket.on('get-data', (data) => console.log('data', data));
-    socket.on('join', (roomId) => {
-      const selectedRoom = io.sockets.adapter.rooms[roomId];
-      const numberOfClients = selectedRoom ? selectedRoom.length : 0;
+    socket.on('join', async (data) => {
+      // console.log('🔥: A user joined', data);
+      try {
+        if (data.roomId && data.userId) {
+          //console.log('🔥: A user joined', data);
+          await liveStreamchatlogsService.newUserJoined({
+            livestreamId: data.roomId,
+            userId: data.userId,
+            socketId: socket.id,
+          });
 
-      if (numberOfClients == 0) {
-        console.log(`Creating room ${roomId} `);
-        socket.join(roomId);
-        socket.emit('room_created', roomId);
-      } else if (numberOfClients >= 1) {
-        console.log(`Joining room ${roomId}  `);
-        socket.join(roomId);
-        socket.emit('room_joined', roomId);
+          socket.join(data.roomId);
+
+          io.emit(
+            'latestActiveUsers',
+            await fetchActiveLiveStreamUsers(data.roomId)
+          );
+
+          io.emit(
+            'messageResponse',
+            await liveStreamchatService.getLiveStreamChatMsg(data.roomId)
+          );
+        }
+      } catch (err) {
+        console.log(err);
       }
     });
-    socket.on('message', (data) => {
-      io.emit('messageResponse', data);
-    });
-    socket.on('typing', (data) =>
-      socket.broadcast.emit('typingResponse', data)
-    );
-    socket.on('upload', (file) => {
-      const folderpath = path.resolve(__dirname, '../public/chatImage');
-      fs.mkdirSync(folderpath, { recursive: true });
-      const fileType = file.type.split('/');
-      const fileName = `chat-${Date.now()}.${fileType[1]}`;
-      if (fs.existsSync(folderpath)) {
-        fs.writeFile(`${folderpath}/${fileName}`, file.file, (err) => {});
-        const filePath = `${API_BASE}/media/chatImage/${fileName}`;
+    socket.on('message', async (data) => {
+      try {
+        await liveStreamchatService.sendLiveStreamChat(
+          data.livestreamId,
+          data.message,
+          data.loggedUser
+        );
 
+        io.emit(
+          'messageResponse',
+          await liveStreamchatService.getLiveStreamChatMsg(data.livestreamId)
+        );
+      } catch (err) {
+        console.log(err);
       }
-      socket.on('newUser', (data) => {
-        users.push(data);
-        io.emit('newUserResponse', users);
+    });
+    socket.on('typing', (data) => {
+      socket.broadcast.emit('typingResponse', data);
+    });
+    socket.on('stop typing', (data) => {
+      socket.broadcast.emit('stop typing', data);
+    });
+    socket.on('newUser', async (data) => {
+      // users.push(data);
+      // await liveStreamchatlogsService.newUserJoined({
+      //   ...data,
+      //   socketId: socket.id,
+      // });
+      // if (data.roomId && data.userId) {
+      //   await liveStreamchatlogsService.newUserJoined({
+      //     livestreamId: data.roomId,
+      //     userId: data.userId,
+      //     socketId: socket.id,
+      //   });
+      //   io.emit(
+      //     'latestActiveUsers',
+      //     await fetchActiveLiveStreamUsers(data.livestreamId)
+      //   );
+      // }
+    });
+
+    // change user status to offline when user disconnect
+    socket.on('disconnect', async () => {
+      console.log('🔥: A user disconnected');
+      const livestreamId = await liveStreamchatlogsService.userDisconnected({
+        socketId: socket.id,
       });
-      socket.on('disconnect', () => {
-        console.log('🔥: A user disconnected');
-      });
+      if (livestreamId) {
+        io.emit(
+          'latestActiveUsers',
+          await fetchActiveLiveStreamUsers(livestreamId)
+        );
+      }
     });
   });
+};
+
+const fetchActiveLiveStreamUsers = async (livestreamId) => {
+  try {
+    const dataresponce =
+      await liveStreamchatlogsService.fetchActiveLiveStreamUsers(livestreamId);
+    return dataresponce;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const init = (server: httpServer) => {

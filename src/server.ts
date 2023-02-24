@@ -22,6 +22,7 @@ import ReplyRoute from './routes/reply.route';
 import ReviewRoute from './routes/review.route';
 import SubscripeLiveStreamRoute from './routes/subscribeLiveStream.route';
 import LiveStreamChatRoute from './routes/liveStreamChat.route';
+import InstituteInstroctorRoute from './routes/instituteinstructor.route';
 
 validateEnv();
 
@@ -48,5 +49,6 @@ const app = new App([
   new LiveStreamRoute(),
   new SubscripeLiveStreamRoute(),
   new LiveStreamChatRoute(),
+  new InstituteInstroctorRoute(),
 ]);
 app.listen();
