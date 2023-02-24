@@ -63,13 +63,21 @@ class LiveStreamRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.liveStreamController.deleteLivestream
     );
-
     this.router.get(
       `/admin${this.path}`,
       passport.authenticate('jwt', { session: false }),
       this.liveStreamController.viewLiveStreamAdmin
     );
+    this.router.delete(
+      `/admin${this.path}/user/:livestreamchatlogsId`,
+      passport.authenticate('jwt', { session: false }),
+      this.liveStreamController.deleteUserAttendance
+    );
+    this.router.get(
+      `/admin${this.path}/user/:livestreamId`,
+      passport.authenticate('jwt', { session: false }),
+      this.liveStreamController.getUserTimeLogByEventId
+    );
   }
 }
-
 export default LiveStreamRoute;

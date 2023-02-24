@@ -391,11 +391,11 @@ class CourseService {
       include: {
         model: this.course,
         where: {
-          id: courseDetails.id,
+          id: courseId,
         },
       },
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(404, 'No Data Found');
 
     const { trailer, thumbnail } = file;
 

@@ -63,7 +63,9 @@ class CourseController {
         file,
         user: trainer,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Added Successfully' });
     } catch (error) {
       next(error);
     }
@@ -130,7 +132,10 @@ class CourseController {
       const response: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.getReplyByCommentIdAdmin(commentId, queryObject);
+      } = await this.courseService.getReplyByCommentIdAdmin(
+        commentId,
+        queryObject
+      );
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -169,7 +174,9 @@ class CourseController {
         trainer,
         courseId,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Updated Successfully' });
     } catch (error) {
       next(error);
     }
@@ -188,7 +195,9 @@ class CourseController {
           courseId,
         }
       );
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Deleted Successfully' });
     } catch (error) {
       next(error);
     }
