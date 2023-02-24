@@ -9,6 +9,15 @@ import path from 'path';
 class InstituteInstructorService {
   public user = DB.User;
   public instituteInstructor = DB.InstituteInstructor;
+  public instructor = DB.Instructor;
+
+  public isInstitute(loggedUser): boolean {
+    return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
+  }
+
+  public isInstructor(loggedUser): boolean {
+    return loggedUser.role === 'Instructor';
+  }
 
   public async fetchInstructors() {
     const allInstructors = await this.user.findAll({
@@ -22,13 +31,10 @@ class InstituteInstructorService {
   }
 
   public async createInstructorRequest(loggedUser, instructorId) {
-    console.log('loggedUser', loggedUser);
-
-    console.log('instructorId', instructorId);
-
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    if (loggedUser.role !== 'Institute' && loggedUser.role !== 'Admin')
-      throw new HttpException(403, 'Access Forbidden');
+    if (!this.isInstitute(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
 
     if (isEmpty(instructorId))
       throw new HttpException(400, 'InstructorId is empty');
@@ -50,6 +56,78 @@ class InstituteInstructorService {
       InstructorId: instructorId,
     });
     return createInstituteInstructor;
+  }
+
+  public async acceptApproval(offerId, is_accepted, loggedUser) {
+    if (!this.isInstructor(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+
+    const findInstituteInstructor = await this.instituteInstructor.findOne({
+      where: {
+        id: offerId,
+      },
+    });
+    if (!findInstituteInstructor) {
+      throw new HttpException(409, 'Your Request is not found');
+    }
+
+    const updateOffer = await this.instituteInstructor.update(
+      { isAccepted: is_accepted },
+      {
+        where: {
+          id: offerId,
+        },
+        returning: true,
+      }
+    );
+    return updateOffer;
+  }
+
+  public async deleteInstituteRequest(loggedUser, offerId) {
+    if (!this.isInstitute(loggedUser)) {
+      throw new HttpException(403, 'Unauthorized');
+    }
+    const deleteRequest = await this.instituteInstructor.destroy({
+      where: { id: offerId },
+    });
+    return deleteRequest;
+  }
+  public async getInstituteRequest(loggedUser, queryObject) {
+    if (!this.isInstitute(loggedUser)) {
+      throw new HttpException(401, 'Unauthorized');
+    }
+
+    //sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const resposnse = await this.instituteInstructor.findAndCountAll({
+      where: { InstituteId: loggedUser.id },
+      include: [
+        {
+          model: this.user as 'Instructor',
+          // where: DB.Sequelize.and({
+          //   firstName: {
+          //     [searchCondition]: search,
+          //   },
+          // }),
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return resposnse;
   }
 }
 export default InstituteInstructorService;

@@ -6,5 +6,5 @@ import { IsString, IsNumber, Min, IsDateString, IsUUID } from 'class-validator';
 
 export class InstituteInstructorIdDTO {
   @IsUUID()
-  public id: string;
+  public offerId: string;
 }

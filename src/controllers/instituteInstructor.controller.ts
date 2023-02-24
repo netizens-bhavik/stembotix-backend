@@ -47,55 +47,76 @@ class InstituteInstructorController {
     }
   };
 
-  //   public accseptInstructorRequest = async (
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ) => {
-  //     try {
-  //       const { livestreamId } = req.params;
-  //       const { message } = req.body;
-  //       const loggedUser = req.user;
+  public accseptInstructorRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { offerId } = req.params;
+      const { is_accepted } = req.body;
+      const loggedUser = req.user;
 
-  //       const liveStreamChatResponse: LiveStreamChat =
-  //         await this.instituteInstructionService.sendLiveStreamChat(
-  //           livestreamId,
-  //           message,
-  //           loggedUser
-  //         );
+      const liveStreamChatResponse: LiveStreamChat =
+        await this.instituteInstructionService.acceptApproval(
+          offerId,
+          is_accepted,
+          loggedUser
+        );
 
-  //       res.status(200).json({
-  //         message: 'Message sent successfully',
-  //         data: liveStreamChatResponse,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      res.status(200).json(liveStreamChatResponse);
+    } catch (err) {
+      next(err);
+    }
+  };
 
-  //   public deleteInstructorRequest = async (
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ) => {
-  //     try {
-  //       const { message_id } = req.params;
-  //       const loggedUser = req.user;
+  public deleteInstructorRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { offerId } = req.params;
+      const loggedUser = req.user;
 
-  //       const liveStreamChatResponse: LiveStreamChat =
-  //         await this.instituteInstructionService.sendLiveStreamChat(
-  //             livestreamId,
-  //             message,
-  //             loggedUser
-  //         );
+      const liveStreamChatResponse: LiveStreamChat =
+        await this.instituteInstructionService.deleteInstituteRequest(
+          loggedUser,
+          offerId
+        );
 
-  //       res.status(200).json({
-  //         message: 'Message deleted successfully',
-  //         data: liveStreamChatResponse,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      res.status(200).json({
+        message: 'Message deleted successfully',
+        data: liveStreamChatResponse,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public getInstitueRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+
+      const liveStreamChatResponse: LiveStreamChat =
+        await this.instituteInstructionService.getInstituteRequest(
+          loggedUser,
+          queryObject
+        );
+
+      res.status(200).json({
+        message: 'Message deleted successfully',
+        data: liveStreamChatResponse,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default InstituteInstructorController;
