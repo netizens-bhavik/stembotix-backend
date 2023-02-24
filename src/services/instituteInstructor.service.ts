@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { API_BASE } from '@/config';
 import path from 'path';
+import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 
 class InstituteInstructorService {
   public user = DB.User;
@@ -19,33 +20,35 @@ class InstituteInstructorService {
     return loggedUser.role === 'Instructor';
   }
 
-  public async fetchInstructors() {
-    const allInstructors = await this.user.findAll({
-      where: {
-        role: 'Instructor',
-        deletedAt: null,
-      },
-      attributes: ['id', 'fullName', 'firstName', 'lastName'],
-    });
-    return allInstructors;
-  }
+  // public async fetchInstructors() {
+  //   const allInstructors = await this.user.findAll({
+  //     where: {
+  //       role: 'Instructor',
+  //       deletedAt: null,
+  //     },
+  //     attributes: ['id', 'fullName', 'firstName', 'lastName'],
+  //   });
+  //   return allInstructors;
+  // }
 
-  public async createInstructorRequest(loggedUser, instructorId) {
+  public async createInstructorRequest(loggedUser, instructorDetail) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
-    if (isEmpty(instructorId))
+    if (isEmpty(instructorDetail.instructorId))
       throw new HttpException(400, 'InstructorId is empty');
 
-    const findInstructor = await this.user.findByPk(instructorId);
+    const findInstructor = await this.user.findByPk(
+      instructorDetail.instructorId
+    );
     if (!findInstructor) throw new HttpException(409, 'Instructor not found');
 
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
         InstituteId: loggedUser.id,
-        instructor_id: instructorId,
+        instructor_id: instructorDetail.instructorId,
       },
     });
     if (findInstituteInstructor)
@@ -53,7 +56,8 @@ class InstituteInstructorService {
 
     const createInstituteInstructor = await this.instituteInstructor.create({
       InstituteId: loggedUser.id,
-      InstructorId: instructorId,
+      InstructorId: instructorDetail.instructorId,
+      proposal: instructorDetail.proposal,
     });
     return createInstituteInstructor;
   }
@@ -95,13 +99,58 @@ class InstituteInstructorService {
     });
     return deleteRequest;
   }
-  public async getInstituteRequest(loggedUser, queryObject) {
-    if (!this.isInstitute(loggedUser)) {
-      throw new HttpException(401, 'Unauthorized');
-    }
 
-    //sorting
-    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+  // public async getInstituteRequest(loggedUser, queryObject) {
+  //   if (!this.isInstitute(loggedUser)) {
+  //     throw new HttpException(401, 'Unauthorized');
+  //   }
+
+  //   //sorting
+  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+  //   const order = queryObject.order || 'DESC';
+  //   // pagination
+  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+  //   // Search
+  //   const [search, searchCondition] = queryObject.search
+  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+  //     : ['', DB.Sequelize.Op.ne];
+
+  //   const resposnse = await this.instituteInstructor.findAndCountAll({
+  //     where: { InstituteId: loggedUser.id },
+  //     include: [
+  //       {
+  //         model: this.user,
+  //         // where: DB.Sequelize.and({
+  //         //   firstName: {
+  //         //     [searchCondition]: search,
+  //         //   },
+  //         // }),
+  //         as: 'Instructor',
+  //       },
+  //     ],
+  //     limit: pageSize,
+  //     offset: pageNo,
+  //     order: [[`${sortBy}`, `${order}`]],
+  //   });
+  //   return resposnse;
+  // }
+  public async getReqByInstructorId(user): Promise<InstructorInstitute> {
+    const response = await this.instituteInstructor.findAndCountAll({
+      where: {
+        instructor_id: user.id,
+      },
+    });
+    return response;
+  }
+  public async getDataByAdmin({ trainer, queryObject }): Promise<{
+    totalCount: number;
+    records: (InstructorInstitute | undefined)[];
+  }> {
+    if (isEmpty(trainer) || !this.isInstitute(trainer))
+      throw new HttpException(401, 'Unauthorized');
+
+    // // sorting
     const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
@@ -111,23 +160,30 @@ class InstituteInstructorService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const resposnse = await this.instituteInstructor.findAndCountAll({
-      where: { InstituteId: loggedUser.id },
-      include: [
-        {
-          model: this.user as 'Instructor',
-          // where: DB.Sequelize.and({
-          //   firstName: {
-          //     [searchCondition]: search,
-          //   },
-          // }),
-        },
-      ],
+    const coursesCount = await this.instituteInstructor.findAndCountAll({
+      include: {
+        model: this.user,
+        attributes: ['fullName', 'firstName', 'lastName', 'email'],
+        as: 'Institute',
+        where: DB.Sequelize.or(
+          {
+            firstName: { [searchCondition]: search },
+          },
+          {
+            lastName: { [searchCondition]: search },
+          }
+        ),
+      },
+
       limit: pageSize,
       offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
+      order: [
+        [{ model: this.user, as: 'Institute' }, 'firstName', order],
+        [{ model: this.user, as: 'Institute' }, 'lastName', order],
+      ],
     });
-    return resposnse;
+
+    return { totalCount: coursesCount.count, records: coursesCount.rows };
   }
 }
 export default InstituteInstructorService;

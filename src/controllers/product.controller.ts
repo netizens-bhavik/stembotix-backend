@@ -144,7 +144,9 @@ class ProductController {
           user: userData,
           productId,
         });
-      res.status(200).send({response:response,message:"Product deleted successfullyi"});
+      res
+        .status(200)
+        .send({ response: response, message: 'Product deleted successfullyi' });
     } catch (error) {
       next(error);
     }
