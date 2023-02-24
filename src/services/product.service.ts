@@ -16,7 +16,7 @@ class ProductService {
   public cartitem = DB.CartItem;
   public cart = DB.Cart;
   public order = DB.Order;
-  public review = DB.Review
+  public review = DB.Review;
 
   public async viewProducts(
     queryObject
@@ -64,9 +64,10 @@ class ProductService {
         },
         {
           model: this.productDimension,
-        },{
-          model:this.review
-        }
+        },
+        {
+          model: this.review,
+        },
       ],
     });
 
@@ -91,9 +92,7 @@ class ProductService {
       where: { deletedAt: null },
     });
     const data: (Product | undefined)[] = await this.product.findAll({
-      where: DB.Sequelize.and(
-        { title: { [searchCondition]: search } }
-      ),
+      where: DB.Sequelize.and({ title: { [searchCondition]: search } }),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -229,7 +228,7 @@ class ProductService {
           to: adminRecord[0].email,
         },
       };
-      this.emailService.mailsData(mailData);
+      this.emailService.sendMailPublishProduct(mailData);
     }
     return {
       id: newProduct.id,
@@ -327,7 +326,7 @@ class ProductService {
           to: adminRecord[0].email,
         },
       };
-      this.emailService.emailsdata(mailData);
+      this.emailService.sendMailunPublishproduct(mailData);
 
       throw new HttpException(
         400,
@@ -377,7 +376,7 @@ class ProductService {
           to: users,
         },
       };
-      this.emailService.sendMails(mailerData);
+      this.emailService.sendMailDeleteProduct(mailerData);
     }
     return { count: res };
   }

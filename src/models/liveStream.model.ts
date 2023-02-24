@@ -19,19 +19,19 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      startDate: {
+      Date: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      endDate: {
-        type: Sequelize.DATE,
+      startTime: {
+        type: Sequelize.TIME,
+        allowNull: false,
+      },
+      endTime: {
+        type: Sequelize.TIME,
         allowNull: false,
       },
       thumbnail: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      link: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -41,11 +41,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       is_active: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
       },
       is_completed: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
       },
     },
     { paranoid: true }
@@ -53,6 +51,18 @@ module.exports = (sequelize, Sequelize) => {
   Livestream.associate = (models) => {
     Livestream.belongsTo(models.User, {
       foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    Livestream.hasMany(models.SubscribeEvent, {
+      foreignKey: 'livestreamId',
+      targetKey: 'id',
+    });
+    Livestream.hasMany(models.LiveStreamChat, {
+      foreignKey: 'livestreamId',
+      targetKey: 'id',
+    });
+    Livestream.hasMany(models.LiveStreamChatLogs, {
+      foreignKey: 'livestreamId',
       targetKey: 'id',
     });
   };

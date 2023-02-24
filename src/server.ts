@@ -20,6 +20,9 @@ import QuizQueRoute from './routes/quizQue.route';
 import QuizScoreRoute from './routes/quizScore.route';
 import ReplyRoute from './routes/reply.route';
 import ReviewRoute from './routes/review.route';
+import SubscripeLiveStreamRoute from './routes/subscribeLiveStream.route';
+import LiveStreamChatRoute from './routes/liveStreamChat.route';
+import InstituteInstroctorRoute from './routes/instituteinstructor.route';
 
 validateEnv();
 
@@ -44,5 +47,8 @@ const app = new App([
   new CompleteQuizRoute(),
   new ReviewRoute(),
   new LiveStreamRoute(),
+  new SubscripeLiveStreamRoute(),
+  new LiveStreamChatRoute(),
+  new InstituteInstroctorRoute(),
 ]);
 app.listen();

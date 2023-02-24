@@ -9,7 +9,7 @@ import { LiveStreamDTO } from '@/dtos/liveStream.dto';
 // import 'reflect-metadata';
 
 class LiveStreamRoute implements Routes {
-  public path = '/liveStream';
+  public path = '/livestream';
   public passport = passportConfig(passport);
   public router = Router();
   public liveStreamController = new LiveStreamController();
@@ -22,7 +22,7 @@ class LiveStreamRoute implements Routes {
       `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
-        uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
+        uploadFiles.single('thumbnail'),
         (req, res, next) => {
           req.body.subscriptionPrice = Number(req.body.subscriptionPrice);
           next();
@@ -31,14 +31,16 @@ class LiveStreamRoute implements Routes {
       ],
       this.liveStreamController.createLiveStream
     );
+    this.router.get(`${this.path}`, this.liveStreamController.viewLiveStream);
+
     this.router.get(
-      `${this.path}`,
+      `${this.path}/list`,
       passport.authenticate('jwt', { session: false }),
-      this.liveStreamController.viewLiveStream
+      this.liveStreamController.listLiveEvent
     );
+
     this.router.get(
       `${this.path}/:livestreamId`,
-      passport.authenticate('jwt', { session: false }),
       this.liveStreamController.viewLiveStreamById
     );
 
@@ -46,7 +48,7 @@ class LiveStreamRoute implements Routes {
       `${this.path}/:livestreamId`,
       [
         passport.authenticate('jwt', { session: false }),
-        uploadFiles.fields([{ name: 'thumbnail', maxCount: 1 }]),
+        uploadFiles.single('thumbnail'),
         (req, res, next) => {
           req.body.subscriptionPrice = Number(req.body.subscriptionPrice);
           next();

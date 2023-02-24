@@ -177,7 +177,7 @@ class CourseService {
           to: adminRecord[0].email,
         },
       };
-      this.emailService.emailData(mailData);
+      this.emailService.sendMailPublishCourse(mailData);
     }
     return {
       id: newCourse.id,
@@ -460,7 +460,7 @@ class CourseService {
           to: adminRecord[0].email,
         },
       };
-      this.emailService.emailsData(mailData);
+      this.emailService.sendMailunPublishcourse(mailData);
 
       throw new HttpException(
         400,
@@ -510,7 +510,7 @@ class CourseService {
           to: users,
         },
       };
-      this.emailService.sendMail(mailerData);
+      this.emailService.sendMailDeleteCourse(mailerData);
     }
     return { count: res };
   }

@@ -8,6 +8,8 @@ import { LiveStream } from '@/interfaces/liveStream.interface';
 class LiveStreamService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
+  public trainer = DB.Trainer;
+  public subscribeEvent = DB.SubscribeEvent;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -20,12 +22,11 @@ class LiveStreamService {
     if (!this.isTrainer(user)) {
       throw new HttpException(404, "You don't have Authority to Create Event");
     }
-    const { thumbnail } = file;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+    const thumbnail = file;
+    const thumbnailPath = `${API_BASE}/media/${thumbnail.path
       .split('/')
       .splice(-2)
       .join('/')}`;
-
     const liveStream = await this.liveStream.create({
       ...liveStreamDetails,
       thumbnail: thumbnailPath,
@@ -38,9 +39,12 @@ class LiveStreamService {
     records: (LiveStream | undefined)[];
   }> {
     const streamData = await this.liveStream.findAndCountAll({
+      include: {
+        model: this.user,
+      },
       order: [
         ['is_active', 'DESC'],
-        ['startDate', 'ASC'],
+        ['startTime', 'ASC'],
       ],
     });
     return { totalCount: streamData.count, records: streamData.rows };
@@ -51,6 +55,9 @@ class LiveStreamService {
       where: {
         id: livestreamId,
       },
+      include: {
+        model: this.user,
+      },
     });
     if (!streamData) throw new HttpException(400, 'No event found');
     return streamData;
@@ -59,32 +66,32 @@ class LiveStreamService {
     livestreamDetails,
     file,
     trainer,
-    livestreamId,
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
 
     const record = await this.liveStream.findOne({
       where: {
-        id: livestreamId,
+        id: livestreamDetails.id,
       },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
 
-    const { thumbnail } = file;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-
+    const thumbnail = file;
+    if (thumbnail) {
+      const thumbnailPath = `${API_BASE}/media/${thumbnail.path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+      livestreamDetails.thumbnail = thumbnailPath;
+    }
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
-        thumbnail: thumbnailPath,
       },
       {
         where: {
-          id: livestreamId,
+          id: livestreamDetails.id,
         },
         returning: true,
       }
@@ -99,15 +106,25 @@ class LiveStreamService {
     if (!this.isTrainer(trainer))
       throw new HttpException(401, "You don't have Authority to Delete Event");
 
-    const record = await this.liveStream.findOne({
+    let record = await this.liveStream.findOne({
       where: {
         id: livestreamId,
       },
+      include: [
+        {
+          model: this.subscribeEvent,
+        },
+      ],
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(402, 'No Record Found');
     const res = await this.liveStream.destroy({
       where: {
-        id: livestreamId,
+        id: record.id,
+      },
+    });
+    await this.subscribeEvent.destroy({
+      where: {
+        livestreamId: livestreamId,
       },
     });
     if (res === 1) {
@@ -132,18 +149,57 @@ class LiveStreamService {
       where: DB.Sequelize.and({ deletedAt: null }),
     });
     const data: (LiveStream | undefined)[] = await this.liveStream.findAll({
-      where: DB.Sequelize.and({
+      where: {
         deletedAt: null,
         title: {
           [searchCondition]: search,
         },
-      }),
+      },
+      include: { model: this.user },
 
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: liveStreamData.count, records: data };
+  }
+  public async listLiveEvent(
+    trainer,
+    queryObject
+  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    if (isEmpty(trainer) || !this.isTrainer(trainer))
+      throw new HttpException(401, 'Unauthorized');
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const trainerRecord = await this.trainer.findOne({
+      where: { user_id: trainer.id },
+    });
+    if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
+    const liveStream = await this.liveStream.findAndCountAll({
+      where: DB.Sequelize.or({ title: { [searchCondition]: search } }),
+
+      include: [
+        {
+          model: this.user,
+          where: {
+            id: trainerRecord.user_id,
+          },
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: liveStream.count, records: liveStream.rows };
   }
 }
 export default LiveStreamService;
