@@ -9,8 +9,7 @@ const liveStreamchatService = new LiveStreamChatService();
 let users = [];
 const initEvents = (io: Server) => {
   io.on('connection', (socket) => {
-    console.log(`⚡: user just connected!`);
-    // */${socket.id}
+    console.log(`⚡: ${socket.id} user just connected!`);
     socket.on('get-data', (data) => console.log('data', data));
     socket.on('join', async (data) => {
       // console.log('🔥: A user joined', data);
