@@ -31,12 +31,12 @@ class InstituteInstroctorRoute implements Routes {
     //   this.instituteInstuctorController.deleteInstructorRequest
     // );
 
-    // //to view request for institute by instructor
-    // this.router.get(
-    //   `${this.path}/view-request-institute`,
-    //   [passport.authenticate('jwt', { session: false })],
-    //   this.instituteInstuctorController.deleteInstructorRequest
-    // );
+    //to view request for institute by instructor
+    this.router.get(
+      `${this.path}/institute`,
+      [passport.authenticate('jwt', { session: false })],
+      this.instituteInstuctorController.getInstitueRequest
+    );
 
     //get all instructors
     this.router.get(
@@ -52,25 +52,25 @@ class InstituteInstroctorRoute implements Routes {
       this.instituteInstuctorController.createInstructorRequest
     );
 
-    // //for instructor
-    // this.router.put(
-    //   `${this.path}/request-instructor/:id`,
-    //   [
-    //     passport.authenticate('jwt', { session: false }),
-    //     validationMiddleware(InstituteInstructorIdDTO, 'params'),
-    //   ],
-    //   this.instituteInstuctorController.accseptInstructorRequest
-    // );
+    //for instructor to approve
+    this.router.put(
+      `${this.path}/request-instructor/:offerId`,
+      [
+        passport.authenticate('jwt', { session: false }),
+        validationMiddleware(InstituteInstructorIdDTO, 'params'),
+      ],
+      this.instituteInstuctorController.accseptInstructorRequest
+    );
 
-    // // for instructor, institute, admin
-    // this.router.delete(
-    //   `${this.path}/request-instructor/:id`,
-    //   [
-    //     passport.authenticate('jwt', { session: false }),
-    //     validationMiddleware(InstituteInstructorIdDTO, 'params'),
-    //   ],
-    //   this.instituteInstuctorController.deleteInstructorRequest
-    // );
+    // for instructor, institute, admin
+    this.router.delete(
+      `${this.path}/request-instructor/:offerId`,
+      [
+        passport.authenticate('jwt', { session: false }),
+        validationMiddleware(InstituteInstructorIdDTO, 'params'),
+      ],
+      this.instituteInstuctorController.deleteInstructorRequest
+    );
   }
 }
 
