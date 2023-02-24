@@ -152,6 +152,10 @@ class CourseService {
       .split('/')
       .splice(-2)
       .join('/')}`;
+    console.log(file);
+
+    // const uploadedFile = await uploadFileS3(ab); // Upload of s3
+    // console.log('bvdhsgfh', uploadedFile);
 
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
     // console.log('bvdhsgfh', uploadedFile);
