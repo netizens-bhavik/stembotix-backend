@@ -22,9 +22,9 @@ module.exports = (sequelize, Sequelize) => {
         },
       },
       isAccepted: {
-        type: Sequelize.ENUM('pending', 'accepted', 'rejected'),
+        type: Sequelize.ENUM('Pending', 'Accepted', 'Rejected'),
         allowNull: false,
-        defaultValue: 'pending',
+        defaultValue: 'Pending',
       },
     },
     { paranoid: true }

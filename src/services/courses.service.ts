@@ -576,35 +576,34 @@ class CourseService {
   //   totalCount: number;
   //   records: (Course | undefined)[];
   // }> {
-  //   try {
-  //     const trainerRecord = await this.trainer.findOne({
-  //       where: { user_id: trainer.id },
-  //     });
-  //     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
-
-  //     const courseData = await this.course.findAndCountAll({
-  //       where: {
-  //         deletedAt: null,
-  //       },
-  //       include: [
-  //         {
-  //           model: this.trainer,
-  //           where: {
-  //             trainer_id: trainerRecord.trainer_id,
-  //           },
-  //           attributes: ['user_id'],
-  //         },
-  //         {
-  //           model: this.review,
-  //           attributes: ['id', 'rating', 'userId'],
-  //           separate: true,
-  //         },
-  //       ],
-  //     });
-  //     return { totalCount: courseData.count, records: courseData.rows };
-  //   } catch (err) {
-  //     console.log(err);
+  //   if (!this.isTrainer(trainer)) {
+  //     throw new HttpException(403, 'Forbidden Resource');
   //   }
+  //   const trainerRecord = await this.trainer.findOne({
+  //     where: { user_id: trainer.id },
+  //   });
+  //   if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
+
+  //   const courseData = await this.course.findAndCountAll({
+  //     where: {
+  //       deletedAt: null,
+  //     },
+  //     include: [
+  //       {
+  //         model: this.trainer,
+  //         where: {
+  //           trainer_id: trainerRecord.trainer_id,
+  //         },
+  //         attributes: ['user_id'],
+  //       },
+  //       {
+  //         model: this.review,
+  //         attributes: ['id', 'rating', 'userId'],
+  //         separate: true,
+  //       },
+  //     ],
+  //   });
+  //   return { totalCount: courseData.count, records: courseData.rows };
   // }
 
   public async togglePublish({

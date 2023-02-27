@@ -221,11 +221,11 @@ class CourseController {
   // ) => {
   //   try {
   //     const trainer = req.user;
-  //     const response: { totalCount: number; records: (Course | undefined)[] }=
+  //     const response: { totalCount: number; records: (Course | undefined)[] } =
   //       await this.courseService.getDetailByTrainerId(trainer);
   //     res.status(200).send(response);
   //   } catch (error) {
-  //     console.log(error);
+  //     next(error);
   //   }
   // };
   public togglePublish = async (
