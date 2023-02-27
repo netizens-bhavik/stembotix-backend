@@ -192,8 +192,8 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
-    const uploadedFile = await uploadFileS3(file); // Upload of s3
-    console.log('bvdhsgfh', uploadedFile);
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
+    // console.log('bvdhsgfh', uploadedFile);
 
     const filePath = `${API_BASE}/media/${file.path
       .split('/')
