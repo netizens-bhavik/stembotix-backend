@@ -7,10 +7,24 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      isAccepted: {
-        type: Sequelize.BOOLEAN,
+      proposal: {
+        type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: false,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: {
+            msg: 'Must be a valid email address',
+          },
+        },
+      },
+      isAccepted: {
+        type: Sequelize.ENUM('Pending', 'Accepted', 'Rejected'),
+        allowNull: false,
+        defaultValue: 'Pending',
       },
     },
     { paranoid: true }
@@ -19,12 +33,12 @@ module.exports = (sequelize, Sequelize) => {
     InstituteInstructor.belongsTo(models.User, {
       foreignKey: 'InstructorId',
       targetKey: 'id',
-      as: 'instructor',
+      as: 'Instructor',
     });
     InstituteInstructor.belongsTo(models.User, {
       foreignKey: 'InstituteId',
       targetKey: 'id',
-      as: 'institute',
+      as: 'Institute',
     });
   };
   return InstituteInstructor;

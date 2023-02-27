@@ -12,6 +12,7 @@ import {
   MailPayloads,
 } from '@/interfaces/mailPayload.interface';
 import { token } from 'morgan';
+import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 
 class CourseService {
   public course = DB.Course;
@@ -44,6 +45,7 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -152,8 +154,6 @@ class CourseService {
       .split('/')
       .splice(-2)
       .join('/')}`;
-    console.log(file);
-
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
     // console.log('bvdhsgfh', uploadedFile);
 
@@ -395,11 +395,11 @@ class CourseService {
       include: {
         model: this.course,
         where: {
-          id: courseDetails.id,
+          id: courseId,
         },
       },
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(404, 'No Data Found');
 
     const { trailer, thumbnail } = file;
 
@@ -571,6 +571,41 @@ class CourseService {
     });
     return { totalCount: coursesCount.count, records: courses };
   }
+
+  // public async getDetailByTrainerId(trainer): Promise<{
+  //   totalCount: number;
+  //   records: (Course | undefined)[];
+  // }> {
+  //   if (!this.isTrainer(trainer)) {
+  //     throw new HttpException(403, 'Forbidden Resource');
+  //   }
+  //   const trainerRecord = await this.trainer.findOne({
+  //     where: { user_id: trainer.id },
+  //   });
+  //   if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
+
+  //   const courseData = await this.course.findAndCountAll({
+  //     where: {
+  //       deletedAt: null,
+  //     },
+  //     include: [
+  //       {
+  //         model: this.trainer,
+  //         where: {
+  //           trainer_id: trainerRecord.trainer_id,
+  //         },
+  //         attributes: ['user_id'],
+  //       },
+  //       {
+  //         model: this.review,
+  //         attributes: ['id', 'rating', 'userId'],
+  //         separate: true,
+  //       },
+  //     ],
+  //   });
+  //   return { totalCount: courseData.count, records: courseData.rows };
+  // }
+
   public async togglePublish({
     trainer,
     courseId,

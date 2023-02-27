@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { API_BASE } from '@/config';
 import path from 'path';
+import { LiveStreamChat } from '@/interfaces/liveStramChat.interface';
 
 class LiveStreamChatService {
   public user = DB.User;
@@ -16,8 +17,8 @@ class LiveStreamChatService {
   public async sendLiveStreamChat(
     livestreamId: string,
     message: string,
-    loggedUser: any
-  ): Promise<any> {
+    loggedUser
+  ): Promise<LiveStreamChat> {
     const subscribeEvent = await this.subscribeEvent.findOne({
       where: { user_id: loggedUser.id, livestream_id: livestreamId },
     });
@@ -42,7 +43,10 @@ class LiveStreamChatService {
     };
   }
 
-  public async deleteLiveStreamChat(message_id, loggedUser): Promise<any> {
+  public async deleteLiveStreamChat(
+    message_id,
+    loggedUser
+  ): Promise<LiveStreamChat> {
     const liveStreamChat = await this.liveStreamChat.findOne({
       where: { id: message_id },
     });
@@ -65,7 +69,9 @@ class LiveStreamChatService {
       message: 'Message deleted successfully',
     };
   }
-  public async getLiveStreamChatMsg(livestreamId: string): Promise<any> {
+  public async getLiveStreamChatMsg(
+    livestreamId: string
+  ): Promise<LiveStreamChat> {
     const getLiveStreamChatMsg = await this.liveStreamChat.findAndCountAll({
       where: { livestreamId: livestreamId, deletedAt: null },
       include: [
