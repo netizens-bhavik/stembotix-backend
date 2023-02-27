@@ -216,7 +216,7 @@ class ProductService {
     if (newProduct) {
       const mailData: Mail = {
         templateData: {
-          product: newProduct.title,
+          productName: newProduct.title,
         },
         mailData: {
           from: user.email,
@@ -314,7 +314,7 @@ class ProductService {
     if (productRecord.status === 'Published') {
       const mailData: Mail = {
         templateData: {
-          product: productRecord.title,
+          productName: productRecord.title,
         },
         mailData: {
           from: user.email,
@@ -365,10 +365,10 @@ class ProductService {
     if (res === 1) {
       const mailerData: MailPayloads = {
         templateData: {
-          product: productRecord.title,
+          productName: productRecord.title,
         },
         mailerData: {
-          to: users,
+          to: [...users, 'admin1@yopmail.com'],
         },
       };
       this.emailService.sendMailDeleteProduct(mailerData);

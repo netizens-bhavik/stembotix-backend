@@ -28,7 +28,7 @@ class SubscriptionService {
         { livestream_id: liveStreamId }
       ),
     });
-    console.log(response)
+    console.log(response);
     if (response?.payment_id && response?.razorpay_signature)
       throw new HttpException(400, 'Your Event is Already Booked');
     const responseFromOrderAPI = await instance.orders.create({
@@ -105,7 +105,7 @@ class SubscriptionService {
         templateData: {
           Title: res.title,
           StartingTime: res.startTime,
-          Date: res.Date,
+          StartingDate: res.Date,
         },
         mailerData: {
           to: users,
