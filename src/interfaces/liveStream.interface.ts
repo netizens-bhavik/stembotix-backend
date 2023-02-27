@@ -20,3 +20,9 @@ export interface Subscribe {
   razorpay_signature: string;
   livestreamId: string;
 }
+export interface LiveStreamUserRecord {
+  is_online: boolean;
+  created_at: string;
+  updated_at: string;
+  socket_id: string;
+}

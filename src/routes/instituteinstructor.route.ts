@@ -4,7 +4,11 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import InstituteInstructorController from '@controllers/instituteInstructor.controller';
-import { InstituteInstructorIdDTO } from '@/dtos/instituteInstructor.dto';
+import {
+  InstituteInstructorIdDto,
+  InstituteInstructorIdDTO,
+  RequestProposalDTO,
+} from '@/dtos/instituteInstructor.dto';
 // import 'reflect-metadata';
 
 class InstituteInstroctorRoute implements Routes {
@@ -39,16 +43,19 @@ class InstituteInstroctorRoute implements Routes {
     );
 
     //get all instructors
-    this.router.get(
-      `${this.path}/instructors`,
-      [passport.authenticate('jwt', { session: false })],
-      this.instituteInstuctorController.fetchInstructors
-    );
+    // this.router.get(
+    //   `${this.path}/instructors`,
+    //   [passport.authenticate('jwt', { session: false })],
+    //   this.instituteInstuctorController.fetchInstructors
+    // );
 
     //for institute
     this.router.post(
       `${this.path}/request-instructor`,
-      [passport.authenticate('jwt', { session: false })],
+      [
+        passport.authenticate('jwt', { session: false }),
+        validationMiddleware(RequestProposalDTO, 'body'),
+      ],
       this.instituteInstuctorController.createInstructorRequest
     );
 
@@ -57,9 +64,9 @@ class InstituteInstroctorRoute implements Routes {
       `${this.path}/request-instructor/:offerId`,
       [
         passport.authenticate('jwt', { session: false }),
-        validationMiddleware(InstituteInstructorIdDTO, 'params'),
+        validationMiddleware(InstituteInstructorIdDTO, 'body'),
       ],
-      this.instituteInstuctorController.accseptInstructorRequest
+      this.instituteInstuctorController.acceptInstructorRequest
     );
 
     // for instructor, institute, admin
@@ -67,9 +74,23 @@ class InstituteInstroctorRoute implements Routes {
       `${this.path}/request-instructor/:offerId`,
       [
         passport.authenticate('jwt', { session: false }),
-        validationMiddleware(InstituteInstructorIdDTO, 'params'),
+        validationMiddleware(InstituteInstructorIdDto, 'params'),
       ],
       this.instituteInstuctorController.deleteInstructorRequest
+    );
+
+    // get all req by Instrutor Id
+    this.router.get(
+      `${this.path}/instructor`,
+      passport.authenticate('jwt', { session: false }),
+      this.instituteInstuctorController.getReqByInstructorId
+    );
+
+    // get all request by Admin
+    this.router.get(
+      `${this.path}/list`,
+      passport.authenticate('jwt', { session: false }),
+      this.instituteInstuctorController.getDataByAdmin
     );
   }
 }

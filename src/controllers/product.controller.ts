@@ -83,7 +83,9 @@ class ProductController {
         file,
         user,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Product Added Successfully' });
     } catch (error) {
       next(error);
     }
@@ -121,7 +123,9 @@ class ProductController {
         file,
         user,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Product Updated Successfully' });
     } catch (error) {
       next(error);
     }
@@ -140,7 +144,9 @@ class ProductController {
           user: userData,
           productId,
         });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Product deleted successfullyi' });
     } catch (error) {
       next(error);
     }
