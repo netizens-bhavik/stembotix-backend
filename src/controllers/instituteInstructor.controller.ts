@@ -147,6 +147,5 @@ class InstituteInstructorController {
       next(error);
     }
   };
-
 }
 export default InstituteInstructorController;
