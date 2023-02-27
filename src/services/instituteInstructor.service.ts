@@ -58,7 +58,7 @@ class InstituteInstructorService {
       InstituteId: loggedUser.id,
       InstructorId: instructorDetail.instructorId,
       proposal: instructorDetail.proposal,
-      email:instructorDetail.email
+      email: instructorDetail.email,
     });
     return createInstituteInstructor;
   }
@@ -100,7 +100,6 @@ class InstituteInstructorService {
     });
     return deleteRequest;
   }
-
   public async getInstituteRequest(loggedUser, queryObject) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(401, 'Unauthorized');

@@ -71,7 +71,7 @@ class App {
   }
 
   private connectToDatabase() {
-    DB.sequelize.sync({ force: false }).catch((err) => {
+    DB.sequelize.sync({ force: true }).catch((err) => {
       return err;
     });
   }
