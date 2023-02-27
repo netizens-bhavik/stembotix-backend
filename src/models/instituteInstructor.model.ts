@@ -11,7 +11,16 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: {
+            msg: 'Must be a valid email address',
+          },
+        },
+      },
       isAccepted: {
         type: Sequelize.ENUM('pending', 'accepted', 'rejected'),
         allowNull: false,

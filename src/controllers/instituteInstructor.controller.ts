@@ -54,11 +54,8 @@ class InstituteInstructorController {
   ) => {
     try {
       const { offerId } = req.params;
-      console.log(req.params);
       const { is_accepted } = req.body;
-      console.log(is_accepted);
       const loggedUser = req.user;
-      console.log(loggedUser);
 
       const liveStreamChatResponse: LiveStreamChat =
         await this.instituteInstructionService.acceptApproval(
@@ -96,30 +93,30 @@ class InstituteInstructorController {
     }
   };
 
-  // public getInstitueRequest = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const loggedUser = req.user;
-  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
-  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  public getInstitueRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
 
-  //     const liveStreamChatResponse: LiveStreamChat =
-  //       await this.instituteInstructionService.getInstituteRequest(
-  //         loggedUser,
-  //         queryObject
-  //       );
+      const liveStreamChatResponse: LiveStreamChat =
+        await this.instituteInstructionService.getInstituteRequest(
+          loggedUser,
+          queryObject
+        );
 
-  //     res.status(200).json({
-  //       message: 'Message deleted successfully',
-  //       data: liveStreamChatResponse,
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+      res.status(200).json({
+        message: 'Message deleted successfully',
+        data: liveStreamChatResponse,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
   public getReqByInstructorId = async (
     req: Request,
     res: Response,

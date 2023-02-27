@@ -36,11 +36,11 @@ class InstituteInstroctorRoute implements Routes {
     // );
 
     //to view request for institute by instructor
-    // this.router.get(
-    //   `${this.path}/institute`,
-    //   [passport.authenticate('jwt', { session: false })],
-    //   this.instituteInstuctorController.getInstitueRequest
-    // );
+    this.router.get(
+      `${this.path}/institute`,
+      [passport.authenticate('jwt', { session: false })],
+      this.instituteInstuctorController.getInstitueRequest
+    );
 
     //get all instructors
     // this.router.get(
@@ -78,17 +78,20 @@ class InstituteInstroctorRoute implements Routes {
       ],
       this.instituteInstuctorController.deleteInstructorRequest
     );
+
+    // get all req by Instrutor Id
     this.router.get(
       `${this.path}/instructor`,
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.getReqByInstructorId
     );
+
+    // get all request by Admin
     this.router.get(
       `${this.path}/list`,
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.getDataByAdmin
     );
-
   }
 }
 

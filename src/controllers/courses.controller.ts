@@ -12,16 +12,11 @@ class CourseController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const coursesData: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.viewCourses({
-        search,
-        pageRecord,
-        pageNo,
-        sortBy,
-        order,
-      });
+      } = await this.courseService.viewCourses(queryObject);
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);
@@ -218,6 +213,21 @@ class CourseController {
       next(error);
     }
   };
+
+  // public getDetailByTrainerId = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const trainer = req.user;
+  //     const response: { totalCount: number; records: (Course | undefined)[] }=
+  //       await this.courseService.getDetailByTrainerId(trainer);
+  //     res.status(200).send(response);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   public togglePublish = async (
     req: Request,
     res: Response,
