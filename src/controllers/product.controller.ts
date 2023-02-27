@@ -35,16 +35,11 @@ class ProductController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const coursesData: {
         totalCount: number;
         records: (Product | undefined)[];
-      } = await this.productService.viewProductsAdmin({
-        search,
-        pageRecord,
-        pageNo,
-        sortBy,
-        order,
-      });
+      } = await this.productService.viewProductsAdmin(queryObject);
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);
@@ -77,7 +72,6 @@ class ProductController {
       const productDetails: Request = req.body;
       const user = req.user;
       const file = req.file;
-
       const response: Product = await this.productService.addProduct({
         productDetails,
         file,
