@@ -12,16 +12,11 @@ class CourseController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const coursesData: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.viewCourses({
-        search,
-        pageRecord,
-        pageNo,
-        sortBy,
-        order,
-      });
+      } = await this.courseService.viewCourses(queryObject);
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);
@@ -63,7 +58,9 @@ class CourseController {
         file,
         user: trainer,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Added Successfully' });
     } catch (error) {
       next(error);
     }
@@ -130,7 +127,10 @@ class CourseController {
       const response: {
         totalCount: number;
         records: (Course | undefined)[];
-      } = await this.courseService.getReplyByCommentIdAdmin(commentId, queryObject);
+      } = await this.courseService.getReplyByCommentIdAdmin(
+        commentId,
+        queryObject
+      );
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -169,7 +169,9 @@ class CourseController {
         trainer,
         courseId,
       });
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Updated Successfully' });
     } catch (error) {
       next(error);
     }
@@ -188,7 +190,9 @@ class CourseController {
           courseId,
         }
       );
-      res.status(200).send(response);
+      res
+        .status(200)
+        .send({ response: response, message: 'Course Deleted Successfully' });
     } catch (error) {
       next(error);
     }
@@ -209,6 +213,21 @@ class CourseController {
       next(error);
     }
   };
+
+  // public getDetailByTrainerId = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const trainer = req.user;
+  //     const response: { totalCount: number; records: (Course | undefined)[] } =
+  //       await this.courseService.getDetailByTrainerId(trainer);
+  //     res.status(200).send(response);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
   public togglePublish = async (
     req: Request,
     res: Response,

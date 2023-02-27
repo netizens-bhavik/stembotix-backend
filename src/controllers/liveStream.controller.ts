@@ -1,4 +1,7 @@
-import { LiveStream } from '@/interfaces/liveStream.interface';
+import {
+  LiveStream,
+  LiveStreamUserRecord,
+} from '@/interfaces/liveStream.interface';
 import LiveStreamService from '@/services/liveStream.service';
 import { NextFunction, Request, Response } from 'express';
 
@@ -132,6 +135,47 @@ class LiveStreamController {
       res.status(200).send(response);
     } catch (error) {
       next(error);
+    }
+  };
+  public getUserTimeLogByEventId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { livestreamId } = req.params;
+      const trainer = req.user;
+      const response: {
+        totalCount: number;
+        records: LiveStreamUserRecord[];
+      } = await this.liveStreamService.getUserTimeLogByEventId(
+        livestreamId,
+        queryObject,
+        trainer
+      );
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public deleteUserAttendance = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { livestreamchatlogsId } = req.params;
+      const trainer = req.user;
+      const response: { count: number } =
+        await this.liveStreamService.deleteUserAttendance(
+          livestreamchatlogsId,
+          trainer
+        );
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
     }
   };
 }

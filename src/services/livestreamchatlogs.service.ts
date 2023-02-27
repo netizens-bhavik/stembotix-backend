@@ -42,8 +42,6 @@ class LiveStreamChatLogsService {
         { where: { livestreamId, userId } }
       );
     }
-
-    //console.log('newUserJoined', liveStreamChatLogs);
     return liveStreamChatLogs;
   }
 
@@ -80,7 +78,6 @@ class LiveStreamChatLogsService {
         },
       ],
     });
-    //console.log(liveStreamChatLogs);
     return liveStreamChatLogs;
   }
 }

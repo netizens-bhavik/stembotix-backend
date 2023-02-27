@@ -192,11 +192,16 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
+    // const uploadedFile = await uploadFileS3(file); // Upload of s3
+    // console.log('bvdhsgfh', uploadedFile);
 
     const filePath = `${API_BASE}/media/${file.path
       .split('/')
       .splice(-2)
       .join('/')}`;
+    // var files = file;
+    // var fileName = file.filename;
+    // var albumPhotosKey = encodeURIComponent(file.path) + '/';
 
     // const uploadedFile = await uploadFileS3(file); // Upload of s3
     // console.log(uploadedFile);

@@ -40,7 +40,11 @@ class CourseRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.courseController.getCourseById
     );
-    // View all comment by courseId
+    // this.router.get(
+    //   `/trainerRecord${this.path}`,
+    //   passport.authenticate('jwt', { session: false }),
+    //   this.courseController.getDetailByTrainerId
+    // );
     this.router.get(
       `/admin${this.path}/:courseId/comments`,
       passport.authenticate('jwt', { session: false }),
@@ -94,6 +98,7 @@ class CourseRoute implements Routes {
       ],
       this.courseController.updateCourse
     );
+
     // toggle course visibility
     this.router.put(
       `${this.path}/toggle-publish/:courseId`,

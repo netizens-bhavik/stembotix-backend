@@ -13,33 +13,34 @@ class CreateUser {
 
   public init = async () => {
     try {
-      //create bulk users from data/user.ts
+      // create bulk users from data/user.ts
+
       const users = await this.users.bulkCreate(userData);
       console.log('users', users);
 
-      // const res = await this.users.count();
-      // if (res !== 0) return;
+      const res = await this.users.count();
+      if (res !== 0) return;
 
-      // let userInstance: RegisterUserDto;
+      let userInstance: RegisterUserDto;
 
-      // userInstance = await this.users.findOne({
-      //   where: { email: userData.email },
-      // });
+      userInstance = await this.users.findOne({
+        where: { email: userData.email },
+      });
 
-      // if (!userInstance) {
-      //   const roleRes = await this.roles.findOne({
-      //     where: { roleName: userData.role },
-      //   });
-      //   const userInstance: User = await this.users.create({
-      //     ...userData,
-      //     role_id: roleRes.id,
-      //   });
-      //   if (userData.role.match(/Admin/i)) {
-      //     await this.trainers.create({
-      //       user_id: userInstance.id,
-      //     });
-      //   }
-      // }
+      if (!userInstance) {
+        const roleRes = await this.roles.findOne({
+          where: { roleName: userData.role },
+        });
+        const userInstance: User = await this.users.create({
+          ...userData,
+          role_id: roleRes.id,
+        });
+        if (userData.role.match(/Admin/i)) {
+          await this.trainers.create({
+            user_id: userInstance.id,
+          });
+        }
+      }
     } catch (error) {
       return error;
     }
