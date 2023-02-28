@@ -70,6 +70,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
+    Course.hasMany(models.OrderItem, {
+      foreignKey: 'course_id',
+      targetKey: 'id',
+    });
   };
 
   return Course;
