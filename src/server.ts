@@ -23,6 +23,7 @@ import ReviewRoute from './routes/review.route';
 import SubscripeLiveStreamRoute from './routes/subscribeLiveStream.route';
 import LiveStreamChatRoute from './routes/liveStreamChat.route';
 import InstituteInstroctorRoute from './routes/instituteinstructor.route';
+import UniversalSearchRoute from './routes/universalSearch.route';
 
 validateEnv();
 
@@ -50,5 +51,6 @@ const app = new App([
   new SubscripeLiveStreamRoute(),
   new LiveStreamChatRoute(),
   new InstituteInstroctorRoute(),
+  new UniversalSearchRoute()
 ]);
 app.listen();
