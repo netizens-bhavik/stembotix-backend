@@ -214,20 +214,20 @@ class CourseController {
     }
   };
 
-  // public getDetailByTrainerId = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const trainer = req.user;
-  //     const response: { totalCount: number; records: (Course | undefined)[] } =
-  //       await this.courseService.getDetailByTrainerId(trainer);
-  //     res.status(200).send(response);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  public getDetailByTrainerId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const trainer = req.user;
+      const response: { totalCount: number; records: (Course | undefined)[] } =
+        await this.courseService.getDetailByTrainerId(trainer);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
   public togglePublish = async (
     req: Request,
     res: Response,

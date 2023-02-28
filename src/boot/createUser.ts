@@ -16,7 +16,6 @@ class CreateUser {
       // create bulk users from data/user.ts
 
       const users = await this.users.bulkCreate(userData);
-      console.log('users', users);
 
       const res = await this.users.count();
       if (res !== 0) return;

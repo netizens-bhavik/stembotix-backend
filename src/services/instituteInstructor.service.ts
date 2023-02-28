@@ -6,11 +6,14 @@ import fs from 'fs';
 import { API_BASE } from '@/config';
 import path from 'path';
 import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
+import EmailService from './email.service';
+import { Mail } from '@/interfaces/mailPayload.interface';
 
 class InstituteInstructorService {
   public user = DB.User;
   public instituteInstructor = DB.InstituteInstructor;
   public instructor = DB.Instructor;
+  public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
     return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
@@ -60,6 +63,18 @@ class InstituteInstructorService {
       proposal: instructorDetail.proposal,
       email: instructorDetail.email,
     });
+    if (createInstituteInstructor) {
+      const mailData: Mail = {
+        templateData: {
+          proposal: instructorDetail.proposal,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: instructorDetail.email,
+        },
+      };
+      this.emailService.sendRequestToJoinInstitute(mailData);
+    }
     return createInstituteInstructor;
   }
 
@@ -88,6 +103,11 @@ class InstituteInstructorService {
         returning: true,
       }
     );
+    // if(updateOffer){
+    //   const mailData:Mail={
+    //     templateData:
+    //   }
+    // }
     return updateOffer;
   }
 
@@ -100,6 +120,7 @@ class InstituteInstructorService {
     });
     return deleteRequest;
   }
+
   public async getInstituteRequest(loggedUser, queryObject) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(401, 'Unauthorized');
