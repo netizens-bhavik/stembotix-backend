@@ -13,6 +13,8 @@ import {
 } from '@/interfaces/mailPayload.interface';
 import { token } from 'morgan';
 import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
+import { Sequelize } from 'sequelize/types';
+import sequelize from 'sequelize';
 
 class CourseService {
   public course = DB.Course;
@@ -170,7 +172,9 @@ class CourseService {
     if (newCourse) {
       const mailData: Mail = {
         templateData: {
-          course: newCourse.title,
+          courseTitle: newCourse.title,
+          courseDescription: newCourse.description,
+          courseId: newCourse.id,
         },
         mailData: {
           from: user.email,
@@ -453,7 +457,7 @@ class CourseService {
     if (courseRecord.status === 'Published') {
       const mailData: Mail = {
         templateData: {
-          course: courseRecord.title,
+          courseTitle: courseRecord.title,
         },
         mailData: {
           from: trainer.email,
@@ -504,7 +508,7 @@ class CourseService {
     if (res === 1) {
       const mailerData: MailPayloads = {
         templateData: {
-          course: courseRecord.title,
+          courseTitle: courseRecord.title,
         },
         mailerData: {
           to: users,
@@ -572,39 +576,46 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  // public async getDetailByTrainerId(trainer): Promise<{
-  //   totalCount: number;
-  //   records: (Course | undefined)[];
-  // }> {
-  //   if (!this.isTrainer(trainer)) {
-  //     throw new HttpException(403, 'Forbidden Resource');
-  //   }
-  //   const trainerRecord = await this.trainer.findOne({
-  //     where: { user_id: trainer.id },
-  //   });
-  //   if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
+  public async getDetailByTrainerId(trainer): Promise<{
+    totalCount: number;
+    records: (Course | undefined)[];
+  }> {
+    if (!this.isTrainer(trainer)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const trainerRecord = await this.trainer.findAll();
+    if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
 
-  //   const courseData = await this.course.findAndCountAll({
-  //     where: {
-  //       deletedAt: null,
-  //     },
-  //     include: [
-  //       {
-  //         model: this.trainer,
-  //         where: {
-  //           trainer_id: trainerRecord.trainer_id,
-  //         },
-  //         attributes: ['user_id'],
-  //       },
-  //       {
-  //         model: this.review,
-  //         attributes: ['id', 'rating', 'userId'],
-  //         separate: true,
-  //       },
-  //     ],
-  //   });
-  //   return { totalCount: courseData.count, records: courseData.rows };
-  // }
+    const courseData = await this.trainer.findAndCountAll({
+      // attributes: [sequelize.fn("COUNT", sequelize.col("`Trainer`->`Courses`.`id`"))],
+      // attributes: [
+      //   [sequelize.fn('COUNT', sequelize.col('Courses.id')), 'total_amount'],
+      // ],
+      include: [
+        {
+          model: this.course,
+          where: {
+            status: 'Published',
+          },
+          include: [
+            {
+              model: this.review,
+              separate: true,
+            },
+            {
+              model: this.orderitem,
+              // attributes: [sequelize.fn('COUNT', sequelize.col('OrderItem->course_id'))]
+            },
+          ],
+        },
+        {
+          model: this.user,
+          attributes: ['firstName', 'lastName', 'fullName'],
+        },
+      ],
+    });
+    return { totalCount: courseData.count, records: courseData.rows };
+  }
 
   public async togglePublish({
     trainer,

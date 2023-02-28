@@ -98,7 +98,7 @@ class EmailService {
       // Mailing Data assignment
       const pathToView = path.resolve(
         __dirname,
-        '../view/verificationEmail.ejs'
+        '../view/subscribeLiveCourseEmail.ejs'
       );
       const { templateData, mailerData } = payload;
 
@@ -229,6 +229,36 @@ class EmailService {
             from: `${mailData.from}`,
             to: mailData.to,
             subject: 'Unpublished Course',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async sendRequestToJoinInstitute(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/sendRequestToJoinInstitute.ejs'
+      );
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Proposal request',
             html: data,
           });
           this.terminateConnection();

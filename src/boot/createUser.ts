@@ -13,9 +13,9 @@ class CreateUser {
 
   public init = async () => {
     try {
-      //create bulk users from data/user.ts
-      // const users = await this.users.bulkCreate(userData);
-      // console.log('users', users);
+      // create bulk users from data/user.ts
+
+      const users = await this.users.bulkCreate(userData);
 
       const res = await this.users.count();
       if (res !== 0) return;

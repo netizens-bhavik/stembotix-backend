@@ -104,7 +104,7 @@ class SubscriptionService {
         templateData: {
           Title: res.title,
           StartingTime: res.startTime,
-          Date: res.Date,
+          StartingDate: res.Date,
         },
         mailerData: {
           to: users,
