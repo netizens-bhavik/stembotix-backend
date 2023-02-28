@@ -98,7 +98,7 @@ class EmailService {
       // Mailing Data assignment
       const pathToView = path.resolve(
         __dirname,
-        '../view/verificationEmail.ejs'
+        '../view/subscribeLiveCourseEmail.ejs'
       );
       const { templateData, mailerData } = payload;
 
