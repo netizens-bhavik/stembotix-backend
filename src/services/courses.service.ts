@@ -170,7 +170,9 @@ class CourseService {
     if (newCourse) {
       const mailData: Mail = {
         templateData: {
-          course: newCourse.title,
+          courseTitle: newCourse.title,
+          courseDescription: newCourse.description,
+          courseId: newCourse.id,
         },
         mailData: {
           from: user.email,
@@ -453,7 +455,7 @@ class CourseService {
     if (courseRecord.status === 'Published') {
       const mailData: Mail = {
         templateData: {
-          course: courseRecord.title,
+          courseTitle: courseRecord.title,
         },
         mailData: {
           from: trainer.email,
@@ -504,7 +506,7 @@ class CourseService {
     if (res === 1) {
       const mailerData: MailPayloads = {
         templateData: {
-          course: courseRecord.title,
+          courseTitle: courseRecord.title,
         },
         mailerData: {
           to: users,
