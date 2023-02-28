@@ -2,20 +2,10 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
-import { API_BASE, API_SECURE_BASE, CLIENT_URL } from '@config';
+import { API_BASE } from '@config';
 // const sgMail = require('@sendgrid/mail');
-import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from '@config';
 import EmailService from './email.service';
-import {
-  Mail,
-  MailPayload,
-  MailPayloads,
-} from '@/interfaces/mailPayload.interface';
-import { token } from 'morgan';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import { Sequelize } from 'sequelize/types';
-import sequelize from 'sequelize';
-
+import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -576,45 +566,156 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  public async getDetailByTrainerId(trainer): Promise<{
+  public async getDetailByTrainer(
+    trainer,
+    queryObject
+  ): Promise<{
     totalCount: number;
     records: (Course | undefined)[];
   }> {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const trainerRecord = await this.trainer.findAll();
     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
 
-    const courseData = await this.trainer.findAndCountAll({
-      // attributes: [sequelize.fn("COUNT", sequelize.col("`Trainer`->`Courses`.`id`"))],
-      // attributes: [
-      //   [sequelize.fn('COUNT', sequelize.col('Courses.id')), 'total_amount'],
-      // ],
+    // const trainerData = await this.trainer.findAndCountAll({
+    //   include: [
+    //     {
+    //       model: this.user,
+    //       attributes: ['firstName', 'lastName', 'fullName'],
+    //       where: DB.Sequelize.or(
+    //         {
+    //           firstName: { [searchCondition]: search },
+    //         },
+    //         {
+    //           lastName: { [searchCondition]: search },
+    //         }
+    //       ),
+    //     },
+    //     {
+    //       model: this.course,
+    //       attributes: ['id', 'title'],
+    //       where: {
+    //         status: 'Published',
+    //       },
+    //       include: [
+    //         {
+    //           model: this.review,
+    //           attributes: ['rating'],
+    //           separate: true,
+    //         },
+    //         {
+    //           model: this.orderitem,
+    //           // attributes: ['id'],
+    //           include: {
+    //             model: this.order,
+    //             // attributes: ['UserId'],
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   ],
+    //   subQuery: false,
+    //   limit: pageSize,
+    //   offset: pageNo,
+    //   order: [
+    //     [{ model: this.user }, 'firstName', order],
+    //     [{ model: this.user }, 'lastName', order],
+    //   ],
+    // });
+
+    const trainerData = await this.trainer.findAndCountAll({
       include: [
         {
+          model: this.user,
+          attributes: ['firstName', 'lastName', 'fullName'],
+          where: DB.Sequelize.or(
+            {
+              firstName: { [searchCondition]: search },
+            },
+            {
+              lastName: { [searchCondition]: search },
+            }
+          ),
+        },
+        {
           model: this.course,
+          attributes: ['id', 'title'],
           where: {
             status: 'Published',
           },
           include: [
             {
               model: this.review,
+              attributes: ['rating'],
               separate: true,
             },
             {
               model: this.orderitem,
-              // attributes: [sequelize.fn('COUNT', sequelize.col('OrderItem->course_id'))]
+              include: {
+                model: this.order,
+              },
             },
           ],
         },
-        {
-          model: this.user,
-          attributes: ['firstName', 'lastName', 'fullName'],
-        },
+      ],
+      subQuery: false,
+      limit: pageSize,
+      offset: pageNo,
+      order: [
+        [{ model: this.user }, 'firstName', order],
+        [{ model: this.user }, 'lastName', order],
       ],
     });
-    return { totalCount: courseData.count, records: courseData.rows };
+
+    console.log(trainerData);
+
+    // const ratings = trainerData.rows[0].Courses[0].Reviews;
+    let allRating = [];
+
+    const response = [];
+    const allRatings = [];
+    trainerData.rows.forEach((row, index) => {
+      response.push(row);
+      row.Courses.forEach((course) => {
+        let ratings = course.Reviews;
+        ratings.forEach((rating) => {
+          allRating.push(rating.rating);
+        });
+      });
+
+      let allAvgRatingLenth = allRating.length;
+      let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
+      console.log(sumOfAllRatings);
+      let avgRating = sumOfAllRatings / allAvgRatingLenth;
+      allRating = [];
+      allRatings.push(avgRating);
+      response[index].avgRating = avgRating;
+    });
+
+    // trainerData.rows.forEach((row) => {
+    //   row.Courses.forEach((course) => {
+    //     let ratings = course.Reviews;
+    //     let allRating = ratings.map((rating) => rating.rating);
+    //     let allAvgRatingLenth = allRating.length;
+    //     let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
+    //     let avgRating = sumOfAllRatings / allAvgRatingLenth;
+    //     course.avgRating = avgRating;
+    //   });
+    // });
+    console.log(response);
+
+    return { totalCount: trainerData.count, records: response };
   }
 
   public async togglePublish({
