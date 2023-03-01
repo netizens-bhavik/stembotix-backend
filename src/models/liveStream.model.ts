@@ -65,6 +65,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'livestreamId',
       targetKey: 'id',
     });
+    Livestream.hasMany(models.ManageLeaves, {
+      foreignKey: 'livestreamId',
+      targetKey: 'id',
+    });
   };
   return Livestream;
 };
