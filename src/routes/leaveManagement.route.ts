@@ -11,7 +11,7 @@ import {
 // import 'reflect-metadata';
 
 class LeaveManagementRoute implements Routes {
-  public path = '/leave-management';
+  public path = '/leave';
   public passport = passportConfig(passport);
   public router = Router();
   public leaveManagementController = new LeaveManagementController();

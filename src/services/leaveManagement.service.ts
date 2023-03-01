@@ -30,7 +30,7 @@ class LeaveManagementService {
     return loggedUser.role === 'Student';
   }
 
-  public async getLeave(loggedUser) {
+  public async getLeave(loggedUser, queryObject) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       this.isInstructor(loggedUser) ||
@@ -38,14 +38,33 @@ class LeaveManagementService {
     ) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const findLeave = await this.manageLeave.findAll({
+
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      : ['', DB.Sequelize.Op.ne];
+
+    const findLeave = await this.manageLeave.findAndCountAll({
       include: [
         {
           model: this.user,
           attributes: ['id', 'firstName', 'lastName', 'email'],
           as: 'ManageUserLeave',
+          where: {
+            firstName: { [searchCondition]: search },
+            lastName: { [searchCondition]: search },
+            email: { [searchCondition]: search },
+          },
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
     return findLeave;
   }

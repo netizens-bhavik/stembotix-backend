@@ -26,16 +26,11 @@ module.exports = (sequelize, Sequelize) => {
     { paranoid: true }
   );
   InstructorHasLeave.associate = (models) => {
-    InstructorHasLeave.belongsTo(models.User, {
-      foreignKey: 'UserId',
+    InstructorHasLeave.belongsTo(models.InstituteInstructor, {
+      foreignKey: 'InstructorId',
       targetKey: 'id',
-      as: 'InstructorHasLeave',
+      as: 'InstructorLeave',
     });
-    // UserHasLeave.belongsTo(models.User, {
-    //   foreignKey: 'LeaveId',
-    //   targetKey: 'id',
-    //   as: 'Leave',
-    // });
   };
   return InstructorHasLeave;
 };

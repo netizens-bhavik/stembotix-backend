@@ -12,7 +12,11 @@ class LeaveManagementController {
   public getLeave = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;
-      const findLeave = await this.leaveManagementService.getLeave(loggedUser);
+      const queryObject = req.query;
+      const findLeave = await this.leaveManagementService.getLeave(
+        loggedUser,
+        queryObject
+      );
       res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
     } catch (error) {
       next(error);
