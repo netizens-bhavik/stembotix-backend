@@ -23,6 +23,24 @@ class LeaveManagementController {
     }
   };
 
+  public getLeaveView = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const queryObject = req.query;
+      const findLeave = await this.leaveManagementService.getLeaveView(
+        loggedUser,
+        queryObject
+      );
+      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createLeave = async (
     req: Request,
     res: Response,

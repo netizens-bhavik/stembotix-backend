@@ -69,6 +69,44 @@ class LeaveManagementService {
     return findLeave;
   }
 
+  public async getLeaveView(loggedUser, queryObject) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      : ['', DB.Sequelize.Op.ne];
+
+    const findLeave = await this.manageLeave.findAndCountAll({
+      include: [
+        {
+          model: this.user,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          as: 'ManageUserLeave',
+          where: {
+            firstName: { [searchCondition]: search },
+            lastName: { [searchCondition]: search },
+            email: { [searchCondition]: search },
+          },
+        },
+      ],
+      where: {
+        UserId: loggedUser.id,
+      },
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return findLeave;
+  }
+
   public async createLeave(loggedUser, leaveData) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
@@ -81,21 +119,21 @@ class LeaveManagementService {
     );
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
-    if (this.isInstructor(loggedUser)) {
-      const leaveType = `${leaveData.leaveType}LeaveCount`;
-      console.log(leaveType);
+    // if (this.isInstructor(loggedUser)) {
+    //   const leaveType = `${leaveData.leaveType}LeaveCount`;
+    //   console.log(leaveType);
 
-      const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
-        where: {
-          UserId: loggedUser.id,
-          [leaveType]: 0,
-        },
-      });
+    //   const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
+    //     where: {
+    //       UserId: loggedUser.id,
+    //       [leaveType]: 0,
+    //     },
+    //   });
 
-      if (isCreated) {
-        console.log('created');
-      }
-    }
+    //   if (isCreated) {
+    //     console.log('created');
+    //   }
+    // }
 
     const checkLeave = await this.manageLeave.findOne({
       where: {
