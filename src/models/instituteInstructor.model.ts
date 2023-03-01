@@ -40,6 +40,11 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
       as: 'Institute',
     });
+    InstituteInstructor.belongsTo(models.InstructorHasLeave, {
+      foreignKey: 'InstructorId',
+      targetKey: 'id',
+      as: 'InstructorLeave',
+    });
   };
   return InstituteInstructor;
 };
