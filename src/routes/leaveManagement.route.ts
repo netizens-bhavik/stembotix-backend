@@ -7,6 +7,7 @@ import LeaveManagementController from '@controllers/leaveManagement.controller';
 import {
   leaveManagementRequestDTO,
   leaveManagementApproveRequestDTO,
+  leaveManagementDateRequestDTO,
 } from '@/dtos/leaveManagement.dto';
 // import 'reflect-metadata';
 
@@ -30,6 +31,27 @@ class LeaveManagementRoute implements Routes {
       `${this.path}/view`,
       [passport.authenticate('jwt', { session: false })],
       this.leaveManagementController.getLeaveView
+    );
+
+    this.router.post(
+      `${this.path}/events`,
+      [
+        passport.authenticate('jwt', { session: false }),
+        validationMiddleware(leaveManagementDateRequestDTO, 'body'),
+      ],
+      this.leaveManagementController.getEventsByDate
+    );
+
+    this.router.get(
+      `${this.path}/student`,
+      [passport.authenticate('jwt', { session: false })],
+      this.leaveManagementController.getLeaveByStudent
+    );
+
+    this.router.get(
+      `${this.path}/instructor`,
+      [passport.authenticate('jwt', { session: false })],
+      this.leaveManagementController.getLeaveByInstructor
     );
 
     this.router.post(

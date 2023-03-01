@@ -5,6 +5,7 @@ import {
 } from '@/dtos/leaveManagement.dto';
 import LeaveManagementService from '@/services/leaveManagement.service';
 import { NextFunction, Request, Response } from 'express';
+import { clearConfigCache } from 'prettier';
 
 class LeaveManagementController {
   public leaveManagementService = new LeaveManagementService();
@@ -12,11 +13,68 @@ class LeaveManagementController {
   public getLeave = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;
-      const queryObject = req.query;
-      const findLeave = await this.leaveManagementService.getLeave(
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const findLeave = await this.leaveManagementService.getLeave({
         loggedUser,
-        queryObject
+        queryObject,
+      });
+      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getEventsByDate = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const { Date } = req.body;
+      const getEventData = await this.leaveManagementService.getEventsByDate(
+        loggedUser,
+        Date
       );
+      res.status(200).send({ EventData: getEventData, message: 'Events List' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getLeaveByStudent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const findLeave = await this.leaveManagementService.getLeaveByStudent({
+        loggedUser,
+        queryObject,
+      });
+      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getLeaveByInstructor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const findLeave = await this.leaveManagementService.getLeaveByInstructor({
+        loggedUser,
+        queryObject,
+      });
       res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
     } catch (error) {
       next(error);
@@ -30,11 +88,12 @@ class LeaveManagementController {
   ) => {
     try {
       const loggedUser = req.user;
-      const queryObject = req.query;
-      const findLeave = await this.leaveManagementService.getLeaveView(
+      const { search, pageRecord, pageNo, sortBy, order, role } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order, role };
+      const findLeave = await this.leaveManagementService.getLeaveView({
         loggedUser,
-        queryObject
-      );
+        queryObject,
+      });
       res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
     } catch (error) {
       next(error);
