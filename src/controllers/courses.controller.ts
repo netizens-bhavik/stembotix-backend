@@ -223,7 +223,7 @@ class CourseController {
       const trainer = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response =
+      const response: { totalCount: number; records: (Course | undefined)[] } =
         await this.courseService.getDetailByTrainer(trainer, queryObject);
       res.status(200).send(response);
     } catch (error) {

@@ -565,7 +565,13 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  public async getDetailByTrainer(trainer, queryObject): Promise<any> {
+  public async getDetailByTrainer(
+    trainer,
+    queryObject
+  ): Promise<{
+    totalCount: number;
+    records: (Course | undefined)[];
+  }> {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -642,7 +648,7 @@ class CourseService {
       row.setDataValue('avgRating', avgRating);
       avgRatingResponse.push(row);
     });
-    return { avgRatingResponse };
+    return { totalCount: trainerData.count, records: avgRatingResponse };
   }
 
   public async togglePublish({
