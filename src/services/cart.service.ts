@@ -41,7 +41,7 @@ class CartService {
       message: '',
       data: {},
     };
-    if (!cartItem[1]) throw new HttpException(400, 'Invalid operation');
+    if (!cartItem[1]) throw new HttpException(400, 'Already added to cart');
     res.data = cartItem[0];
     res.message = `${ItemTypes.Product} added to cart successfully.`;
     return res;
@@ -71,7 +71,7 @@ class CartService {
       message: '',
       data: {},
     };
-    if (!cartItem[1]) throw new HttpException(400, 'Invalid operation');
+    if (!cartItem[1]) throw new HttpException(400, 'Already addes to cart');
     res.data = cartItem[0];
     res.message = `${ItemTypes.Product} added to cart successfully.`;
     return res;
