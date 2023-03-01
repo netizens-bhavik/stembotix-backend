@@ -647,7 +647,6 @@ class CourseService {
 
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
-      console.log(sumOfAllRatings);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
       allRating = [];
       ratings.push(avgRating);
