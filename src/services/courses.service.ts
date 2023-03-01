@@ -588,52 +588,6 @@ class CourseService {
     const trainerRecord = await this.trainer.findAll();
     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
 
-    // const trainerData = await this.trainer.findAndCountAll({
-    //   include: [
-    //     {
-    //       model: this.user,
-    //       attributes: ['firstName', 'lastName', 'fullName'],
-    //       where: DB.Sequelize.or(
-    //         {
-    //           firstName: { [searchCondition]: search },
-    //         },
-    //         {
-    //           lastName: { [searchCondition]: search },
-    //         }
-    //       ),
-    //     },
-    //     {
-    //       model: this.course,
-    //       attributes: ['id', 'title'],
-    //       where: {
-    //         status: 'Published',
-    //       },
-    //       include: [
-    //         {
-    //           model: this.review,
-    //           attributes: ['rating'],
-    //           separate: true,
-    //         },
-    //         {
-    //           model: this.orderitem,
-    //           // attributes: ['id'],
-    //           include: {
-    //             model: this.order,
-    //             // attributes: ['UserId'],
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    //   subQuery: false,
-    //   limit: pageSize,
-    //   offset: pageNo,
-    //   order: [
-    //     [{ model: this.user }, 'firstName', order],
-    //     [{ model: this.user }, 'lastName', order],
-    //   ],
-    // });
-
     const trainerData = await this.trainer.findAndCountAll({
       include: [
         {
@@ -677,16 +631,13 @@ class CourseService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
-
-    console.log(trainerData);
-
     // const ratings = trainerData.rows[0].Courses[0].Reviews;
-    let allRating = [];
 
-    const response = [];
-    const allRatings = [];
+    let allRating = [];
+    const avgRatingResponse = [];
+    const ratings = [];
     trainerData.rows.forEach((row, index) => {
-      response.push(row);
+      avgRatingResponse.push(row);
       row.Courses.forEach((course) => {
         let ratings = course.Reviews;
         ratings.forEach((rating) => {
@@ -699,8 +650,8 @@ class CourseService {
       console.log(sumOfAllRatings);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
       allRating = [];
-      allRatings.push(avgRating);
-      response[index].avgRating = avgRating;
+      ratings.push(avgRating);
+      avgRatingResponse[index].avgRating = avgRating;
     });
 
     // trainerData.rows.forEach((row) => {
@@ -713,9 +664,7 @@ class CourseService {
     //     course.avgRating = avgRating;
     //   });
     // });
-    console.log(response);
-
-    return { totalCount: trainerData.count, records: response };
+    return { totalCount: trainerData.count, records: avgRatingResponse };
   }
 
   public async togglePublish({
