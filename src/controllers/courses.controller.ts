@@ -214,15 +214,17 @@ class CourseController {
     }
   };
 
-  public getDetailByTrainerId = async (
+  public getDetailByTrainer = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const trainer = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Course | undefined)[] } =
-        await this.courseService.getDetailByTrainerId(trainer);
+        await this.courseService.getDetailByTrainer(trainer, queryObject);
       res.status(200).send(response);
     } catch (error) {
       next(error);
