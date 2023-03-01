@@ -40,9 +40,9 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
       as: 'Institute',
     });
-    InstituteInstructor.belongsTo(models.InstructorHasLeave, {
-      foreignKey: 'InstructorId',
-      targetKey: 'id',
+    InstituteInstructor.hasMany(models.InstructorHasLeave, {
+      foreignKey: 'InstituteInstructorId',
+      sourceKey: 'id',
       as: 'InstructorLeave',
     });
   };

@@ -632,16 +632,22 @@ class CourseService {
     });
 
     let allRating = [];
+    let allUser = [];
+    const allUserResponse = [];
     const avgRatingResponse = [];
     trainerData.rows.forEach((row, index) => {
       allRating = [];
+      allUser = [];
       row.Courses.forEach((course) => {
         let ratings = course.Reviews;
         ratings.forEach((rating) => {
           allRating.push(rating.rating);
+          let user = course.OrderItems;
+          user.forEach((user) => {
+            allUser.push(user);
+          });
         });
       });
-
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
@@ -649,7 +655,10 @@ class CourseService {
         'avgRating',
         Number.parseFloat(avgRating as unknown as string).toFixed(1)
       );
+      let allUserLength = allUser.length;
+      row.setDataValue('allUserCount', allUserLength);
       avgRatingResponse.push(row);
+      allUserResponse.push(row);
     });
     return { totalCount: trainerData.count, records: avgRatingResponse };
   }
