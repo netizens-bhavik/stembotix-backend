@@ -14,6 +14,7 @@ class AuthService {
   public users = DB.User;
   public roles = DB.Role;
   public refreshToken = DB.RefreshToken;
+  public user = DB.User;
   public accountHash = DB.AccountVerification;
   public trainers = DB.Trainer;
   public emailService = new EmailService();
@@ -88,6 +89,21 @@ class AuthService {
     refreshToken: string;
     user: User;
   }> {
+    const verifiedAccount = await this.user.findOne({
+      where: DB.Sequelize.and(
+        {
+          is_email_verified: true,
+        },
+        {
+          email: userData.email,
+        }
+      ),
+    });
+    if (!verifiedAccount)
+      throw new HttpException(
+        401,
+        'Your account is not verified. To verify signup again'
+      );
     let refreshToken = userData?.cookie || null;
 
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');

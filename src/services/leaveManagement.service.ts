@@ -83,7 +83,6 @@ class LeaveManagementService {
 
     if (this.isInstructor(loggedUser)) {
       const leaveType = `${leaveData.leaveType}LeaveCount`;
-      console.log(leaveType);
 
       const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
         where: {
@@ -92,9 +91,9 @@ class LeaveManagementService {
         },
       });
 
-      if (isCreated) {
-        console.log('created');
-      }
+      // if (isCreated) {
+      //   console.log('created');
+      // }
     }
 
     const checkLeave = await this.manageLeave.findOne({

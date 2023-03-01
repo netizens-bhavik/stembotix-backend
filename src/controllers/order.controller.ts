@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '@/services/order.service';
 import { AddOrderDTO, VerifyOrderDTO } from '@/dtos/order.dto';
+import { OrderItem } from '@/interfaces/order.interface';
 
 class OrderController {
   public orderService = new OrderService();
@@ -18,6 +19,25 @@ class OrderController {
       next(error);
     }
   };
+  public listOrdersByAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const trainer = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: {
+        totalCount: number;
+        records: (OrderItem | undefined)[];
+      } = await this.orderService.listOrdersByAdmin({queryObject, trainer});
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public addOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
       //@ts-ignore

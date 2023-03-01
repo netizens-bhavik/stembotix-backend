@@ -645,7 +645,10 @@ class CourseService {
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
-      row.setDataValue('avgRating', avgRating);
+      row.setDataValue(
+        'avgRating',
+        Number.parseFloat(avgRating as unknown as string).toFixed(1)
+      );
       avgRatingResponse.push(row);
     });
     return { totalCount: trainerData.count, records: avgRatingResponse };
