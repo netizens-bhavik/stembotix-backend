@@ -103,6 +103,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasOne(models.Trainer);
     User.hasOne(models.LikeDislike, {
       foreignKey: 'userId',
       targetKey: 'id',
