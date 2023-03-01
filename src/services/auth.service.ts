@@ -102,7 +102,7 @@ class AuthService {
     if (!verifiedAccount)
       throw new HttpException(
         401,
-        'Your account is not verified. To verify signup again'
+        'Your account is not verified. To verify account signup again'
       );
     let refreshToken = userData?.cookie || null;
 
