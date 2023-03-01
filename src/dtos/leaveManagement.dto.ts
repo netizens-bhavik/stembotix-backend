@@ -26,6 +26,11 @@ export class leaveManagementRequestDTO {
   public livestreamId: string;
 }
 
+export class leaveManagementDateRequestDTO {
+  @IsDateString()
+  public Date: Date;
+}
+
 export class leaveManagementBulkRequestDTO {
   // @IsDateString()
   // public Date: Date;
