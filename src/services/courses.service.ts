@@ -404,7 +404,6 @@ class CourseService {
         .join('/')}`;
       courseDetails.trailer = trailerPath;
     }
-
     if (thumbnail) {
       const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
         .split('/')
@@ -566,13 +565,7 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  public async getDetailByTrainer(
-    trainer,
-    queryObject
-  ): Promise<{
-    totalCount: number;
-    records: (Course | undefined)[];
-  }> {
+  public async getDetailByTrainer(trainer, queryObject): Promise<any> {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -631,13 +624,11 @@ class CourseService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
-    // const ratings = trainerData.rows[0].Courses[0].Reviews;
 
     let allRating = [];
     const avgRatingResponse = [];
-    const ratings = [];
     trainerData.rows.forEach((row, index) => {
-      avgRatingResponse.push(row);
+      allRating = [];
       row.Courses.forEach((course) => {
         let ratings = course.Reviews;
         ratings.forEach((rating) => {
@@ -648,22 +639,10 @@ class CourseService {
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
-      allRating = [];
-      ratings.push(avgRating);
-      avgRatingResponse[index].avgRating = avgRating;
+      row.setDataValue('avgRating', avgRating);
+      avgRatingResponse.push(row);
     });
-
-    // trainerData.rows.forEach((row) => {
-    //   row.Courses.forEach((course) => {
-    //     let ratings = course.Reviews;
-    //     let allRating = ratings.map((rating) => rating.rating);
-    //     let allAvgRatingLenth = allRating.length;
-    //     let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
-    //     let avgRating = sumOfAllRatings / allAvgRatingLenth;
-    //     course.avgRating = avgRating;
-    //   });
-    // });
-    return { totalCount: trainerData.count, records: avgRatingResponse };
+    return { avgRatingResponse };
   }
 
   public async togglePublish({
