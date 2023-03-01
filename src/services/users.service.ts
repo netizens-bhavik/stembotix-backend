@@ -7,6 +7,8 @@ import { isEmpty } from '@utils/util';
 
 class UserService {
   public users = DB.User;
+  public course = DB.Course;
+  public product = DB.Product;
 
   public isAdmin(userData): boolean {
     return userData.role === 'Admin';
