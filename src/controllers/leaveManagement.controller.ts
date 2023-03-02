@@ -6,6 +6,7 @@ import {
 import LeaveManagementService from '@/services/leaveManagement.service';
 import { NextFunction, Request, Response } from 'express';
 import { clearConfigCache } from 'prettier';
+import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 
 class LeaveManagementController {
   public leaveManagementService = new LeaveManagementService();
@@ -15,11 +16,14 @@ class LeaveManagementController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const findLeave = await this.leaveManagementService.getLeave({
+      const findLeave: {
+        totalCount: number;
+        records: (LeaveData | undefined)[];
+      } = await this.leaveManagementService.getLeave({
         loggedUser,
         queryObject,
       });
-      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+      res.status(200).send(findLeave);
     } catch (error) {
       next(error);
     }
@@ -52,11 +56,14 @@ class LeaveManagementController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const findLeave = await this.leaveManagementService.getLeaveByStudent({
+      const findLeave: {
+        totalCount: number;
+        records: (LeaveData | undefined)[];
+      } = await this.leaveManagementService.getLeaveByStudent({
         loggedUser,
         queryObject,
       });
-      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+      res.status(200).send(findLeave);
     } catch (error) {
       next(error);
     }
@@ -71,11 +78,14 @@ class LeaveManagementController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const findLeave = await this.leaveManagementService.getLeaveByInstructor({
+      const findLeave: {
+        totalCount: number;
+        records: (LeaveData | undefined)[];
+      } = await this.leaveManagementService.getLeaveByInstructor({
         loggedUser,
         queryObject,
       });
-      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+      res.status(200).send(findLeave);
     } catch (error) {
       next(error);
     }
@@ -94,7 +104,7 @@ class LeaveManagementController {
         loggedUser,
         queryObject,
       });
-      res.status(200).send({ leaveData: findLeave, message: 'Leave found' });
+      res.status(200).send(findLeave);
     } catch (error) {
       next(error);
     }
@@ -112,7 +122,9 @@ class LeaveManagementController {
         loggedUser,
         reqBody
       );
-      res.status(200).send({ ...createLeaveStatus, message: 'Leave created' });
+      res
+        .status(200)
+        .send({ response: createLeaveStatus, message: 'Leave created' });
     } catch (error) {
       next(error);
     }
@@ -163,7 +175,7 @@ class LeaveManagementController {
         );
       res
         .status(200)
-        .send({ status: updateLeaveStatus, message: 'Leave updated' });
+        .send({ response: updateLeaveStatus, message: 'Leave updated' });
     } catch (error) {
       next(error);
     }
@@ -179,7 +191,9 @@ class LeaveManagementController {
       const leaveId = req.params.id;
       const deleteLeaveStatus =
         await this.leaveManagementService.deleteLeaveById(loggedUser, leaveId);
-      res.status(200).send({ ...deleteLeaveStatus, message: 'Leave deleted' });
+      res
+        .status(200)
+        .send({ response: deleteLeaveStatus, message: 'Leave deleted' });
     } catch (error) {
       next(error);
     }
@@ -201,7 +215,7 @@ class LeaveManagementController {
           isApproved
         );
       res.status(200).send({
-        status: approveLeaveStatus,
+        response: approveLeaveStatus,
         message: `Leave ${
           isApproved.isApproved === 'Approved' ? 'Approved' : 'Rejected'
         }`,

@@ -10,6 +10,7 @@ import EmailService from './email.service';
 import { Mail } from '@/interfaces/mailPayload.interface';
 import { User } from 'aws-sdk/clients/budgets';
 import { clearConfigCache } from 'prettier';
+import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 
 class LeaveManagementService {
   public user = DB.User;
@@ -32,7 +33,10 @@ class LeaveManagementService {
     return loggedUser.role === 'Student';
   }
 
-  public async getLeave({ loggedUser, queryObject }) {
+  public async getLeave({
+    loggedUser,
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       this.isInstructor(loggedUser) ||
@@ -50,7 +54,7 @@ class LeaveManagementService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
       : ['', DB.Sequelize.Op.ne];
 
-    const findLeave = await this.manageLeave.findAll({
+    const findLeave = await this.manageLeave.findAndCountAll({
       include: [
         {
           model: this.user,
@@ -71,10 +75,13 @@ class LeaveManagementService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return findLeave;
+    return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
-  public async getLeaveView({ loggedUser, queryObject }) {
+  public async getLeaveView({
+    loggedUser,
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -89,7 +96,7 @@ class LeaveManagementService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
       : ['', DB.Sequelize.Op.ne];
 
-    const findLeave = await this.manageLeave.findAll({
+    const findLeave = await this.manageLeave.findAndCountAll({
       include: [
         {
           model: this.user,
@@ -109,19 +116,17 @@ class LeaveManagementService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return findLeave;
+    return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
-  public async createLeave(loggedUser, leaveData) {
+  public async createLeave(loggedUser, leaveData): Promise<AddLeaveData> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
+    // if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
+    //   throw new HttpException(403, 'Forbidden Resource');
+    // }
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
 
-    const findLivestream = await this.livestream.findByPk(
-      leaveData.livestreamId
-    );
+    const findLivestream = await this.livestream.findByPk(leaveData.LiveStream);
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     if (this.isInstructor(loggedUser)) {
@@ -153,9 +158,9 @@ class LeaveManagementService {
     const checkLeave = await this.manageLeave.findOne({
       where: {
         Date: leaveData.Date,
-        LeaveReason: leaveData.leaveReason,
-        LeaveType: leaveData.leaveType,
-        livestreamId: leaveData.livestreamId,
+        LeaveReason: leaveData.LeaveReason,
+        LeaveType: leaveData.LeaveType,
+        livestreamId: leaveData.LiveStream,
         isInstructor: this.isInstructor(loggedUser),
         isStudent: this.isStudent(loggedUser),
         UserId: loggedUser.id,
@@ -166,9 +171,9 @@ class LeaveManagementService {
 
     const createLeave = await this.manageLeave.create({
       Date: leaveData.Date,
-      LeaveReason: leaveData.leaveReason,
-      LeaveType: leaveData.leaveType,
-      livestreamId: leaveData.livestreamId,
+      LeaveReason: leaveData.LeaveReason,
+      LeaveType: leaveData.LeaveType,
+      livestreamId: leaveData.LiveStream,
       isInstructor: this.isInstructor(loggedUser),
       isStudent: this.isStudent(loggedUser),
       UserId: loggedUser.id,
@@ -216,9 +221,9 @@ class LeaveManagementService {
     const updateLeave = await this.manageLeave.update(
       {
         Date: leaveData.Date,
-        LeaveReason: leaveData.leaveReason,
-        LeaveType: leaveData.leaveType,
-        livestreamId: leaveData.livestreamId,
+        LeaveReason: leaveData.LeaveReason,
+        LeaveType: leaveData.LeaveType,
+        livestreamId: leaveData.LiveStream,
       },
       {
         where: { id: leaveId },
@@ -292,7 +297,10 @@ class LeaveManagementService {
     });
   }
 
-  public async getLeaveByStudent({ loggedUser, queryObject }) {
+  public async getLeaveByStudent({
+    loggedUser,
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       !this.isInstructor(loggedUser) &&
@@ -306,7 +314,7 @@ class LeaveManagementService {
       where: { userId: loggedUser.id },
     });
 
-    const findLeave = await this.manageLeave.findAll({
+    const findLeave = await this.manageLeave.findAndCountAll({
       where: {
         UserId: loggedUser.id,
         livestreamId: instructorLivestream.map((livestream) => livestream.id),
@@ -321,10 +329,13 @@ class LeaveManagementService {
       ],
     });
 
-    return findLeave;
+    return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
-  public async getLeaveByInstructor({ loggedUser, queryObject }) {
+  public async getLeaveByInstructor({
+    loggedUser,
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       !this.isInstructor(loggedUser) &&
@@ -338,7 +349,7 @@ class LeaveManagementService {
       where: { userId: loggedUser.id },
     });
 
-    const findLeave = await this.manageLeave.findAll({
+    const findLeave = await this.manageLeave.findAndCountAll({
       where: {
         UserId: loggedUser.id,
         livestreamId: instructorLivestream.map((livestream) => livestream.id),
@@ -353,7 +364,7 @@ class LeaveManagementService {
       ],
     });
 
-    return findLeave;
+    return { totalCount: findLeave.count, records: findLeave.rows };
   }
 }
 export default LeaveManagementService;

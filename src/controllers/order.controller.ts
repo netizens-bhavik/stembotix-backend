@@ -32,6 +32,10 @@ class OrderController {
         queryObject,
         trainer,
       });
+      // const response: {
+      //   totalCount: number;
+      //   records: (OrderItem | undefined)[];
+      // } = await this.orderService.listOrdersByAdmin({queryObject, trainer});
       res.status(200).send(response);
     } catch (error) {
       next(error);

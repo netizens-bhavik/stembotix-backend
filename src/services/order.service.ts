@@ -26,16 +26,17 @@ class OrderService {
   public isTrainer(user): boolean {
     return user.role === 'Admin';
   }
-  public async listOrdersByAdmin({
-    trainer,
-    queryObject,
-  }) {
+  public async listOrdersByAdmin({ trainer, queryObject }) {
     const OrderData = await this.orderData.getOrderData({
       trainer,
       queryObject,
     });
     return OrderData;
   }
+
+  // public isTrainer(user): boolean {
+  //   return user.role === 'Instructor' || user.role === 'Admin';
+  // }
 
   public async listOrders(userId: string) {
     const data = await this.order.findAll({
