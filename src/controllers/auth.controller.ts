@@ -30,7 +30,6 @@ class AuthController {
   public logIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password, cookie } = req.body;
-
       const { refreshToken, accessToken, user } = await this.authService.login({
         email,
         password,
