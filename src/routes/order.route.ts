@@ -22,6 +22,11 @@ class OrderRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.orderController.listOrders
     );
+    this.router.get(
+      `/admin${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.orderController.listOrdersByAdmin
+    );
     this.router.post(
       `${this.path}`,
       [

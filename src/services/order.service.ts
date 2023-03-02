@@ -5,6 +5,12 @@ import { isEmpty } from '@utils/util';
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
+import { OrderItem } from '@/interfaces/order.interface';
+import sequelize from 'sequelize';
+// import { Op } from 'sequelize/types/operators';
+// import { DataTypes, Model, Optional } from "sequelize";
+// const { v4: uuidv4 } = require('uuid');
+// uuidv4();
 
 class OrderService {
   public user = DB.User;
@@ -12,6 +18,10 @@ class OrderService {
   public orderItem = DB.OrderItem;
   public cartItem = DB.CartItem;
   public cart = DB.Cart;
+
+  public isTrainer(user): boolean {
+    return user.role === 'Instructor' || user.role === 'Admin';
+  }
 
   public async listOrders(userId: string) {
     const data = await this.order.findAll({
@@ -37,6 +47,72 @@ class OrderService {
     });
     if (!data) throw new HttpException(404, 'No order exist');
     return data;
+  }
+  public async listOrdersByAdmin({
+    trainer,
+    queryObject,
+  }): Promise<{ totalCount: number; records: (OrderItem | undefined)[] }> {
+    if (!this.isTrainer(trainer)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const orderData = await this.orderItem.findAndCountAll({
+      where: { deletedAt: null },
+    });
+    const data = await this.order.findAll({
+      include: [
+        {
+          model: DB.User,
+          where: DB.Sequelize.or(
+            {
+              firstName: {
+                [searchCondition]: search,
+              },
+            },
+            {
+              lastName: {
+                [searchCondition]: search,
+              },
+            }
+          ),
+        },
+
+        {
+          model: this.orderItem,
+          // where: DB.Sequelize.and({
+          //   item_type: { [sequelize.Op.in]: ['Product', 'Course'] },
+          // }),
+          include: [
+            {
+              model: DB.Product,
+            },
+            {
+              model: DB.Course,
+
+              include: [
+                {
+                  model: DB.Trainer,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      subQuery: false,
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: orderData.count, records: data };
   }
   public async addOrder(userId: string, amount: number) {
     // Razorpay Instance
