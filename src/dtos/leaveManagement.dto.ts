@@ -17,13 +17,13 @@ export class leaveManagementRequestDTO {
   public Date: Date;
 
   @IsString()
-  public leaveReason: string;
+  public LeaveReason: string;
 
-  @IsEnum(['Sick', 'Casual', 'Earned'])
-  public leaveType: string;
+  @IsEnum(['Sick', 'Paid', 'Unpaid'])
+  public LeaveType: string;
 
   @IsUUID()
-  public livestreamId: string;
+  public LiveStream: string;
 }
 
 export class leaveManagementDateRequestDTO {

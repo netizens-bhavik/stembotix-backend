@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       LeaveType: {
-        type: Sequelize.ENUM('Sick', 'Casual', 'Earned'),
+        type: Sequelize.ENUM('Sick', 'Paid', 'Unpaid'),
         allowNull: false,
         defaultValue: 'Casual',
       },
