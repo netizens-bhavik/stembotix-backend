@@ -27,7 +27,7 @@ module.exports = (sequelize, Sequelize) => {
   );
   InstructorHasLeave.associate = (models) => {
     InstructorHasLeave.belongsTo(models.InstituteInstructor, {
-      foreignKey: 'InstructorId',
+      foreignKey: 'InstituteInstructorId',
       targetKey: 'id',
       as: 'InstructorLeave',
     });

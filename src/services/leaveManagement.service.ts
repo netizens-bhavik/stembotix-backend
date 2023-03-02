@@ -9,12 +9,14 @@ import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface'
 import EmailService from './email.service';
 import { Mail } from '@/interfaces/mailPayload.interface';
 import { User } from 'aws-sdk/clients/budgets';
+import { clearConfigCache } from 'prettier';
 
 class LeaveManagementService {
   public user = DB.User;
   public instructor = DB.Instructor;
   public livestream = DB.LiveStream;
   public manageLeave = DB.ManageLeaves;
+  public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
   public emailService = new EmailService();
 
@@ -30,7 +32,7 @@ class LeaveManagementService {
     return loggedUser.role === 'Student';
   }
 
-  public async getLeave(loggedUser, queryObject) {
+  public async getLeave({ loggedUser, queryObject }) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       this.isInstructor(loggedUser) ||
@@ -38,7 +40,6 @@ class LeaveManagementService {
     ) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination
@@ -49,19 +50,61 @@ class LeaveManagementService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
       : ['', DB.Sequelize.Op.ne];
 
-    const findLeave = await this.manageLeave.findAndCountAll({
+    const findLeave = await this.manageLeave.findAll({
       include: [
         {
           model: this.user,
-          attributes: ['id', 'firstName', 'lastName', 'email'],
+          attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
           as: 'ManageUserLeave',
-          where: {
-            firstName: { [searchCondition]: search },
-            lastName: { [searchCondition]: search },
-            email: { [searchCondition]: search },
-          },
+          where: DB.Sequelize.or(
+            { firstName: { [searchCondition]: search } },
+            { lastName: { [searchCondition]: search } },
+            { email: { [searchCondition]: search } }
+          ),
+        },
+        {
+          model: this.livestream,
+          attributes: ['id', 'title'],
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return findLeave;
+  }
+
+  public async getLeaveView({ loggedUser, queryObject }) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      : ['', DB.Sequelize.Op.ne];
+
+    const findLeave = await this.manageLeave.findAll({
+      include: [
+        {
+          model: this.user,
+          attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
+          as: 'ManageUserLeave',
+          where: DB.Sequelize.or(
+            { firstName: { [searchCondition]: search } },
+            { lastName: { [searchCondition]: search } },
+            { email: { [searchCondition]: search } }
+          ),
+        },
+      ],
+      where: {
+        UserId: loggedUser.id,
+      },
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -82,19 +125,29 @@ class LeaveManagementService {
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     if (this.isInstructor(loggedUser)) {
-      const leaveType = `${leaveData.leaveType}LeaveCount`;
-      console.log(leaveType);
-
-      const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
+      const findInstitute = await this.instituteInstructor.findAll({
         where: {
-          UserId: loggedUser.id,
-          [leaveType]: 0,
+          InstructorId: loggedUser.id,
         },
       });
 
-      if (isCreated) {
-        console.log('created');
-      }
+      if (!findInstitute)
+        throw new HttpException(
+          409,
+          'Instructor is not associated with any institute'
+        );
+
+      console.log(findInstitute);
+
+      // const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
+      //   where: {
+      //     UserId: loggedUser.id,
+      //   },
+      // });
+
+      // if (isCreated) {
+      //   console.log('created');
+      // }
     }
 
     const checkLeave = await this.manageLeave.findOne({
@@ -212,6 +265,95 @@ class LeaveManagementService {
     });
 
     return updateLeave;
+  }
+
+  public async getEventsByDate(loggedUser, date) {
+    const newDate = new Date(date);
+
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    // if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
+    //   throw new HttpException(403, 'Forbidden Resource');
+    // }
+    if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
+
+    const findEvents = await this.livestream.findAll({
+      where: { date: newDate },
+      attributes: ['id', 'date', 'startTime', 'endTime', 'title'],
+    });
+
+    return findEvents.map((event) => {
+      return {
+        id: event.id,
+        date: event.date,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        title: event.title,
+      };
+    });
+  }
+
+  public async getLeaveByStudent({ loggedUser, queryObject }) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (
+      !this.isInstructor(loggedUser) &&
+      !this.isInstitute(loggedUser) &&
+      this.isStudent(loggedUser)
+    ) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
+    const instructorLivestream = await this.livestream.findAll({
+      where: { userId: loggedUser.id },
+    });
+
+    const findLeave = await this.manageLeave.findAll({
+      where: {
+        UserId: loggedUser.id,
+        livestreamId: instructorLivestream.map((livestream) => livestream.id),
+        isStudent: true,
+      },
+      include: [
+        {
+          model: this.user,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          as: 'ManageUserLeave',
+        },
+      ],
+    });
+
+    return findLeave;
+  }
+
+  public async getLeaveByInstructor({ loggedUser, queryObject }) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (
+      !this.isInstructor(loggedUser) &&
+      this.isInstitute(loggedUser) &&
+      !this.isStudent(loggedUser)
+    ) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
+    const instructorLivestream = await this.livestream.findAll({
+      where: { userId: loggedUser.id },
+    });
+
+    const findLeave = await this.manageLeave.findAll({
+      where: {
+        UserId: loggedUser.id,
+        livestreamId: instructorLivestream.map((livestream) => livestream.id),
+        isInstructor: true,
+      },
+      include: [
+        {
+          model: this.user,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          as: 'ManageUserLeave',
+        },
+      ],
+    });
+
+    return findLeave;
   }
 }
 export default LeaveManagementService;
