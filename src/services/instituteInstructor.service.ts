@@ -172,8 +172,9 @@ class InstituteInstructorService {
     totalCount: number;
     records: (InstructorInstitute | undefined)[];
   }> {
-    if (isEmpty(trainer) || !this.isInstitute(trainer))
+    if (!this.isInstitute(trainer)) {
       throw new HttpException(401, 'Unauthorized');
+    }
 
     // // sorting
     const order = queryObject.order || 'DESC';
@@ -188,7 +189,7 @@ class InstituteInstructorService {
     const coursesCount = await this.instituteInstructor.findAndCountAll({
       include: {
         model: this.user,
-        attributes: ['fullName', 'firstName', 'lastName', 'email'],
+        attributes: ['fullName', 'firstName', 'lastName', 'email','id','email','role'],
         as: 'Institute',
         where: DB.Sequelize.or(
           {
@@ -209,6 +210,25 @@ class InstituteInstructorService {
     });
 
     return { totalCount: coursesCount.count, records: coursesCount.rows };
+  }
+
+  public async viewRequest(user, instructor) {
+    if (!user) throw new HttpException(403, 'Unauthorized');
+    const response = await this.instituteInstructor.findOne({
+      where: DB.Sequelize.and(
+        {
+          instructor_id: instructor.instructorId,
+        },
+        {
+          institute_id: user.id,
+        }
+      ),
+    });
+    return (
+      response ?? {
+        message: 'no data found',
+      }
+    );
   }
 }
 export default InstituteInstructorService;

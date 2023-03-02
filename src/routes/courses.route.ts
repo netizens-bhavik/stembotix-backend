@@ -41,7 +41,7 @@ class CourseRoute implements Routes {
       this.courseController.getCourseById
     );
     this.router.get(
-      `/trainerRecord${this.path}`,
+      `/trainerRecord`,
       passport.authenticate('jwt', { session: false }),
       this.courseController.getDetailByTrainer
     );

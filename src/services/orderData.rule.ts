@@ -24,13 +24,13 @@ export class OrderData {
     let recommendation = [];
 
     recommendation = [];
-    recommendation = await this.listOrdersByAdmin({ trainer, queryObject });
+    recommendation = await this.searchByUserName({ trainer, queryObject });
     recommendation = await this.getOrdersByAdmin({ trainer, queryObject });
 
     return recommendation;
   }
 
-  public async listOrdersByAdmin({
+  public async searchByUserName({
     trainer,
     queryObject,
   }){
@@ -46,10 +46,6 @@ export class OrderData {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
-    // const orderData = await this.orderItem.findAndCountAll({
-    //   where: { deletedAt: null },
-    // });
     const recommendation = await this.order.findAll({
       include: [
         {
@@ -67,7 +63,7 @@ export class OrderData {
             }
           ),
         },
-        { model: this.orderItem },
+        { model: DB.OrderItem },
       ],
 
       limit: pageSize,
@@ -89,14 +85,14 @@ export class OrderData {
     // const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     // const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // // Search
-    // const [search, searchCondition] = queryObject.search
-    //   ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-    //   : ['', DB.Sequelize.Op.ne];
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
 
     const recommendation = await this.orderItem.findAll({
-      // where: {
-      //   item_type: { [searchCondition]: search },
-      // },
+      where: {
+        item_type: { [searchCondition]: search },
+      },
     //   limit: pageSize,
     //   offset: pageNo,
     //   order: [[`${sortBy}`, `${order}`]],

@@ -44,8 +44,7 @@ class LeaveManagementService {
     ) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -58,6 +57,10 @@ class LeaveManagementService {
       include: [
         {
           model: this.user,
+          order: [
+            [{ model: this.user }, 'firstName', order],
+            [{ model: this.user }, 'lastName', order],
+          ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
           as: 'ManageUserLeave',
           where: DB.Sequelize.or(
@@ -73,7 +76,6 @@ class LeaveManagementService {
       ],
       limit: pageSize,
       offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
@@ -86,8 +88,8 @@ class LeaveManagementService {
     if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
+    // const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC'
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -100,6 +102,10 @@ class LeaveManagementService {
       include: [
         {
           model: this.user,
+          order: [
+            [{ model: this.user }, 'firstName', order],
+            [{ model: this.user }, 'lastName', order],
+          ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
           as: 'ManageUserLeave',
           where: DB.Sequelize.or(
@@ -108,13 +114,15 @@ class LeaveManagementService {
             { email: { [searchCondition]: search } }
           ),
         },
+        {
+          model: this.livestream,
+        },
       ],
       where: {
         UserId: loggedUser.id,
       },
       limit: pageSize,
       offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
@@ -142,8 +150,6 @@ class LeaveManagementService {
           'Instructor is not associated with any institute'
         );
 
-      console.log(findInstitute);
-
       // const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
       //   where: {
       //     UserId: loggedUser.id,
@@ -158,7 +164,7 @@ class LeaveManagementService {
     const checkLeave = await this.manageLeave.findOne({
       where: {
         Date: leaveData.Date,
-        LeaveReason: leaveData.LeaveReason,
+        // LeaveReason: leaveData.LeaveReason,
         LeaveType: leaveData.LeaveType,
         livestreamId: leaveData.LiveStream,
         isInstructor: this.isInstructor(loggedUser),

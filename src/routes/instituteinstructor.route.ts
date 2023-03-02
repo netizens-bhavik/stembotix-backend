@@ -92,6 +92,11 @@ class InstituteInstroctorRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.getDataByAdmin
     );
+    this.router.get(
+      `${this.path}/hire-status`,
+      passport.authenticate('jwt', { session: false }),
+      this.instituteInstuctorController.viewRequest
+    );
   }
 }
 

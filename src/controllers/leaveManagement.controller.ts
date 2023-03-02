@@ -146,7 +146,6 @@ class LeaveManagementController {
     try {
       const loggedUser = req.user;
       const leaveId = req.params.id;
-      // console.log(leaveId);
       const findLeave = await this.leaveManagementService.getLeaveById(
         loggedUser,
         leaveId

@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
   );
   ManageLeaves.associate = (models) => {
     ManageLeaves.belongsTo(models.User, {
-      foreignKey: 'UserId',
+      foreignKey: 'userId',
       targetKey: 'id',
       as: 'ManageUserLeave',
     });

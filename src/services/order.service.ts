@@ -83,6 +83,7 @@ class OrderService {
   //   const orderData = await this.orderItem.findAndCountAll({
   //     where: { deletedAt: null },
   //   });
+
   //   const data = await this.order.findAll({
   //     include: [
   //       {
@@ -100,13 +101,46 @@ class OrderService {
   //           }
   //         ),
   //       },
+
+  //       {
+  //         model: DB.OrderItem,
+  //         // where: DB.Sequelize.and({
+  //         //   item_type: { [sequelize.Op.in]: ['Product', 'Course'] },
+  //         // }),
+  //         include: [
+  //           {
+  //             model: DB.Product,
+  //             // where: {
+  //             //   title: {
+  //             //     [searchCondition]: search,
+  //             //   },
+  //             // },
+  //           },
+  //           {
+  //             model: DB.Course,
+  //             where: {
+  //               title: {
+  //                 [searchCondition]: search,
+  //               },
+  //             },
+
+  //             include: [
+  //               {
+  //                 model: DB.Trainer,
+  //               },
+  //             ],
+  //           },
+  //         ],
+  //       },
   //     ],
+  //     subQuery: false,
   //     limit: pageSize,
   //     offset: pageNo,
   //     order: [[`${sortBy}`, `${order}`]],
   //   });
   //   return { totalCount: orderData.count, records: data };
   // }
+
   // public async listOrdersByAdmin({
   //   trainer,
   //   queryObject,
