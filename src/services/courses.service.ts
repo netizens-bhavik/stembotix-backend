@@ -157,7 +157,6 @@ class CourseService {
       trailer: trailerPath,
       thumbnail: thumbnailPath,
     });
-    console.log(newCourse)
 
 
     newCourse.addTrainer(trainerRecord);
