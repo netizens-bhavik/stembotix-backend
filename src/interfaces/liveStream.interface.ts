@@ -11,6 +11,7 @@ export interface LiveStream {
   startTime: Time;
   endTime: Time;
   categories: string;
+  instituteId: string;
 }
 
 export interface Subscribe {

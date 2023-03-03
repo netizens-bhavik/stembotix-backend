@@ -22,15 +22,15 @@ class LeaveManagementRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `/admin${this.path}/`,
+      `/admin${this.path}`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeave
+      this.leaveManagementController.getLeaveByAdmin
     );
 
     this.router.get(
-      `${this.path}/view`,
+      `/instructor${this.path}`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveView
+      this.leaveManagementController.getLeaveViewbyInstructor
     );
 
     this.router.post(
@@ -40,12 +40,6 @@ class LeaveManagementRoute implements Routes {
         validationMiddleware(leaveManagementDateRequestDTO, 'body'),
       ],
       this.leaveManagementController.getEventsByDate
-    );
-
-    this.router.get(
-      `${this.path}/student`,
-      [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveByStudent
     );
 
     this.router.get(
