@@ -1,6 +1,6 @@
 import { hash } from 'bcrypt';
 import DB from '@databases';
-import { RegisterUserDto, LoginUserDto } from '@dtos/users.dto';
+import { RegisterUserDto, LoginUserDto, RegisterUserDTO } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
@@ -66,7 +66,7 @@ class UserService {
   public async updateUser(
     loggedUser,
     userId: string,
-    userData: RegisterUserDto
+    userData: RegisterUserDTO
   ): Promise<User> {
     if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
       throw new HttpException(403, 'Access Forbidden');

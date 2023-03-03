@@ -78,12 +78,11 @@ class InstituteInstructorService {
     return createInstituteInstructor;
   }
 
-  public async acceptApproval(offerId, is_accepted, loggedUser) {
-    if (!this.isInstructor(loggedUser)) {
+  public async acceptApproval(offerId, loggedUser,isAcceptedCount): Promise<{ count: number }> {
+    if (!this.isInstructor(loggedUser))
       throw new HttpException(403, 'Forbidden Resource');
-    }
 
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (!loggedUser) {throw new HttpException(401, 'Unauthorized')};
 
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
@@ -94,21 +93,20 @@ class InstituteInstructorService {
       throw new HttpException(409, 'Your Request is not found');
     }
 
+
+        let isAccepted = isAcceptedCount.count ===0  ? 'Accepted'
+        : 'Rejected';
+
+
     const updateOffer = await this.instituteInstructor.update(
-      { isAccepted: is_accepted },
+      {isAccepted },
       {
         where: {
           id: offerId,
         },
-        returning: true,
       }
     );
-    // if(updateOffer){
-    //   const mailData:Mail={
-    //     templateData:
-    //   }
-    // }
-    return updateOffer;
+    return  {count:isAcceptedCount.count} ;
   }
 
   public async deleteInstituteRequest(loggedUser, offerId) {
@@ -157,7 +155,10 @@ class InstituteInstructorService {
     return resposnse;
   }
 
-  public async getReqByInstructorId(user): Promise<InstructorInstitute> {
+  public async getReqByInstructorId(user): Promise<{
+    totalCount: number;
+    records: (InstructorInstitute | undefined)[];
+  }> {
     if (!this.isInstructor(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -166,14 +167,15 @@ class InstituteInstructorService {
         instructor_id: user.id,
       },
     });
-    return response;
+    return { totalCount: response.count, records: response.rows };
   }
   public async getDataByAdmin({ trainer, queryObject }): Promise<{
     totalCount: number;
     records: (InstructorInstitute | undefined)[];
   }> {
-    if (isEmpty(trainer) || !this.isInstitute(trainer))
+    if (!this.isInstitute(trainer)) {
       throw new HttpException(401, 'Unauthorized');
+    }
 
     // // sorting
     const order = queryObject.order || 'DESC';
@@ -188,7 +190,15 @@ class InstituteInstructorService {
     const coursesCount = await this.instituteInstructor.findAndCountAll({
       include: {
         model: this.user,
-        attributes: ['fullName', 'firstName', 'lastName', 'email'],
+        attributes: [
+          'fullName',
+          'firstName',
+          'lastName',
+          'email',
+          'id',
+          'email',
+          'role',
+        ],
         as: 'Institute',
         where: DB.Sequelize.or(
           {
@@ -209,6 +219,25 @@ class InstituteInstructorService {
     });
 
     return { totalCount: coursesCount.count, records: coursesCount.rows };
+  }
+
+  public async viewRequest(user, instructor) {
+    if (!user) throw new HttpException(403, 'Unauthorized');
+    const response = await this.instituteInstructor.findOne({
+      where: DB.Sequelize.and(
+        {
+          instructor_id: instructor.instructorId,
+        },
+        {
+          institute_id: user.id,
+        }
+      ),
+    });
+    return (
+      response ?? {
+        message: 'no data found',
+      }
+    );
   }
 }
 export default InstituteInstructorService;

@@ -20,6 +20,17 @@ class SubscriptionService {
       key_id: RAZORPAY_KEY_ID,
       key_secret: RAZORPAY_KEY_SECRET,
     });
+    const restrictedUser = await this.user.findOne({
+      where: DB.Sequelize.and(
+        {
+          id: user.id,
+        },
+        {
+          is_email_verified: false,
+        }
+      ),
+    });
+    if (restrictedUser) throw new HttpException(403, 'Forbidden Recources');
     const response = await this.subscribelivestream.findOne({
       where: DB.Sequelize.and(
         {
@@ -81,10 +92,10 @@ class SubscriptionService {
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);
     hmac.update(razorpay_order_id + '|' + payment_id);
-    // const digest = hmac.digest('hex');
+    const digest = hmac.digest('hex');
 
-    // if (digest !== razorpay_signature)
-    //   throw new HttpException(400, 'Transaction is not legit');
+    if (digest !== razorpay_signature)
+      throw new HttpException(400, 'Transaction is not legit');
 
     const paymentData = {
       payment_id,

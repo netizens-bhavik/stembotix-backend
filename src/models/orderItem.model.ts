@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
       },
       item_type: {
-        type: Sequelize.ENUM(['Product', 'Course']),
+        type: Sequelize.STRING,
       },
       quantity: {
         type: Sequelize.INTEGER,

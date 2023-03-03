@@ -9,8 +9,9 @@ export interface Course {
   language: string;
   status: string;
   avgRating: string;
+  coursetypeId: string;
 }
-export interface AvgRating{
+export interface AvgRating {
   id: string;
   title: string;
   price: number;
