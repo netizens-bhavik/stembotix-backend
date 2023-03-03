@@ -15,25 +15,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      LeaveType: {
-        type: Sequelize.ENUM('Sick', 'Paid', 'Unpaid'),
-        allowNull: false,
-        defaultValue: 'Casual',
-      },
       isApproved: {
         type: Sequelize.ENUM('Pending', 'Approved', 'Rejected'),
         allowNull: false,
         defaultValue: 'Pending',
-      },
-      isInstructor: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      isStudent: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
     },
     { paranoid: true }
@@ -48,11 +33,11 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'livestreamId',
       targetKey: 'id',
     });
-    // ManageLeaves.belongsTo(models.User, {
-    //   foreignKey: 'LeaveId',
-    //   targetKey: 'id',
-    //   as: 'Leave',
-    // });
+
+    ManageLeaves.belongsTo(models.LeaveTypes, {
+      foreignKey: 'LeaveTypeId',
+      targetKey: 'id',
+    });
   };
   return ManageLeaves;
 };

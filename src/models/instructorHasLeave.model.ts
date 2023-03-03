@@ -19,13 +19,16 @@ module.exports = (sequelize, Sequelize) => {
     InstructorHasLeave.belongsTo(models.InstituteInstructor, {
       foreignKey: 'InstituteInstructorId',
       targetKey: 'id',
-      as: 'InstructorLeave',
     });
-    InstructorHasLeave.belongsTo(models.LeaveTypes, {
-      foreignKey: 'LeaveTypeId',
-      targetKey: 'id',
-      as: 'LeaveType',
-    });
+    // InstructorHasLeave.belongsTo(models.LeaveTypes, {
+    //   foreignKey: 'LeaveTypeId',
+    //   targetKey: 'id',
+    // });
+    // InstructorHasLeave.belongsTo(models.LeaveTypes, {
+    //   foreignKey: 'LeaveTypeId',
+    //   targetKey: 'id',
+    //   as: 'LeaveType',
+    // });
   };
   return InstructorHasLeave;
 };

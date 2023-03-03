@@ -19,8 +19,8 @@ export class leaveManagementRequestDTO {
   @IsString()
   public LeaveReason: string;
 
-  @IsEnum(['Sick', 'Paid', 'Unpaid'])
-  public LeaveType: string;
+  @IsUUID()
+  public LeaveTypeId: string;
 
   @IsUUID()
   public LiveStream: string;

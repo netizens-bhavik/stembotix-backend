@@ -33,6 +33,10 @@ module.exports = (sequelize, Sequelize) => {
       sourceKey: 'id',
       as: 'LeaveType',
     });
+    LeaveTypes.hasMany(models.ManageLeaves, {
+      foreignKey: 'LeaveTypeId',
+      sourceKey: 'id',
+    });
   };
   return LeaveTypes;
 };

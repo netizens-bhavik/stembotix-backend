@@ -112,6 +112,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.LiveStream, {
+      foreignKey: 'instituteId',
+      targetKey: 'id',
+    });
     User.hasMany(models.SubscribeEvent, {
       foreignKey: 'userId',
       targetKey: 'id',

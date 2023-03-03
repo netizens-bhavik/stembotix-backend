@@ -593,11 +593,11 @@ class CourseService {
       include: [
         {
           model: this.user,
-          attributes: ['firstName', 'lastName', 'fullName','role'],
-          
+          attributes: ['firstName', 'lastName', 'fullName', 'role'],
+
           where: {
             role: {
-              [DB.Sequelize.Op.not]: 'Admin'
+              [DB.Sequelize.Op.not]: 'Admin',
             },
             [DB.Sequelize.Op.or]: [
               {
@@ -606,10 +606,8 @@ class CourseService {
               {
                 lastName: { [searchCondition]: search },
               },
-            ]
+            ],
           },
-
-         
         },
         {
           model: this.course,

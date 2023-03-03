@@ -28,9 +28,9 @@ class LeaveManagementRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/view`,
+      `/instructor${this.path}`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveView
+      this.leaveManagementController.getLeaveViewbyInstructor
     );
 
     this.router.post(
@@ -40,12 +40,6 @@ class LeaveManagementRoute implements Routes {
         validationMiddleware(leaveManagementDateRequestDTO, 'body'),
       ],
       this.leaveManagementController.getEventsByDate
-    );
-
-    this.router.get(
-      `${this.path}/student`,
-      [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveByStudent
     );
 
     this.router.get(
