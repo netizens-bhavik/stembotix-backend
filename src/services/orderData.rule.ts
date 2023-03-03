@@ -23,17 +23,15 @@ export class OrderData {
   public async getOrderData({ trainer, queryObject }) {
     let recommendation = [];
 
-    recommendation = [];
+    // recommendation = [];
     recommendation = await this.searchByUserName({ trainer, queryObject });
-    recommendation = await this.getOrdersByAdmin({ trainer, queryObject });
-
+    console.log(recommendation.length);
+    recommendation = await this.searchByItemType({ trainer, queryObject });
+    console.log(recommendation.length);
     return recommendation;
   }
 
-  public async searchByUserName({
-    trainer,
-    queryObject,
-  }){
+  public async searchByUserName({ trainer, queryObject }) {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -63,7 +61,6 @@ export class OrderData {
             }
           ),
         },
-        { model: DB.OrderItem },
       ],
 
       limit: pageSize,
@@ -72,31 +69,30 @@ export class OrderData {
     });
     return recommendation;
   }
-  public async getOrdersByAdmin({
-    trainer,
-    queryObject,
-  }){
+  public async searchByItemType({ trainer, queryObject }) {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    // const order = queryObject.order || 'DESC';
-    // // pagination
-    // const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-    // const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-    // // Search
+
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const recommendation = await this.orderItem.findAll({
+    const recommendation = await this.order.findAll({
       where: {
         item_type: { [searchCondition]: search },
       },
-    //   limit: pageSize,
-    //   offset: pageNo,
-    //   order: [[`${sortBy}`, `${order}`]],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
+
     return recommendation;
   }
 }

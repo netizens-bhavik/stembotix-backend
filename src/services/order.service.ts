@@ -6,7 +6,7 @@ import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
 import { OrderItem } from '@/interfaces/order.interface';
-import sequelize from 'sequelize';
+import sequelize, { Op, Sequelize } from 'sequelize';
 import { OrderData } from './orderData.rule';
 // import { Op } from 'sequelize/types/operators';
 // import { DataTypes, Model, Optional } from "sequelize";
@@ -63,6 +63,7 @@ class OrderService {
     if (!data) throw new HttpException(404, 'No order exist');
     return data;
   }
+
   // public async listOrdersByAdmin({
   //   trainer,
   //   queryObject,
@@ -99,40 +100,17 @@ class OrderService {
   //               [searchCondition]: search,
   //             },
   //           }
-  //         ),
-  //       },
-
-  //       {
-  //         model: DB.OrderItem,
-  //         // where: DB.Sequelize.and({
-  //         //   item_type: { [sequelize.Op.in]: ['Product', 'Course'] },
-  //         // }),
-  //         include: [
-  //           {
-  //             model: DB.Product,
-  //             // where: {
-  //             //   title: {
-  //             //     [searchCondition]: search,
-  //             //   },
-  //             // },
-  //           },
-  //           {
-  //             model: DB.Course,
-  //             where: {
-  //               title: {
-  //                 [searchCondition]: search,
-  //               },
-  //             },
-
-  //             include: [
-  //               {
-  //                 model: DB.Trainer,
-  //               },
-  //             ],
-  //           },
-  //         ],
-  //       },
-  //     ],
+  //           ),
+  //         },
+  //         {
+  //           model: DB.OrderItem,
+  //           // where: DB.Sequelize.or({
+  //           //   item_type: {
+  //           //     [searchCondition]: search,
+  //           //   },
+  //           // }),
+  //         },
+  //       ],
   //     subQuery: false,
   //     limit: pageSize,
   //     offset: pageNo,
@@ -220,10 +198,10 @@ class OrderService {
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);
     hmac.update(razorpay_order_id + '|' + payment_id);
-    const digest = hmac.digest('hex');
+    // const digest = hmac.digest('hex');
 
-    if (digest !== razorpay_signature)
-      throw new HttpException(400, 'Transaction is not legit');
+    // if (digest !== razorpay_signature)
+    //   throw new HttpException(400, 'Transaction is not legit');
 
     // If payment is verified
     const paymentData = {

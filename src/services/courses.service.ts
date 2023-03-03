@@ -157,6 +157,8 @@ class CourseService {
       trailer: trailerPath,
       thumbnail: thumbnailPath,
     });
+    console.log(newCourse)
+
 
     newCourse.addTrainer(trainerRecord);
     if (newCourse) {
@@ -184,6 +186,7 @@ class CourseService {
       thumbnail: `${API_BASE}/media/${newCourse.thumbnail}`,
       // @ts-ignore
       trailer: `${API_BASE}/media/${newCourse.trailer}`,
+      coursetypeId: newCourse.coursetypeId,
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
       deletedAt: newCourse.deletedAt,
@@ -565,7 +568,7 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  public async getDetailByTrainer(
+  public async getTrainerDetails(
     trainer,
     queryObject
   ): Promise<{
@@ -590,15 +593,23 @@ class CourseService {
       include: [
         {
           model: this.user,
-          attributes: ['firstName', 'lastName', 'fullName'],
-          where: DB.Sequelize.or(
-            {
-              firstName: { [searchCondition]: search },
+          attributes: ['firstName', 'lastName', 'fullName','role'],
+          
+          where: {
+            role: {
+              [DB.Sequelize.Op.not]: 'Admin'
             },
-            {
-              lastName: { [searchCondition]: search },
-            }
-          ),
+            [DB.Sequelize.Op.or]: [
+              {
+                firstName: { [searchCondition]: search },
+              },
+              {
+                lastName: { [searchCondition]: search },
+              },
+            ]
+          },
+
+         
         },
         {
           model: this.course,
@@ -644,7 +655,7 @@ class CourseService {
         user.forEach((user) => {
           allUser.push(user);
         });
-        
+
         let ratings = course.Reviews;
         ratings.forEach((rating) => {
           allRating.push(rating.rating);
@@ -653,11 +664,10 @@ class CourseService {
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
-      const rating = avgRating ? Number.parseFloat(avgRating as unknown as string).toFixed(1) : "0";
-      row.setDataValue(
-        'avgRating',
-        rating
-      );
+      const rating = avgRating
+        ? Number.parseFloat(avgRating as unknown as string).toFixed(1)
+        : '0';
+      row.setDataValue('avgRating', rating);
       let allUserLength = allUser.length;
       row.setDataValue('allUserCount', allUserLength);
       avgRatingResponse.push(row);

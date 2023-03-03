@@ -37,7 +37,7 @@ class InstituteInstroctorRoute implements Routes {
 
     //to view request for institute by instructor
     this.router.get(
-      `${this.path}/institute`,
+      `${this.path}/institute-hire-status-list`,
       [passport.authenticate('jwt', { session: false })],
       this.instituteInstuctorController.getInstitueRequest
     );
@@ -62,10 +62,9 @@ class InstituteInstroctorRoute implements Routes {
     //for instructor to approve
     this.router.put(
       `${this.path}/request-instructor/:offerId`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(InstituteInstructorIdDTO, 'body'),
-      ],
+
+      passport.authenticate('jwt', { session: false }),
+
       this.instituteInstuctorController.acceptInstructorRequest
     );
 
@@ -81,14 +80,14 @@ class InstituteInstroctorRoute implements Routes {
 
     // get all req by Instrutor Id
     this.router.get(
-      `${this.path}/instructor`,
+      `${this.path}/instructor-hire-status-list`,
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.getReqByInstructorId
     );
 
     // get all request by Admin
     this.router.get(
-      `${this.path}/list`,
+      `/admin${this.path}/hire-status-list`,
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.getDataByAdmin
     );

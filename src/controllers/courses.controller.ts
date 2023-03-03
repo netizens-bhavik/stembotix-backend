@@ -214,7 +214,7 @@ class CourseController {
     }
   };
 
-  public getDetailByTrainer = async (
+  public getTrainerDetails = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -224,7 +224,7 @@ class CourseController {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Course | undefined)[] } =
-        await this.courseService.getDetailByTrainer(trainer, queryObject);
+        await this.courseService.getTrainerDetails(trainer, queryObject);
       res.status(200).send(response);
     } catch (error) {
       next(error);

@@ -54,17 +54,16 @@ class InstituteInstructorController {
   ) => {
     try {
       const { offerId } = req.params;
-      const { is_accepted } = req.body;
       const loggedUser = req.user;
-
-      const liveStreamChatResponse: LiveStreamChat =
+      const isAcceptedCount = req.body;
+      const liveStreamChatResponse: { count: number } =
         await this.instituteInstructionService.acceptApproval(
           offerId,
-          is_accepted,
-          loggedUser
+          loggedUser,
+          isAcceptedCount
         );
 
-      res.status(200).json(liveStreamChatResponse);
+      res.status(200).send(liveStreamChatResponse);
     } catch (err) {
       next(err);
     }
@@ -124,8 +123,10 @@ class InstituteInstructorController {
   ) => {
     try {
       const user = req.user;
-      const response =
-        await this.instituteInstructionService.getReqByInstructorId(user);
+      const response: {
+        totalCount: number;
+        records: (InstructorInstitute | undefined)[];
+      } = await this.instituteInstructionService.getReqByInstructorId(user);
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -159,7 +160,7 @@ class InstituteInstructorController {
   ) => {
     try {
       const user = req.user;
-      const  instructor  = req.body;
+      const instructor = req.body;
       const response = await this.instituteInstructionService.viewRequest(
         user,
         instructor
