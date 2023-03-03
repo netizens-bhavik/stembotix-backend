@@ -22,9 +22,9 @@ class LeaveManagementRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `/admin${this.path}/`,
+      `/admin${this.path}`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeave
+      this.leaveManagementController.getLeaveByAdmin
     );
 
     this.router.get(

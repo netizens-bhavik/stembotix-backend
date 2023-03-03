@@ -23,11 +23,8 @@ export class OrderData {
   public async getOrderData({ trainer, queryObject }) {
     let recommendation = [];
 
-    // recommendation = [];
     recommendation = await this.searchByUserName({ trainer, queryObject });
-    console.log(recommendation.length);
-    recommendation = await this.searchByItemType({ trainer, queryObject });
-    console.log(recommendation.length);
+    // recommendation = await this.searchByItemType({ trainer, queryObject });
     return recommendation;
   }
 
@@ -58,11 +55,14 @@ export class OrderData {
               lastName: {
                 [searchCondition]: search,
               },
-            }
+            },
           ),
         },
+        {
+          model: this.orderItem,
+        },
       ],
-
+      subQuery: false,
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -85,9 +85,18 @@ export class OrderData {
       : ['', DB.Sequelize.Op.ne];
 
     const recommendation = await this.order.findAll({
-      where: {
-        item_type: { [searchCondition]: search },
-      },
+      include: [
+        {
+          model: this.orderItem,
+          where: {
+            item_type: { [searchCondition]: search },
+          },
+        },
+        {
+          model: this.user,
+        },
+      ],
+
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],

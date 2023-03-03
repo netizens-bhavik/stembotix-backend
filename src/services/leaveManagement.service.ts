@@ -33,7 +33,7 @@ class LeaveManagementService {
     return loggedUser.role === 'Student';
   }
 
-  public async getLeave({
+  public async getLeaveByAdmin({
     loggedUser,
     queryObject,
   }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {

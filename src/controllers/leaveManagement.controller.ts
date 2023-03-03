@@ -11,7 +11,7 @@ import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 class LeaveManagementController {
   public leaveManagementService = new LeaveManagementService();
 
-  public getLeave = async (req: Request, res: Response, next: NextFunction) => {
+  public getLeaveByAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
@@ -19,7 +19,7 @@ class LeaveManagementController {
       const findLeave: {
         totalCount: number;
         records: (LeaveData | undefined)[];
-      } = await this.leaveManagementService.getLeave({
+      } = await this.leaveManagementService.getLeaveByAdmin({
         loggedUser,
         queryObject,
       });
