@@ -7,7 +7,7 @@ import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
 import { OrderItem } from '@/interfaces/order.interface';
 import sequelize, { Op, Sequelize } from 'sequelize';
-import { OrderData } from './orderData.rule';
+import { OrderData } from '../utils/ruleEngine/orderData.rule';
 // import { Op } from 'sequelize/types/operators';
 // import { DataTypes, Model, Optional } from "sequelize";
 // const { v4: uuidv4 } = require('uuid');
