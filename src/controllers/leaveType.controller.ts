@@ -91,24 +91,24 @@ class LeaveTypeController {
     }
   };
 
-  public toggleLeaveType = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const loggedUser = req.user;
-      const leaveTypeId = req.params.id;
+  // public toggleLeaveType = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const loggedUser = req.user;
+  //     const leaveTypeId = req.params.id;
 
-      const toggleLeave = await this.leaveTypeService.toggleLeaveType({
-        loggedUser,
-        leaveTypeId,
-      });
+  //     const toggleLeave = await this.leaveTypeService.toggleLeaveType({
+  //       loggedUser,
+  //       leaveTypeId,
+  //     });
 
-      res.status(200).send(toggleLeave);
-    } catch (error) {
-      next(error);
-    }
-  };
+  //     res.status(200).send(toggleLeave);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 }
 export default LeaveTypeController;
