@@ -43,11 +43,11 @@ class LeaveTypeRoute implements Routes {
       this.leaveTypeController.deleteLeaveType
     );
 
-    this.router.put(
-      `/admin${this.path}/toggle/:id`,
-      [passport.authenticate('jwt', { session: false })],
-      this.leaveTypeController.toggleLeaveType
-    );
+    // this.router.put(
+    //   `/admin${this.path}/toggle/:id`,
+    //   [passport.authenticate('jwt', { session: false })],
+    //   this.leaveTypeController.toggleLeaveType
+    // );
   }
 }
 

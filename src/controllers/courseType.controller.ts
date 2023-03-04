@@ -45,7 +45,22 @@ class CourseTypeController {
       next(err);
     }
   };
-
+  public listCourseType = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const response: {
+        totalCount: number;
+        records: (Coursetype | undefined)[];
+      } = await this.coursetypeservice.listCourseType(user);
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
   public updateCourseType = async (
     req: Request,
     res: Response,

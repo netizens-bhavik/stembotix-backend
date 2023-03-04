@@ -54,6 +54,17 @@ class CourseTypeService {
     });
     return { totalCount: courseType.count, records: courseType.rows };
   }
+  public async listCourseType(user) {
+    if (!this.isTrainer(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const courseType = await this.coursetype.findAll({
+      where: {
+        userId: user.id,
+      },
+    });
+    return courseType;
+  }
   public async updateCourseType(
     user,
     coursetypeId,

@@ -71,7 +71,7 @@ class LeaveTypeService {
       where: {
         LeaveName: leaveTypeData.LeaveName,
         Type: leaveTypeData.Type,
-        IsEnable: true,
+        // IsEnable: true,
       },
     });
 
@@ -83,13 +83,18 @@ class LeaveTypeService {
       LeaveName: leaveTypeData.LeaveName,
       LeaveDescription: leaveTypeData.LeaveDescription,
       Type: leaveTypeData.Type,
-      IsEnable: true,
+      // IsEnable: true,
     });
 
     return createLeaveType;
   }
 
-  public async updateLeaveType({ loggedUser, leaveTypeData, leaveTypeId }) {
+  public async updateLeaveType({
+    loggedUser,
+    leaveTypeData,
+    leaveTypeId,
+  }): Promise<{ records: object; message: string }> {
+    console.log(leaveTypeData);
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -110,7 +115,6 @@ class LeaveTypeService {
         LeaveName: leaveTypeData.LeaveName,
         LeaveDescription: leaveTypeData.LeaveDescription,
         Type: leaveTypeData.Type,
-        IsEnable: leaveTypeData.IsEnable,
       },
       {
         where: {
@@ -118,7 +122,11 @@ class LeaveTypeService {
         },
       }
     );
-    return { message: 'Leave Type updated successfully' };
+    console.log('updateLeaveType', updateLeaveType[0]);
+    return {
+      records: updateLeaveType,
+      message: 'Leave Type updated successfully',
+    };
   }
 
   public async deleteLeaveType({ loggedUser, leaveTypeId }) {
@@ -145,33 +153,33 @@ class LeaveTypeService {
     return { message: 'Leave Type deleted successfully' };
   }
 
-  public async toggleLeaveType({ loggedUser, leaveTypeId }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    if (!this.isInstitute(loggedUser)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
+  // public async toggleLeaveType({ loggedUser, leaveTypeId }) {
+  //   if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  //   if (!this.isInstitute(loggedUser)) {
+  //     throw new HttpException(403, 'Forbidden Resource');
+  //   }
 
-    const findLeaveType = await this.leaveType.findOne({
-      where: {
-        id: leaveTypeId,
-      },
-    });
+  //   const findLeaveType = await this.leaveType.findOne({
+  //     where: {
+  //       id: leaveTypeId,
+  //     },
+  //   });
 
-    if (!findLeaveType) {
-      throw new HttpException(409, 'Leave Type not found');
-    }
+  //   if (!findLeaveType) {
+  //     throw new HttpException(409, 'Leave Type not found');
+  //   }
 
-    const updateLeaveType = await this.leaveType.update(
-      {
-        IsEnable: !findLeaveType.IsEnable,
-      },
-      {
-        where: {
-          id: leaveTypeId,
-        },
-      }
-    );
-    return { message: 'Leave Type updated successfully' };
-  }
+  //   const updateLeaveType = await this.leaveType.update(
+  //     {
+  //       IsEnable: !findLeaveType.IsEnable,
+  //     },
+  //     {
+  //       where: {
+  //         id: leaveTypeId,
+  //       },
+  //     }
+  //   );
+  //   return { message: 'Leave Type updated successfully' };
+  // }
 }
 export default LeaveTypeService;
