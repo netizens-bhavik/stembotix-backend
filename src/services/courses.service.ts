@@ -158,6 +158,7 @@ class CourseService {
       thumbnail: thumbnailPath,
     });
 
+
     newCourse.addTrainer(trainerRecord);
     if (newCourse) {
       const mailData: Mail = {
