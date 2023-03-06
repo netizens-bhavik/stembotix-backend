@@ -9,7 +9,4 @@ export class LeaveTypeDTO {
 
   @IsEnum(['Sick', 'Paid', 'Unpaid'])
   public Type: string;
-
-  @IsBoolean()
-  public IsEnable: boolean;
 }
