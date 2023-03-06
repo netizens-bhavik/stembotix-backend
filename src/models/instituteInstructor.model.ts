@@ -43,7 +43,6 @@ module.exports = (sequelize, Sequelize) => {
     InstituteInstructor.hasMany(models.InstructorHasLeave, {
       foreignKey: 'InstituteInstructorId',
       sourceKey: 'id',
-      as: 'InstructorLeave',
     });
   };
   return InstituteInstructor;

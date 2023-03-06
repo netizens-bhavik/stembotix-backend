@@ -74,6 +74,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
+    Course.belongsTo(models.CourseType, {
+      foreignKey: 'coursetypeId',
+      targetKey: 'id',
+    });
   };
 
   return Course;

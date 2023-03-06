@@ -28,10 +28,14 @@ class OrderController {
       const trainer = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: {
-        totalCount: number;
-        records: (OrderItem | undefined)[];
-      } = await this.orderService.listOrdersByAdmin({queryObject, trainer});
+      const response = await this.orderService.listOrdersByAdmin({
+        queryObject,
+        trainer,
+      });
+      // const response: {
+      //   totalCount: number;
+      //   records: (OrderItem | undefined)[];
+      // } = await this.orderService.listOrdersByAdmin({queryObject, trainer});
       res.status(200).send(response);
     } catch (error) {
       next(error);
@@ -41,9 +45,9 @@ class OrderController {
   public addOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
       //@ts-ignore
-      const { id: userId } = req.user;
+      const user = req.user;
       const { amount }: AddOrderDTO = req.body;
-      const response = await this.orderService.addOrder(userId, amount);
+      const response = await this.orderService.addOrder(user, amount);
       res.status(200).send(response);
     } catch (error) {
       next(error);

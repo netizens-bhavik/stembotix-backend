@@ -158,6 +158,7 @@ class CourseService {
       thumbnail: thumbnailPath,
     });
 
+
     newCourse.addTrainer(trainerRecord);
     if (newCourse) {
       const mailData: Mail = {
@@ -184,6 +185,7 @@ class CourseService {
       thumbnail: `${API_BASE}/media/${newCourse.thumbnail}`,
       // @ts-ignore
       trailer: `${API_BASE}/media/${newCourse.trailer}`,
+      coursetypeId: newCourse.coursetypeId,
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
       deletedAt: newCourse.deletedAt,
@@ -565,16 +567,15 @@ class CourseService {
     return { totalCount: coursesCount.count, records: courses };
   }
 
-  public async getDetailByTrainer(
+  public async getTrainerDetails(
     trainer,
     queryObject
   ): Promise<{
     totalCount: number;
     records: (Course | undefined)[];
   }> {
-    if (!this.isTrainer(trainer)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
+    if (trainer.Role.roleName === 'Student')
+      throw new HttpException(401, 'Unauthorized');
     const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
@@ -591,15 +592,21 @@ class CourseService {
       include: [
         {
           model: this.user,
-          attributes: ['firstName', 'lastName', 'fullName'],
-          where: DB.Sequelize.or(
-            {
-              firstName: { [searchCondition]: search },
+          attributes: ['firstName', 'lastName', 'fullName', 'role'],
+
+          where: {
+            role: {
+              [DB.Sequelize.Op.not]: 'Admin',
             },
-            {
-              lastName: { [searchCondition]: search },
-            }
-          ),
+            [DB.Sequelize.Op.or]: [
+              {
+                firstName: { [searchCondition]: search },
+              },
+              {
+                lastName: { [searchCondition]: search },
+              },
+            ],
+          },
         },
         {
           model: this.course,
@@ -610,11 +617,13 @@ class CourseService {
           include: [
             {
               model: this.review,
+              // separate:true,
               attributes: ['rating'],
               separate: true,
             },
             {
               model: this.orderitem,
+              separate: true,
               include: {
                 model: this.order,
               },
@@ -639,28 +648,29 @@ class CourseService {
       allRating = [];
       allUser = [];
       row.Courses.forEach((course) => {
+        let user = course.OrderItems;
+        user.forEach((user) => {
+          allUser.push(user);
+        });
+
         let ratings = course.Reviews;
         ratings.forEach((rating) => {
           allRating.push(rating.rating);
-          let user = course.OrderItems;
-          user.forEach((user) => {
-            allUser.push(user);
-          });
         });
       });
       let allAvgRatingLenth = allRating.length;
       let sumOfAllRatings = allRating.reduce((acc, curr) => acc + curr, 0);
       let avgRating = sumOfAllRatings / allAvgRatingLenth;
-      row.setDataValue(
-        'avgRating',
-        Number.parseFloat(avgRating as unknown as string).toFixed(1)
-      );
+      const rating = avgRating
+        ? Number.parseFloat(avgRating as unknown as string).toFixed(1)
+        : '0';
+      row.setDataValue('avgRating', rating);
       let allUserLength = allUser.length;
       row.setDataValue('allUserCount', allUserLength);
       avgRatingResponse.push(row);
       allUserResponse.push(row);
     });
-    return { totalCount: trainerData.count, records: avgRatingResponse };
+    return { totalCount: trainerData.rows.length, records: avgRatingResponse };
   }
 
   public async togglePublish({
