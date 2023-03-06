@@ -5,10 +5,15 @@ import DB from '@databases';
 class CourseTypeService {
   public coursetype = DB.CourseType;
   public user = DB.User;
+  public course = DB.Course;
 
   public isTrainer(user): boolean {
     return user.role === 'Admin';
   }
+  public isUser(user): boolean {
+    return user.role === 'Admin' || user.role === 'Instructor';
+  }
+
   public async addCourseType(coursetype, user): Promise<Coursetype> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -55,14 +60,10 @@ class CourseTypeService {
     return { totalCount: courseType.count, records: courseType.rows };
   }
   public async listCourseType(user) {
-    if (!this.isTrainer(user)) {
+    if (!this.isUser(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const courseType = await this.coursetype.findAll({
-      where: {
-        userId: user.id,
-      },
-    });
+    const courseType = await this.coursetype.findAll();
     return courseType;
   }
   public async updateCourseType(
@@ -108,6 +109,63 @@ class CourseTypeService {
     if (res === 0) throw new HttpException(404, 'No data found');
 
     return { count: res };
+  }
+
+  public async viewCourseByCourseTypeIdByAdmin({
+    courseTypeId,
+    user,
+    queryObject,
+  }): Promise<{
+    totalCount: number;
+    records: (Coursetype | undefined)[];
+  }> {
+    if (!this.isTrainer(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.coursetype.findAndCountAll({
+      where: {
+        id: courseTypeId,
+      },
+      include: [
+        {
+          model: this.course,
+          where: DB.Sequelize.and({
+            title: {
+              [searchCondition]: search,
+            },
+          }),
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return response;
+  }
+
+  public async viewCourseByCourseTypeId(coursetypeId): Promise<{
+    totalCount: number;
+    records: (Coursetype | undefined)[];
+  }> {
+    const response = await this.coursetype.findAndCountAll({
+      where: {
+        id: coursetypeId,
+      },
+      include: {
+        model: this.course,
+      },
+    });
+    return { totalCount: response.count, records: response.rows };
   }
 }
 export default CourseTypeService;

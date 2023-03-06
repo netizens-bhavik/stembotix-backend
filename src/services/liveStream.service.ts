@@ -70,13 +70,14 @@ class LiveStreamService {
     livestreamDetails,
     file,
     trainer,
+    livestreamId
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
 
     const record = await this.liveStream.findOne({
       where: {
-        id: livestreamDetails.id,
+        id: livestreamId,
       },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
@@ -95,7 +96,7 @@ class LiveStreamService {
       },
       {
         where: {
-          id: livestreamDetails.id,
+          id: livestreamId,
         },
         returning: true,
       }

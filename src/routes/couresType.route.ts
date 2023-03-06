@@ -44,6 +44,17 @@ class CourseTypeRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.courseTypeController.deleteCourseType
     );
+    this.router.get(
+      `/admin${this.path}/:courseTypeId`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseTypeController.viewCourseByCourseTypeIdByAdmin
+    );
+
+    this.router.get(
+      `${this.path}/:courseTypeId`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseTypeController.viewCourseByCourseTypeId
+    );
   }
 }
 export default CourseTypeRoute;
