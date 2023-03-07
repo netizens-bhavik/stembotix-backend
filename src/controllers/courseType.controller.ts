@@ -96,5 +96,42 @@ class CourseTypeController {
       next(error);
     }
   };
+  public viewCourseByCourseTypeIdByAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const { courseTypeId } = req.params;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: {
+        totalCount: number;
+        records: (Coursetype | undefined)[];
+      } = await this.coursetypeservice.viewCourseByCourseTypeIdByAdmin({user, queryObject,courseTypeId});
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
+  
+  public viewCourseByCourseTypeId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { courseTypeId } = req.params;
+      const response: {
+        totalCount: number;
+        records: (Coursetype | undefined)[];
+      } = await this.coursetypeservice.viewCourseByCourseTypeId(courseTypeId);
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
+
 }
 export default CourseTypeController;

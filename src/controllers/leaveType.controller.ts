@@ -28,6 +28,22 @@ class LeaveTypeController {
       next(error);
     }
   };
+  public getAllLeaveType = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const leaveTypes = await this.leaveTypeService.getAllLeaveType(
+        loggedUser,
+      );
+
+      res.status(200).send(leaveTypes);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   public addLeaveType = async (
     req: Request,

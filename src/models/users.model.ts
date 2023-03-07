@@ -142,7 +142,6 @@ module.exports = (sequelize, Sequelize) => {
     User.hasMany(models.ManageLeaves, {
       foreignKey: 'userId',
       targetKey: 'id',
-      as: 'ManageUserLeave',
     });
     User.hasMany(models.CourseType, {
       foreignKey: 'userId',

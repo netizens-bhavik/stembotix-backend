@@ -56,6 +56,7 @@ module.exports = (sequelize, Sequelize) => {
     Livestream.belongsTo(models.User, {
       foreignKey: 'instituteId',
       targetKey: 'id',
+      as: 'Institute',
     });
     Livestream.hasMany(models.SubscribeEvent, {
       foreignKey: 'livestreamId',
