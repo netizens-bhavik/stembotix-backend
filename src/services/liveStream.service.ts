@@ -70,7 +70,7 @@ class LiveStreamService {
     livestreamDetails,
     file,
     trainer,
-    livestreamId
+    livestreamId,
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
@@ -80,7 +80,7 @@ class LiveStreamService {
         id: livestreamId,
       },
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(404, 'No stream Found');
 
     const thumbnail = file;
     if (thumbnail) {
@@ -160,7 +160,13 @@ class LiveStreamService {
           [searchCondition]: search,
         },
       },
-      include: { model: this.user },
+      include: [
+        { model: this.user },
+        {
+          model: this.user,
+          as: 'Institute',
+        },
+      ],
 
       limit: pageSize,
       offset: pageNo,
@@ -198,6 +204,10 @@ class LiveStreamService {
           where: {
             id: trainerRecord.user_id,
           },
+        },
+        {
+          model: this.user,
+          as: 'Institute',
         },
       ],
       limit: pageSize,

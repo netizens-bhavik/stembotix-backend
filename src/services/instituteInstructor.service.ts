@@ -35,18 +35,9 @@ class InstituteInstructorService {
   // }
 
   public async createInstructorRequest(loggedUser, instructorDetail) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
-    if (isEmpty(instructorDetail.instructorId))
-      throw new HttpException(400, 'InstructorId is empty');
-
-    const findInstructor = await this.user.findByPk(
-      instructorDetail.instructorId
-    );
-    if (!findInstructor) throw new HttpException(409, 'Instructor not found');
 
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
@@ -78,11 +69,17 @@ class InstituteInstructorService {
     return createInstituteInstructor;
   }
 
-  public async acceptApproval(offerId, loggedUser,isAcceptedCount): Promise<{ count: number }> {
+  public async acceptApproval(
+    offerId,
+    loggedUser,
+    isAcceptedCount
+  ): Promise<{ count: number }> {
     if (!this.isInstructor(loggedUser))
       throw new HttpException(403, 'Forbidden Resource');
 
-    if (!loggedUser) {throw new HttpException(401, 'Unauthorized')};
+    if (!loggedUser) {
+      throw new HttpException(401, 'Unauthorized');
+    }
 
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
@@ -93,20 +90,17 @@ class InstituteInstructorService {
       throw new HttpException(409, 'Your Request is not found');
     }
 
-
-        let isAccepted = isAcceptedCount.count ===0  ? 'Accepted'
-        : 'Rejected';
-
+    let isAccepted = isAcceptedCount.count === 0 ? 'Accepted' : 'Rejected';
 
     const updateOffer = await this.instituteInstructor.update(
-      {isAccepted },
+      { isAccepted },
       {
         where: {
           id: offerId,
         },
       }
     );
-    return  {count:isAcceptedCount.count} ;
+    return { count: isAcceptedCount.count };
   }
 
   public async deleteInstituteRequest(loggedUser, offerId) {
@@ -166,10 +160,10 @@ class InstituteInstructorService {
       where: {
         instructor_id: user.id,
       },
-      include:{
-        model:this.user,
-        as:'Institute'
-      }
+      include: {
+        model: this.user,
+        as: 'Institute',
+      },
     });
     return { totalCount: response.count, records: response.rows };
   }
@@ -242,6 +236,26 @@ class InstituteInstructorService {
         message: 'no data found',
       }
     );
+  }
+  public async viewInstituteByInstructor(user) {
+    if (!this.isInstructor(user))
+      throw new HttpException(403, 'Forbidden Resource');
+
+    const data = await this.instituteInstructor.findAll({
+      where: {
+        instructor_id: user.id,
+        isAccepted: 'Accepted',
+      },
+      include: [
+        {
+          model: this.user,
+          // attributes:['firstName','lastName','fullName'],
+          as: 'Institute',
+          required:true
+        },
+      ],
+    });
+    return data;
   }
 }
 export default InstituteInstructorService;
