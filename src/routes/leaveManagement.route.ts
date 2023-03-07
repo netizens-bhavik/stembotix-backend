@@ -33,6 +33,12 @@ class LeaveManagementRoute implements Routes {
       this.leaveManagementController.getLeaveViewbyInstructor
     );
 
+    this.router.get(
+      `/instructor${this.path}/leave-type/:livestreamId`,
+      [passport.authenticate('jwt', { session: false })],
+      this.leaveManagementController.getLeaveTypeforInstructor
+    );
+
     this.router.post(
       `${this.path}/events`,
       [
