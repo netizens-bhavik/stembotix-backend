@@ -28,6 +28,8 @@ import UniversalSearchRoute from './routes/universalSearch.route';
 import LeaveTypeRoute from './routes/leaveType.route';
 import InstructorLeaveRoute from './routes/instructorHasLeave.route';
 import CourseTypeRoute from './routes/couresType.route';
+import HolidayListRoute from './routes/holidayList.route';
+import HolidayRoute from './routes/holiday.route';
 
 validateEnv();
 
@@ -60,5 +62,7 @@ const app = new App([
   new LeaveTypeRoute(),
   new InstructorLeaveRoute(),
   new CourseTypeRoute(),
+  new HolidayListRoute(),
+  new HolidayRoute(),
 ]);
 app.listen();

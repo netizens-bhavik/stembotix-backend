@@ -90,6 +90,25 @@ class LeaveManagementController {
     }
   };
 
+  public getLeaveTypeforInstructor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const livestreamId = req.params.livestreamId;
+      const findLeaveType =
+        await this.leaveManagementService.getLeaveTypeforInstructor({
+          loggedUser,
+          livestreamId,
+        });
+      res.status(200).send(findLeaveType);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createLeave = async (
     req: Request,
     res: Response,
