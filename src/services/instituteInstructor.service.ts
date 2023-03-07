@@ -166,6 +166,10 @@ class InstituteInstructorService {
       where: {
         instructor_id: user.id,
       },
+      include:{
+        model:this.user,
+        as:'Institute'
+      }
     });
     return { totalCount: response.count, records: response.rows };
   }

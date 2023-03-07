@@ -27,7 +27,6 @@ module.exports = (sequelize, Sequelize) => {
     ManageLeaves.belongsTo(models.User, {
       foreignKey: 'userId',
       targetKey: 'id',
-      as: 'ManageUserLeave',
     });
     ManageLeaves.belongsTo(models.LiveStream, {
       foreignKey: 'livestreamId',

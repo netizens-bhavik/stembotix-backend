@@ -18,28 +18,33 @@ class LeaveTypeRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `/admin${this.path}/`,
-      [passport.authenticate('jwt', { session: false })],
+      `/admin${this.path}`,
+      passport.authenticate('jwt', { session: false }),
       this.leaveTypeController.getLeaveType
+    );
+    this.router.get(
+      `${this.path}/list`,
+      passport.authenticate('jwt', { session: false }),
+      this.leaveTypeController.getAllLeaveType
     );
 
     this.router.post(
-      `/admin${this.path}/`,
-      [passport.authenticate('jwt', { session: false })],
+      `/admin${this.path}`,
+      passport.authenticate('jwt', { session: false }),
       validationMiddleware(LeaveTypeDTO, 'body'),
       this.leaveTypeController.addLeaveType
     );
 
     this.router.put(
       `/admin${this.path}/:id`,
-      [passport.authenticate('jwt', { session: false })],
+      passport.authenticate('jwt', { session: false }),
       validationMiddleware(LeaveTypeDTO, 'body', true),
       this.leaveTypeController.updateLeaveType
     );
 
     this.router.delete(
       `/admin${this.path}/:id`,
-      [passport.authenticate('jwt', { session: false })],
+      passport.authenticate('jwt', { session: false }),
       this.leaveTypeController.deleteLeaveType
     );
 

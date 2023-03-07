@@ -1,13 +1,5 @@
 import DB from '@databases';
-import Razorpay from 'razorpay';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
-import { VerifyOrderDTO } from '@/dtos/order.dto';
-import crypto from 'crypto';
-import { OrderItem } from '@/interfaces/order.interface';
-import sequelize from 'sequelize';
-
 export class OrderData {
   public user = DB.User;
   public order = DB.Order;
@@ -22,9 +14,12 @@ export class OrderData {
   }
   public async getOrderData({ trainer, queryObject }) {
     let recommendation = [];
-
-    recommendation = await this.searchByUserName({ trainer, queryObject });
-    // recommendation = await this.searchByItemType({ trainer, queryObject });
+    let type = ['Course', 'Product','course','product'];
+    if (type.includes(queryObject.search)) {
+      recommendation = await this.searchByItemType({ trainer, queryObject });
+    } else {
+      recommendation = await this.searchByUserName({ trainer, queryObject });
+    }
     return recommendation;
   }
 
@@ -41,10 +36,11 @@ export class OrderData {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const recommendation = await this.order.findAll({
+
+    const recommendation = await this.order.findAndCountAll({
       include: [
         {
-          model: DB.User,
+          model: this.user,
           where: DB.Sequelize.or(
             {
               firstName: {
@@ -55,14 +51,13 @@ export class OrderData {
               lastName: {
                 [searchCondition]: search,
               },
-            },
+            }
           ),
         },
         {
           model: this.orderItem,
         },
       ],
-      subQuery: false,
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -84,16 +79,16 @@ export class OrderData {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const recommendation = await this.order.findAll({
+    const recommendation = await this.order.findAndCountAll({
       include: [
         {
-          model: this.orderItem,
-          where: {
-            item_type: { [searchCondition]: search },
-          },
+          model: this.user,
         },
         {
-          model: this.user,
+          model: this.orderItem,
+          where: DB.Sequelize.and({
+            item_type: { [searchCondition]: search },
+          }),
         },
       ],
 

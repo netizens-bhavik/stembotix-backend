@@ -190,19 +190,14 @@ class LeaveManagementController {
     try {
       const loggedUser = req.user;
       const leaveId = req.params.id;
-      const isApproved: leaveManagementApproveRequestDTO = req.body;
-      const approveLeaveStatus =
+      const isApproved = req.body;
+      const approveLeaveStatus: { count: number } =
         await this.leaveManagementService.approveLeaveById(
           loggedUser,
           leaveId,
           isApproved
         );
-      res.status(200).send({
-        response: approveLeaveStatus,
-        message: `Leave ${
-          isApproved.isApproved === 'Approved' ? 'Approved' : 'Rejected'
-        }`,
-      });
+      res.status(200).send(approveLeaveStatus);
     } catch (error) {
       next(error);
     }

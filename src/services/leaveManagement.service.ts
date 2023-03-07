@@ -62,7 +62,6 @@ class LeaveManagementService {
             [{ model: this.user }, 'lastName', order],
           ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
-          as: 'ManageUserLeave',
           where: DB.Sequelize.or(
             { firstName: { [searchCondition]: search } },
             { lastName: { [searchCondition]: search } },
@@ -107,7 +106,6 @@ class LeaveManagementService {
             [{ model: this.user }, 'lastName', order],
           ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
-          as: 'ManageUserLeave',
           where: DB.Sequelize.or(
             { firstName: { [searchCondition]: search } },
             { lastName: { [searchCondition]: search } },
@@ -119,7 +117,7 @@ class LeaveManagementService {
         },
       ],
       where: {
-        UserId: loggedUser.id,
+        user_id: loggedUser.id,
       },
       limit: pageSize,
       offset: pageNo,
@@ -231,7 +229,6 @@ class LeaveManagementService {
         {
           model: this.user,
           attributes: ['id', 'firstName', 'lastName', 'email'],
-          as: 'ManageUserLeave',
         },
       ],
     });
@@ -316,11 +313,15 @@ class LeaveManagementService {
     const findLeave = await this.manageLeave.findByPk(leaveId);
     if (!findLeave) throw new HttpException(409, 'Leave not found');
 
-    const updateLeave = await this.manageLeave.update(isApproved, {
-      where: { id: leaveId },
-    });
+    let isAccepted = isApproved.count === 0 ? 'Approved' : 'Rejected';
+    const updateLeave = await this.manageLeave.update(
+      { isAccepted },
+      {
+        where: { id: leaveId },
+      }
+    );
 
-    return updateLeave;
+    return { count: isApproved.count };
   }
 
   public async getEventsByDate(loggedUser, date) {
@@ -383,7 +384,6 @@ class LeaveManagementService {
         {
           model: this.user,
           attributes: ['id', 'firstName', 'lastName', 'email'],
-          as: 'ManageUserLeave',
         },
       ],
       order: [[sortBy, order]],

@@ -46,40 +46,57 @@ class InstructorLeaveService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const findLeave = await this.instructorHasLeave.findAndCountAll({
-      attributes: ['id', 'LeaveCount'],
+      // attributes: ['id', 'LeaveCount'],
       include: [
         {
           model: this.leaveType,
-          attributes: [
-            'id',
-            'LeaveName',
-            'LeaveDescription',
-            'Type',
-            'IsEnable',
-          ],
+          attributes: ['id', 'LeaveName', 'LeaveDescription', 'Type'],
         },
         {
           model: this.instituteInstructor,
           attributes: ['id'],
+          required: true,
           include: [
             {
               model: this.user,
               as: 'Instructor',
-              attributes: ['id', 'firstName', 'lastName'],
-            },
-            {
-              model: this.user,
-              as: 'Institute',
-              attributes: ['id', 'firstName', 'lastName'],
+              attributes: ['firstName', 'lastName', 'fullName'],
+              where: DB.Sequelize.or(
+                {
+                  firstName: { [searchCondition]: search },
+                },
+                {
+                  lastName: { [searchCondition]: search },
+                }
+              ),
             },
           ],
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
+
+    // findEvents.map((event) => {
+    //   return {
+    //     id: event.id,
+    //     date: event.date,
+    //     startTime: event.startTime,
+    //     endTime: event.endTime,
+    //     title: event.title,
+    //   };
+    // });
+
+    // const mydata = findLeave.rows.map((data) => {
+    //   console.log(data);
+    // });
+
+
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -107,11 +124,17 @@ class InstructorLeaveService {
     if (findLeave) {
       throw new HttpException(400, 'Leave already exists');
     }
+
+    if(LeaveCount<0){
+      throw new HttpException(401, 'Leave count must not be less than 0');
+    }
+
     const createLeave = await this.instructorHasLeave.create({
       InstituteInstructorId,
       LeaveTypeId,
       LeaveCount,
     });
+
     return { message: 'Leave added successfully' };
   }
 
@@ -138,11 +161,23 @@ class InstructorLeaveService {
       throw new HttpException(404, 'Leave Type not found');
     }
     const findLeave = await this.instructorHasLeave.findOne({
-      where: { InstituteInstructorId, LeaveTypeId },
+      where: { InstituteInstructorId },
     });
     if (!findLeave) {
       throw new HttpException(404, 'Leave not found');
     }
+
+    if(LeaveCount<0){
+      throw new HttpException(401, 'Leave count must not be less than 0');
+    }
+
+    const checkfindLeave = await this.instructorHasLeave.findOne({
+      where: { InstituteInstructorId, LeaveTypeId },
+    });
+    if (checkfindLeave) {
+      throw new HttpException(400, 'Leave already exists');
+    }
+
     const updateLeave = await this.instructorHasLeave.update(
       {
         InstituteInstructorId,
@@ -186,12 +221,7 @@ class InstructorLeaveService {
         {
           model: this.user,
           as: 'Instructor',
-          attributes: ['id', 'firstName', 'lastName'],
-        },
-        {
-          model: this.user,
-          as: 'Institute',
-          attributes: ['id', 'firstName', 'lastName'],
+          attributes: ['firstName', 'lastName', 'fullName'],
         },
       ],
     });
