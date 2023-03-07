@@ -19,6 +19,10 @@ class LeaveManagementService {
   public manageLeave = DB.ManageLeaves;
   public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
+  public leaveType = DB.LeaveTypes;
+  public holidayList = DB.HolidayList;
+  public holiday = DB.Holidays;
+
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
@@ -125,6 +129,43 @@ class LeaveManagementService {
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
+  public async getLeaveTypeforInstructor({ loggedUser, livestreamId }) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (!this.isInstructor(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
+    const findLivestream = await this.livestream.findByPk(livestreamId);
+    if (!findLivestream) throw new HttpException(409, 'Livestream not found');
+
+    const findInstitute = await this.instituteInstructor.findOne({
+      where: {
+        InstructorId: loggedUser.id,
+        InstituteId: findLivestream.instituteId,
+        isAccepted: 'Accepted',
+      },
+    });
+
+    if (!findInstitute)
+      throw new HttpException(
+        409,
+        'You are not associated with this institute for this Event'
+      );
+
+    const findLeave = await this.instrucorHasLeave.findAll({
+      where: {
+        InstituteInstructorId: findInstitute.id,
+      },
+      include: [
+        {
+          model: this.leaveType,
+        },
+      ],
+    });
+
+    return findLeave;
+  }
+
   public async createLeave(loggedUser, leaveData): Promise<AddLeaveData> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser)) {
@@ -163,11 +204,6 @@ class LeaveManagementService {
         409,
         'You do not have leave balance for this leave type'
       );
-    // const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
-    //   where: {
-    //     UserId: loggedUser.id,
-    //   },
-    // });
 
     if (checkLeaveBalance.LeaveCount <= 0)
       throw new HttpException(
@@ -187,6 +223,16 @@ class LeaveManagementService {
     });
 
     if (checkLeave) throw new HttpException(409, 'Leave already exists');
+
+    const checkHoliday = await this.holiday.findOne({
+      where: {
+        date: leaveData.Date,
+        instituteId: findLivestream.instituteId,
+      },
+    });
+
+    if (checkHoliday)
+      throw new HttpException(409, 'You cannot take leave on holiday');
 
     const createLeave = await this.manageLeave.create({
       Date: leaveData.Date,
@@ -264,6 +310,16 @@ class LeaveManagementService {
         409,
         'You are not associated with this institute for this Event'
       );
+
+    const checkHoliday = await this.holiday.findOne({
+      where: {
+        date: leaveData.Date,
+        instituteId: findLivestream.instituteId,
+      },
+    });
+
+    if (checkHoliday)
+      throw new HttpException(409, 'You cannot take leave on holiday');
 
     const InstituteInstructorId = findInstitute.id;
 

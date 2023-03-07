@@ -147,11 +147,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    // User.hasMany(models.InstructorHasLeave, {
-    //   foreignKey: 'UserId',
-    //   targetKey: 'id',
-    //   as: 'InstructorHasLeave',
-    // });
+    User.hasMany(models.Holidays, {
+      foreignKey: 'instituteId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {
