@@ -27,7 +27,7 @@ class CurriculumSectionService {
       include: [
         {
           model: this.trainer,
-          through: [],
+          through: { attributes: [] },
           include: [
             {
               model: this.user,

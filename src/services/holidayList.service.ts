@@ -42,7 +42,6 @@ class HolidayListService {
     loggedUser,
     queryObject,
   }): Promise<AllHolidayList> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     // if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
     //   throw new HttpException(403, 'Forbidden Resource');
     // }
@@ -71,11 +70,6 @@ class HolidayListService {
   }
 
   public async getAllHolidayList({ loggedUser }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    // if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
-    //   throw new HttpException(403, 'Forbidden Resource');
-    // }
-
     const findLeave = await this.holidayList.findAll({
       attributes: ['id', 'name', 'description', 'type'],
     });
@@ -87,7 +81,6 @@ class HolidayListService {
     loggedUser,
     holidayListData,
   }): Promise<HolidayList> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -108,8 +101,7 @@ class HolidayListService {
     loggedUser,
     holidayListId,
     holidayListData,
-  }): Promise<HolidayList> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  }): Promise<{ count: number; rows: HolidayList[] }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -119,23 +111,17 @@ class HolidayListService {
     if (!findHolidayList)
       throw new HttpException(409, `Holiday List not found`);
 
-    await this.holidayList.update(
+    const updateHolidayList = await this.holidayList.update(
       { ...holidayListData },
-      { where: { id: holidayListId } }
+      { where: { id: holidayListId }, returning: true }
     );
-
-    const updateHolidayList: HolidayList = await this.holidayList.findByPk(
-      holidayListId
-    );
-
-    return updateHolidayList;
+    return { count: updateHolidayList[0], rows: updateHolidayList[1] };
   }
 
   public async deleteHolidayList({
     loggedUser,
     holidayListId,
-  }): Promise<HolidayList> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  }): Promise<{ count: number }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -145,9 +131,13 @@ class HolidayListService {
     if (!findHolidayList)
       throw new HttpException(409, `Holiday List not found`);
 
-    await this.holidayList.destroy({ where: { id: holidayListId } });
-
-    return findHolidayList;
+    const res = await this.holidayList.destroy({
+      where: { id: holidayListId },
+    });
+    if (res === 1) {
+      throw new HttpException(200, 'Holiday List has been deleted');
+    }
+    return { count: res };
   }
 }
 export default HolidayListService;
