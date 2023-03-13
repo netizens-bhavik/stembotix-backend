@@ -20,10 +20,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'InstituteInstructorId',
       targetKey: 'id',
     });
-    // InstructorHasLeave.belongsTo(models.LeaveTypes, {
-    //   foreignKey: 'LeaveTypeId',
-    //   targetKey: 'id',
-    // });
+    InstructorHasLeave.belongsTo(models.LeaveTypes, {
+      foreignKey: 'LeaveTypeId',
+      targetKey: 'id',
+    });
     // InstructorHasLeave.belongsTo(models.LeaveTypes, {
     //   foreignKey: 'LeaveTypeId',
     //   targetKey: 'id',

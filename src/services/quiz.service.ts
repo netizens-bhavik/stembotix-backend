@@ -104,7 +104,7 @@ class QuizService {
   //    }
   //     return { totalCount: response.count, records: response.rows };
   //   }
-  public async getQuizByIdAdmin(
+  public async getQuizByAdmin(
     quizId,
     queryObject
   ): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {

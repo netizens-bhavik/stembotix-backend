@@ -51,7 +51,7 @@ class LeaveManagementController {
     }
   };
 
-  public getLeaveByInstructor = async (
+  public getLeaveByInstitute = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -60,7 +60,7 @@ class LeaveManagementController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const findLeave = await this.leaveManagementService.getLeaveByInstructor({
+      const findLeave = await this.leaveManagementService.getLeaveByInstitute({
         loggedUser,
         queryObject,
       });
@@ -70,7 +70,7 @@ class LeaveManagementController {
     }
   };
 
-  public getLeaveViewbyInstructor = async (
+  public viewLeavebyInstructor = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -79,12 +79,32 @@ class LeaveManagementController {
       const loggedUser = req.user;
       const { search, pageRecord, pageNo, sortBy, order, role } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order, role };
-      const findLeave =
-        await this.leaveManagementService.getLeaveViewbyInstructor({
+      const findLeave = await this.leaveManagementService.viewLeavebyInstructor(
+        {
           loggedUser,
           queryObject,
-        });
+        }
+      );
       res.status(200).send(findLeave);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getLeaveTypeforInstructor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const loggedUser = req.user;
+      const livestreamId = req.params.livestreamId;
+      const findLeaveType =
+        await this.leaveManagementService.getLeaveTypeforInstructor({
+          loggedUser,
+          livestreamId,
+        });
+      res.status(200).send(findLeaveType);
     } catch (error) {
       next(error);
     }
@@ -189,20 +209,15 @@ class LeaveManagementController {
   ) => {
     try {
       const loggedUser = req.user;
-      const leaveId = req.params.id;
-      const isApproved: leaveManagementApproveRequestDTO = req.body;
-      const approveLeaveStatus =
+      const { leaveId } = req.params;
+      const isApproved = req.body;
+      const approveLeaveStatus: { count: number } =
         await this.leaveManagementService.approveLeaveById(
           loggedUser,
           leaveId,
           isApproved
         );
-      res.status(200).send({
-        response: approveLeaveStatus,
-        message: `Leave ${
-          isApproved.isApproved === 'Approved' ? 'Approved' : 'Rejected'
-        }`,
-      });
+      res.status(200).send(approveLeaveStatus);
     } catch (error) {
       next(error);
     }

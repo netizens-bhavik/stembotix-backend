@@ -67,12 +67,13 @@ class LiveStreamController {
       const { livestreamId } = req.params;
       const livestreamDetails = req.body;
       const file = req.file;
-      const trainer = req.user;
-      livestreamDetails['id'] = livestreamId;
+      const user = req.user;
+      // livestreamDetails['id'] = livestreamId;
       const response = await this.liveStreamService.updateLiveStream({
         livestreamDetails,
         file,
-        trainer,
+        user,
+        livestreamId,
       });
       res.status(200).send(response);
     } catch (error) {
@@ -85,11 +86,11 @@ class LiveStreamController {
     next: NextFunction
   ) => {
     try {
-      const trainerData = req.user;
+      const user = req.user;
       const { livestreamId } = req.params;
       const response: { count: number } =
         await this.liveStreamService.deleteLiveStream({
-          trainer: trainerData,
+          user,
           livestreamId,
         });
       res.status(200).send(response);

@@ -18,12 +18,12 @@ class InstructorLeaveRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `${this.path}/`,
-      [passport.authenticate('jwt', { session: false })],
+      `${this.path}`,
+      passport.authenticate('jwt', { session: false }),
       this.instructorLeaveController.getInstructorLeave
     );
     this.router.post(
-      `${this.path}/`,
+      `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
         validationMiddleware(InstructorLeaveCountDTO, 'body'),

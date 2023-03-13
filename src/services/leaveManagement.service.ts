@@ -19,6 +19,10 @@ class LeaveManagementService {
   public manageLeave = DB.ManageLeaves;
   public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
+  public leaveType = DB.LeaveTypes;
+  public holidayList = DB.HolidayList;
+  public holiday = DB.Holidays;
+
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
@@ -62,7 +66,6 @@ class LeaveManagementService {
             [{ model: this.user }, 'lastName', order],
           ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
-          as: 'ManageUserLeave',
           where: DB.Sequelize.or(
             { firstName: { [searchCondition]: search } },
             { lastName: { [searchCondition]: search } },
@@ -73,6 +76,9 @@ class LeaveManagementService {
           model: this.livestream,
           attributes: ['id', 'title'],
         },
+        {
+          model: this.leaveType,
+        },
       ],
       limit: pageSize,
       offset: pageNo,
@@ -80,7 +86,7 @@ class LeaveManagementService {
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
-  public async getLeaveViewbyInstructor({
+  public async viewLeavebyInstructor({
     loggedUser,
     queryObject,
   }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
@@ -88,7 +94,7 @@ class LeaveManagementService {
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
@@ -99,32 +105,64 @@ class LeaveManagementService {
       : ['', DB.Sequelize.Op.ne];
 
     const findLeave = await this.manageLeave.findAndCountAll({
+      where: {
+        user_id: loggedUser.id,
+      },
       include: [
         {
           model: this.user,
-          order: [
-            [{ model: this.user }, 'firstName', order],
-            [{ model: this.user }, 'lastName', order],
-          ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
-          as: 'ManageUserLeave',
-          where: DB.Sequelize.or(
-            { firstName: { [searchCondition]: search } },
-            { lastName: { [searchCondition]: search } },
-            { email: { [searchCondition]: search } }
-          ),
         },
         {
           model: this.livestream,
         },
+        {
+          model: this.leaveType,
+        },
       ],
-      where: {
-        UserId: loggedUser.id,
-      },
+
       limit: pageSize,
       offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: findLeave.count, records: findLeave.rows };
+  }
+
+  public async getLeaveTypeforInstructor({ loggedUser, livestreamId }) {
+    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+    if (!this.isInstructor(loggedUser)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
+    const findLivestream = await this.livestream.findByPk(livestreamId);
+    if (!findLivestream) throw new HttpException(409, 'Livestream not found');
+
+    const findInstitute = await this.instituteInstructor.findOne({
+      where: {
+        InstructorId: loggedUser.id,
+        InstituteId: findLivestream.instituteId,
+        isAccepted: 'Accepted',
+      },
+    });
+
+    if (!findInstitute)
+      throw new HttpException(
+        409,
+        'You are not associated with this institute for this Event'
+      );
+
+    const findLeave = await this.instrucorHasLeave.findAll({
+      where: {
+        InstituteInstructorId: findInstitute.id,
+      },
+      include: [
+        {
+          model: this.leaveType,
+        },
+      ],
+    });
+
+    return findLeave;
   }
 
   public async createLeave(loggedUser, leaveData): Promise<AddLeaveData> {
@@ -165,11 +203,6 @@ class LeaveManagementService {
         409,
         'You do not have leave balance for this leave type'
       );
-    // const [instance, isCreated] = await this.instrucorHasLeave.findOrCreate({
-    //   where: {
-    //     UserId: loggedUser.id,
-    //   },
-    // });
 
     if (checkLeaveBalance.LeaveCount <= 0)
       throw new HttpException(
@@ -180,21 +213,29 @@ class LeaveManagementService {
     const checkLeave = await this.manageLeave.findOne({
       where: {
         Date: leaveData.Date,
-        // LeaveReason: leaveData.LeaveReason,
-        LeaveType: leaveData.LeaveType,
         livestreamId: leaveData.LiveStream,
-        UserId: loggedUser.id,
+        userId: loggedUser.id,
         LeaveTypeId: leaveData.LeaveTypeId,
       },
     });
 
     if (checkLeave) throw new HttpException(409, 'Leave already exists');
 
+    const checkHoliday = await this.holiday.findOne({
+      where: {
+        date: leaveData.Date,
+        instituteId: findLivestream.instituteId,
+      },
+    });
+
+    if (checkHoliday)
+      throw new HttpException(409, 'You cannot take leave on holiday');
+
     const createLeave = await this.manageLeave.create({
       Date: leaveData.Date,
       LeaveReason: leaveData.LeaveReason,
       livestreamId: leaveData.LiveStream,
-      UserId: loggedUser.id,
+      userId: loggedUser.id,
       LeaveTypeId: leaveData.LeaveTypeId,
     });
 
@@ -231,7 +272,6 @@ class LeaveManagementService {
         {
           model: this.user,
           attributes: ['id', 'firstName', 'lastName', 'email'],
-          as: 'ManageUserLeave',
         },
       ],
     });
@@ -268,6 +308,16 @@ class LeaveManagementService {
         'You are not associated with this institute for this Event'
       );
 
+    const checkHoliday = await this.holiday.findOne({
+      where: {
+        date: leaveData.Date,
+        instituteId: findLivestream.instituteId,
+      },
+    });
+
+    if (checkHoliday)
+      throw new HttpException(409, 'You cannot take leave on holiday');
+
     const InstituteInstructorId = findInstitute.id;
 
     const updateLeave = await this.manageLeave.update(
@@ -275,7 +325,7 @@ class LeaveManagementService {
         Date: leaveData.Date,
         LeaveReason: leaveData.LeaveReason,
         livestreamId: leaveData.LiveStream,
-        UserId: loggedUser.id,
+        userId: loggedUser.id,
         LeaveTypeId: leaveData.LeaveTypeId,
       },
       {
@@ -305,22 +355,28 @@ class LeaveManagementService {
     return deleteLeave;
   }
 
-  public async approveLeaveById(loggedUser, leaveId, isApproved) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  public async approveLeaveById(
+    loggedUser,
+    leaveId,
+    isApprovedCount
+  ): Promise<{ count: number }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    if (isEmpty(isApproved))
-      throw new HttpException(400, 'Leave approval is empty');
-
-    const findLeave = await this.manageLeave.findByPk(leaveId);
+    const findLeave = await this.manageLeave.findOne({where:{
+      id:leaveId
+    }});
     if (!findLeave) throw new HttpException(409, 'Leave not found');
 
-    const updateLeave = await this.manageLeave.update(isApproved, {
-      where: { id: leaveId },
-    });
+    let isApproved = isApprovedCount.count === 0 ? 'Approved' : 'Rejected';
+    const updateLeave = await this.manageLeave.update(
+      { isApproved },
+      {
+        where: { id: leaveId },
+      }
+    );
 
-    return updateLeave;
+    return { count: isApprovedCount.count };
   }
 
   public async getEventsByDate(loggedUser, date) {
@@ -333,7 +389,7 @@ class LeaveManagementService {
     if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
 
     const findEvents = await this.livestream.findAll({
-      where: { date: newDate },
+      where: { date: newDate,userId:loggedUser.id },
       attributes: ['id', 'date', 'startTime', 'endTime', 'title'],
     });
 
@@ -348,7 +404,7 @@ class LeaveManagementService {
     });
   }
 
-  public async getLeaveByInstructor({ loggedUser, queryObject }) {
+  public async getLeaveByInstitute({ loggedUser, queryObject }) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -382,8 +438,13 @@ class LeaveManagementService {
       include: [
         {
           model: this.user,
-          attributes: ['id', 'firstName', 'lastName', 'email'],
-          as: 'ManageUserLeave',
+          attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
+        },
+        {
+          model: this.leaveType,
+        },
+        {
+          model: this.livestream,
         },
       ],
       order: [[sortBy, order]],
@@ -393,16 +454,7 @@ class LeaveManagementService {
 
     return {
       count: findLeave.count,
-      records: findLeave.rows.map((leave) => {
-        return {
-          id: leave.id,
-          date: leave.Date,
-          leaveReason: leave.LeaveReason,
-          leaveType: leave.LeaveType,
-          isApproved: leave.isApproved,
-          user: leave.ManageUserLeave,
-        };
-      }),
+      records: findLeave.rows,
     };
   }
 }

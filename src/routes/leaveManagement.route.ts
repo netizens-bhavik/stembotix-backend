@@ -29,8 +29,14 @@ class LeaveManagementRoute implements Routes {
 
     this.router.get(
       `/instructor${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.leaveManagementController.viewLeavebyInstructor
+    );
+
+    this.router.get(
+      `/instructor${this.path}/leave-type/:livestreamId`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveViewbyInstructor
+      this.leaveManagementController.getLeaveTypeforInstructor
     );
 
     this.router.post(
@@ -43,17 +49,16 @@ class LeaveManagementRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/instructor`,
+      `/institute${this.path}`,
       [passport.authenticate('jwt', { session: false })],
-      this.leaveManagementController.getLeaveByInstructor
+      this.leaveManagementController.getLeaveByInstitute
     );
 
     this.router.post(
       `${this.path}`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(leaveManagementRequestDTO, 'body'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(leaveManagementRequestDTO, 'body'),
+
       this.leaveManagementController.createLeave
     );
 
@@ -90,11 +95,8 @@ class LeaveManagementRoute implements Routes {
 
     //approve leave by id
     this.router.put(
-      `${this.path}/approve/:id`,
-      [
+      `${this.path}/approve/:leaveId`,
         passport.authenticate('jwt', { session: false }),
-        validationMiddleware(leaveManagementApproveRequestDTO, 'body'),
-      ],
       this.leaveManagementController.approveLeaveById
     );
   }

@@ -142,17 +142,15 @@ module.exports = (sequelize, Sequelize) => {
     User.hasMany(models.ManageLeaves, {
       foreignKey: 'userId',
       targetKey: 'id',
-      as: 'ManageUserLeave',
     });
     User.hasMany(models.CourseType, {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    // User.hasMany(models.InstructorHasLeave, {
-    //   foreignKey: 'UserId',
-    //   targetKey: 'id',
-    //   as: 'InstructorHasLeave',
-    // });
+    User.hasMany(models.Holidays, {
+      foreignKey: 'instituteId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {

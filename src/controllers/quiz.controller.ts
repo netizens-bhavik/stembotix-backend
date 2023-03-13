@@ -52,7 +52,7 @@ class QuizController {
       next(err);
     }
   };
-  public getQuizByIdAdmin = async (
+  public getQuizByAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -63,7 +63,7 @@ class QuizController {
       const { quizId } = req.params;
       const user = req.user;
       const response: { totalCount: number; records: (Quiz | undefined)[] } =
-        await this.quizService.getQuizByIdAdmin(quizId, queryObject);
+        await this.quizService.getQuizByAdmin(quizId, queryObject);
       res.status(200).send(response);
     } catch (err) {
       next(err);
