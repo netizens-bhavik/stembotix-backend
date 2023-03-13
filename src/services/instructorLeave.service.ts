@@ -50,11 +50,11 @@ class InstructorLeaveService {
       : ['', DB.Sequelize.Op.ne];
 
     const findLeave = await this.instructorHasLeave.findAndCountAll({
-      // attributes: ['id', 'LeaveCount'],
+      // attributes: ['id', 'leaveCount'],
       include: [
         {
           model: this.leaveType,
-          attributes: ['id', 'LeaveName', 'LeaveDescription', 'Type'],
+          attributes: ['id', 'leaveName', 'leaveDescription', 'type'],
         },
         {
           model: this.instituteInstructor,
@@ -96,7 +96,6 @@ class InstructorLeaveService {
     //   console.log(data);
     // });
 
-
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -105,34 +104,34 @@ class InstructorLeaveService {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const { InstituteInstructorId, LeaveTypeId, LeaveCount } = leaveData;
+    const { instituteInstructorId, leaveTypeId, leaveCount } = leaveData;
     const findInstructor = await this.instituteInstructor.findOne({
-      where: { id: InstituteInstructorId },
+      where: { id: instituteInstructorId },
     });
     if (!findInstructor) {
       throw new HttpException(404, 'Instructor not found');
     }
     const findLeaveType = await this.leaveType.findOne({
-      where: { id: LeaveTypeId },
+      where: { id: leaveTypeId },
     });
     if (!findLeaveType) {
       throw new HttpException(404, 'Leave Type not found');
     }
     const findLeave = await this.instructorHasLeave.findOne({
-      where: { InstituteInstructorId, LeaveTypeId },
+      where: { instituteInstructorId, leaveTypeId },
     });
     if (findLeave) {
       throw new HttpException(400, 'Leave already exists');
     }
 
-    if(LeaveCount<0){
+    if (leaveCount < 0) {
       throw new HttpException(401, 'Leave count must not be less than 0');
     }
 
     const createLeave = await this.instructorHasLeave.create({
-      InstituteInstructorId,
-      LeaveTypeId,
-      LeaveCount,
+      instituteInstructorId,
+      leaveTypeId,
+      leaveCount,
     });
 
     return { message: 'Leave added successfully' };
@@ -141,38 +140,38 @@ class InstructorLeaveService {
   public async updateInstructorLeave({
     loggedUser,
     leaveData,
-    IntructorLeaveId,
+    intructorLeaveId,
   }) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const { InstituteInstructorId, LeaveTypeId, LeaveCount } = leaveData;
+    const { instituteInstructorId, leaveTypeId, leaveCount } = leaveData;
     const findInstructor = await this.instituteInstructor.findOne({
-      where: { id: InstituteInstructorId },
+      where: { id: instituteInstructorId },
     });
     if (!findInstructor) {
       throw new HttpException(404, 'Instructor not found');
     }
     const findLeaveType = await this.leaveType.findOne({
-      where: { id: LeaveTypeId },
+      where: { id: leaveTypeId },
     });
     if (!findLeaveType) {
       throw new HttpException(404, 'Leave Type not found');
     }
     const findLeave = await this.instructorHasLeave.findOne({
-      where: { InstituteInstructorId },
+      where: { instituteInstructorId },
     });
     if (!findLeave) {
       throw new HttpException(404, 'Leave not found');
     }
 
-    if(LeaveCount<0){
+    if (leaveCount < 0) {
       throw new HttpException(401, 'Leave count must not be less than 0');
     }
 
     const checkfindLeave = await this.instructorHasLeave.findOne({
-      where: { InstituteInstructorId, LeaveTypeId },
+      where: { instituteInstructorId, leaveTypeId, leaveCount },
     });
     if (checkfindLeave) {
       throw new HttpException(400, 'Leave already exists');
@@ -180,30 +179,39 @@ class InstructorLeaveService {
 
     const updateLeave = await this.instructorHasLeave.update(
       {
-        InstituteInstructorId,
-        LeaveTypeId,
-        LeaveCount,
+        instituteInstructorId,
+        leaveTypeId,
+        leaveCount,
       },
-      { where: { id: IntructorLeaveId } }
+      { where: { id: intructorLeaveId } }
     );
     return { message: 'Leave updated successfully' };
   }
 
-  public async deleteInstructorLeave({ loggedUser, IntructorLeaveId }) {
+  public async deleteInstructorLeave({
+    loggedUser,
+    intructorLeaveId,
+  }): Promise<{ count: number }> {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     const findLeave = await this.instructorHasLeave.findOne({
-      where: { id: IntructorLeaveId },
+      where: { id: intructorLeaveId },
     });
     if (!findLeave) {
       throw new HttpException(404, 'Leave not found');
     }
     const deleteLeave = await this.instructorHasLeave.destroy({
-      where: { id: IntructorLeaveId },
+      where: { id: intructorLeaveId },
     });
-    return { message: 'Leave deleted successfully' };
+
+    let message =
+      deleteLeave === 1 ? 'Leave deleted successfully' : 'Leave not found';
+
+    return {
+      count: deleteLeave,
+    };
   }
 
   public async getInstructorsList({ loggedUser }) {
@@ -214,7 +222,7 @@ class InstructorLeaveService {
     const findInstructor = await this.instituteInstructor.findAndCountAll({
       attributes: ['id'],
       where: {
-        InstituteId: loggedUser.id,
+        instituteId: loggedUser.id,
         isAccepted: 'Accepted',
       },
       include: [

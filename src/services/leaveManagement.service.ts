@@ -139,8 +139,8 @@ class LeaveManagementService {
 
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
-        InstructorId: loggedUser.id,
-        InstituteId: findLivestream.instituteId,
+        instructorId: loggedUser.id,
+        instituteId: findLivestream.instituteId,
         isAccepted: 'Accepted',
       },
     });
@@ -153,7 +153,7 @@ class LeaveManagementService {
 
     const findLeave = await this.instrucorHasLeave.findAll({
       where: {
-        InstituteInstructorId: findInstitute.id,
+        instituteInstructorId: findInstitute.id,
       },
       include: [
         {
@@ -172,13 +172,18 @@ class LeaveManagementService {
     }
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
 
-    const findLivestream = await this.livestream.findByPk(leaveData.LiveStream);
+    // console.log(leaveData);
+
+    const findLivestream = await this.livestream.findOne({
+      id: leaveData.livestreamId,
+    });
+    // console.log(findLivestream);
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
-        InstructorId: loggedUser.id,
-        InstituteId: findLivestream.instituteId,
+        instructorId: loggedUser.id,
+        instituteId: findLivestream.instituteId,
         isAccepted: 'Accepted',
       },
     });
@@ -189,12 +194,12 @@ class LeaveManagementService {
         'You are not associated with this institute for this Event'
       );
 
-    var InstituteInstructorId = findInstitute.id;
+    var instituteInstructorId = findInstitute.id;
 
     const checkLeaveBalance = await this.instrucorHasLeave.findOne({
       where: {
-        InstituteInstructorId: InstituteInstructorId,
-        LeaveTypeId: leaveData.LeaveTypeId,
+        instituteInstructorId: instituteInstructorId,
+        leaveTypeId: leaveData.leaveTypeId,
       },
     });
 
@@ -204,7 +209,7 @@ class LeaveManagementService {
         'You do not have leave balance for this leave type'
       );
 
-    if (checkLeaveBalance.LeaveCount <= 0)
+    if (checkLeaveBalance.leaveCount <= 0)
       throw new HttpException(
         409,
         'You do not have leave balance for this leave type'
@@ -212,10 +217,10 @@ class LeaveManagementService {
 
     const checkLeave = await this.manageLeave.findOne({
       where: {
-        Date: leaveData.Date,
-        livestreamId: leaveData.LiveStream,
+        date: leaveData.date,
+        livestreamId: leaveData.liveStreamId,
         userId: loggedUser.id,
-        LeaveTypeId: leaveData.LeaveTypeId,
+        leaveTypeId: leaveData.leaveTypeId,
       },
     });
 
@@ -223,7 +228,7 @@ class LeaveManagementService {
 
     const checkHoliday = await this.holiday.findOne({
       where: {
-        date: leaveData.Date,
+        date: leaveData.date,
         instituteId: findLivestream.instituteId,
       },
     });
@@ -232,11 +237,8 @@ class LeaveManagementService {
       throw new HttpException(409, 'You cannot take leave on holiday');
 
     const createLeave = await this.manageLeave.create({
-      Date: leaveData.Date,
-      LeaveReason: leaveData.LeaveReason,
-      livestreamId: leaveData.LiveStream,
+      ...leaveData,
       userId: loggedUser.id,
-      LeaveTypeId: leaveData.LeaveTypeId,
     });
 
     if (!createLeave) throw new HttpException(409, 'Leave not created');
@@ -244,12 +246,12 @@ class LeaveManagementService {
     //update leave balance
     const updateLeaveBalance = await this.instrucorHasLeave.update(
       {
-        LeaveCount: checkLeaveBalance.LeaveCount - 1,
+        leaveCount: checkLeaveBalance.leaveCount - 1,
       },
       {
         where: {
-          InstituteInstructorId: InstituteInstructorId,
-          LeaveTypeId: leaveData.LeaveTypeId,
+          instituteInstructorId: instituteInstructorId,
+          leaveTypeId: leaveData.leaveTypeId,
         },
       }
     );
@@ -291,13 +293,15 @@ class LeaveManagementService {
     const findLeave = await this.manageLeave.findByPk(leaveId);
     if (!findLeave) throw new HttpException(409, 'Leave not found');
 
-    const findLivestream = await this.livestream.findByPk(leaveData.LiveStream);
+    const findLivestream = await this.livestream.findOne({
+      id: leaveData.liveStreamId,
+    });
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
-        InstructorId: loggedUser.id,
-        InstituteId: findLivestream.instituteId,
+        instructorId: loggedUser.id,
+        instituteId: findLivestream.instituteId,
         isAccepted: 'Accepted',
       },
     });
@@ -310,7 +314,7 @@ class LeaveManagementService {
 
     const checkHoliday = await this.holiday.findOne({
       where: {
-        date: leaveData.Date,
+        date: leaveData.date,
         instituteId: findLivestream.instituteId,
       },
     });
@@ -318,15 +322,12 @@ class LeaveManagementService {
     if (checkHoliday)
       throw new HttpException(409, 'You cannot take leave on holiday');
 
-    const InstituteInstructorId = findInstitute.id;
+    const instituteInstructorId = findInstitute.id;
 
     const updateLeave = await this.manageLeave.update(
       {
-        Date: leaveData.Date,
-        LeaveReason: leaveData.LeaveReason,
-        livestreamId: leaveData.LiveStream,
+        ...leaveData,
         userId: loggedUser.id,
-        LeaveTypeId: leaveData.LeaveTypeId,
       },
       {
         where: { id: leaveId },
@@ -363,9 +364,11 @@ class LeaveManagementService {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const findLeave = await this.manageLeave.findOne({where:{
-      id:leaveId
-    }});
+    const findLeave = await this.manageLeave.findOne({
+      where: {
+        id: leaveId,
+      },
+    });
     if (!findLeave) throw new HttpException(409, 'Leave not found');
 
     let isApproved = isApprovedCount.count === 0 ? 'Approved' : 'Rejected';
@@ -375,6 +378,52 @@ class LeaveManagementService {
         where: { id: leaveId },
       }
     );
+
+    if (!updateLeave) throw new HttpException(409, 'Leave not updated');
+
+    if (isApproved === 'Rejected') {
+      const findInstitute = await this.instituteInstructor.findOne({
+        where: {
+          instructorId: findLeave.UserId,
+          instituteId: loggedUser.id,
+          isAccepted: 'Accepted',
+        },
+      });
+
+      if (!findInstitute)
+        throw new HttpException(
+          409,
+          'You are not associated with this institute for this Event'
+        );
+
+      const instituteInstructorId = findInstitute.id;
+
+      const checkLeaveBalance = await this.instrucorHasLeave.findOne({
+        where: {
+          instituteInstructorId: instituteInstructorId,
+          leaveTypeId: findLeave.leaveTypeId,
+        },
+      });
+
+      if (!checkLeaveBalance)
+        throw new HttpException(409, 'Leave balance not found');
+
+      //update leave balance
+      const updateLeaveBalance = await this.instrucorHasLeave.update(
+        {
+          leaveCount: checkLeaveBalance.leaveCount + 1,
+        },
+        {
+          where: {
+            instituteInstructorId: instituteInstructorId,
+            leaveTypeId: findLeave.leaveTypeId,
+          },
+        }
+      );
+
+      if (!updateLeaveBalance)
+        throw new HttpException(409, 'Leave balance not updated');
+    }
 
     return { count: isApprovedCount.count };
   }
@@ -389,7 +438,7 @@ class LeaveManagementService {
     if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
 
     const findEvents = await this.livestream.findAll({
-      where: { date: newDate,userId:loggedUser.id },
+      where: { date: newDate, userId: loggedUser.id },
       attributes: ['id', 'date', 'startTime', 'endTime', 'title'],
     });
 

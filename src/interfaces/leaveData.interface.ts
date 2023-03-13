@@ -1,8 +1,8 @@
 export interface LeaveData {
   id: string;
-  Date: Date;
-  LeaveReason: string;
-  LeaveType: string;
+  date: Date;
+  leaveReason: string;
+  leaveTypeId: string;
   isApproved: string;
   isInstructor: boolean;
   isStudent: boolean;
@@ -11,8 +11,8 @@ export interface LeaveData {
 }
 
 export interface AddLeaveData {
-  Date: Date;
-  LeaveReason: string;
-  LeaveType: string;
+  date: Date;
+  leaveReason: string;
+  leaveTypeId: string;
   livestreamId: string;
 }

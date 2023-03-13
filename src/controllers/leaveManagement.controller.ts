@@ -40,10 +40,10 @@ class LeaveManagementController {
   ) => {
     try {
       const loggedUser = req.user;
-      const { Date } = req.body;
+      const { date } = req.body;
       const getEventData = await this.leaveManagementService.getEventsByDate(
         loggedUser,
-        Date
+        date
       );
       res.status(200).send({ EventData: getEventData, message: 'Events List' });
     } catch (error) {

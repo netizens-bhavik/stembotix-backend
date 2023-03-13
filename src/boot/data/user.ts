@@ -1,13 +1,13 @@
-// const StudentData = [
+// const userData = [
 //   {
 //     firstName: 'Admin',
 //     lastName: 'Manual',
-//     email: 'admin@yopmail.com',
+//     email: 'admin1@yopmail.com',
 //     password: 'admin@123',
 //     date_of_birth: '07-11-2000',
 //     isEmailVerified: true,
 //     role: 'Admin',
-//     role_id: 'b1f6e85e-8d3d-4a9b-99ca-118f12f1fd84',
+//     role_id: '5fd18683-afe2-4029-82a8-ae6e2e5397bd',
 //   },
 //   {
 //     firstName: 'Alice',
@@ -17,7 +17,7 @@
 //     date_of_birth: '02-05-1987',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Bob',
@@ -27,7 +27,7 @@
 //     date_of_birth: '07-22-1992',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Charlie',
@@ -37,7 +37,7 @@
 //     date_of_birth: '11-15-1985',
 //     isEmailVerified: true,
 //     role: 'Instructor',
-//     role_id: '0ed4bfe7-95c5-4f53-8b40-f0fcb84e22a7',
+//     role_id: '1e4c4fe6-266b-44c0-a114-03d1fe0abc4f',
 //   },
 //   {
 //     firstName: 'Diana',
@@ -47,7 +47,7 @@
 //     date_of_birth: '05-03-1996',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Ethan',
@@ -57,7 +57,7 @@
 //     date_of_birth: '09-12-1988',
 //     isEmailVerified: true,
 //     role: 'Instructor',
-//     role_id: '0ed4bfe7-95c5-4f53-8b40-f0fcb84e22a7',
+//     role_id: '1e4c4fe6-266b-44c0-a114-03d1fe0abc4f',
 //   },
 //   {
 //     firstName: 'Frank',
@@ -67,7 +67,7 @@
 //     date_of_birth: '12-29-1993',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Grace',
@@ -77,7 +77,7 @@
 //     date_of_birth: '04-18-1999',
 //     isEmailVerified: true,
 //     role: 'Instructor',
-//     role_id: '0ed4bfe7-95c5-4f53-8b40-f0fcb84e22a7',
+//     role_id: '1e4c4fe6-266b-44c0-a114-03d1fe0abc4f',
 //   },
 //   {
 //     firstName: 'Henry',
@@ -87,7 +87,7 @@
 //     date_of_birth: '08-01-1990',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Isabel',
@@ -97,7 +97,7 @@
 //     date_of_birth: '03-07-1987',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 //   {
 //     firstName: 'Jack',
@@ -107,7 +107,7 @@
 //     date_of_birth: '06-11-1994',
 //     isEmailVerified: true,
 //     role: 'Instructor',
-//     role_id: '0ed4bfe7-95c5-4f53-8b40-f0fcb84e22a7',
+//     role_id: '1e4c4fe6-266b-44c0-a114-03d1fe0abc4f',
 //   },
 //   {
 //     firstName: 'Karen',
@@ -117,7 +117,7 @@
 //     date_of_birth: '10-26-1992',
 //     isEmailVerified: true,
 //     role: 'Student',
-//     role_id: 'e8852299-c9ed-4cd6-be64-7441099eb116',
+//     role_id: 'd5b81b78-a84f-4f3c-a474-21fec43f6388',
 //   },
 // ];
 const StudentData = {
