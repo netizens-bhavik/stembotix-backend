@@ -7,7 +7,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      LeaveCount: {
+      leaveCount: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -17,18 +17,13 @@ module.exports = (sequelize, Sequelize) => {
   );
   InstructorHasLeave.associate = (models) => {
     InstructorHasLeave.belongsTo(models.InstituteInstructor, {
-      foreignKey: 'InstituteInstructorId',
+      foreignKey: 'instituteInstructorId',
       targetKey: 'id',
     });
     InstructorHasLeave.belongsTo(models.LeaveTypes, {
-      foreignKey: 'LeaveTypeId',
+      foreignKey: 'leaveTypeId',
       targetKey: 'id',
     });
-    // InstructorHasLeave.belongsTo(models.LeaveTypes, {
-    //   foreignKey: 'LeaveTypeId',
-    //   targetKey: 'id',
-    //   as: 'LeaveType',
-    // });
   };
   return InstructorHasLeave;
 };

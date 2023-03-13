@@ -51,8 +51,8 @@ class LeaveTypeService {
 
     const findLeave = await this.leaveType.findAndCountAll({
       where: DB.Sequelize.or(
-        { LeaveName: { [searchCondition]: search } },
-        { LeaveDescription: { [searchCondition]: search } }
+        { leaveName: { [searchCondition]: search } },
+        { leaveDescription: { [searchCondition]: search } }
       ),
       limit: pageSize,
       offset: pageNo,
@@ -74,8 +74,9 @@ class LeaveTypeService {
 
     const findLeaveType = await this.leaveType.findOne({
       where: {
-        LeaveName: leaveTypeData.LeaveName,
-        Type: leaveTypeData.Type,
+        leaveName: leaveTypeData.leaveName,
+        type: leaveTypeData.type,
+        // IsEnable: true,
       },
     });
 
@@ -84,9 +85,7 @@ class LeaveTypeService {
     }
 
     const createLeaveType = await this.leaveType.create({
-      LeaveName: leaveTypeData.LeaveName,
-      LeaveDescription: leaveTypeData.LeaveDescription,
-      Type: leaveTypeData.Type,
+      ...leaveTypeData,
     });
 
     return createLeaveType;
@@ -115,9 +114,6 @@ class LeaveTypeService {
     const updateLeaveType = await this.leaveType.update(
       {
         ...leaveTypeData,
-        //   LeaveName: leaveTypeData.LeaveName,
-        //   LeaveDescription: leaveTypeData.LeaveDescription,
-        //   Type: leaveTypeData.Type,
       },
       {
         where: {

@@ -2,11 +2,11 @@ import { IsString, IsBoolean, IsUUID, IsNumber } from 'class-validator';
 
 export class InstructorLeaveCountDTO {
   @IsNumber()
-  public LeaveCount: number;
+  public leaveCount: number;
 
   @IsUUID()
-  public LeaveTypeId: string;
+  public leaveTypeId: string;
 
   @IsUUID()
-  public InstituteInstructorId: string;
+  public instituteInstructorId: string;
 }

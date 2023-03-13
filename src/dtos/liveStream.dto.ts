@@ -25,7 +25,7 @@ export class LiveStreamDTO {
   public description: string;
 
   @IsDateString()
-  public Date: Date;
+  public date: Date;
 
   @IsString()
   public startTime: Time;
