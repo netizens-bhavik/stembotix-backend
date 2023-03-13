@@ -31,17 +31,17 @@ module.exports = (sequelize, Sequelize) => {
   );
   InstituteInstructor.associate = (models) => {
     InstituteInstructor.belongsTo(models.User, {
-      foreignKey: 'InstructorId',
+      foreignKey: 'instructorId',
       targetKey: 'id',
       as: 'Instructor',
     });
     InstituteInstructor.belongsTo(models.User, {
-      foreignKey: 'InstituteId',
+      foreignKey: 'instituteId',
       targetKey: 'id',
       as: 'Institute',
     });
     InstituteInstructor.hasMany(models.InstructorHasLeave, {
-      foreignKey: 'InstituteInstructorId',
+      foreignKey: 'instituteInstructorId',
       sourceKey: 'id',
     });
   };

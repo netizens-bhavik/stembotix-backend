@@ -17,11 +17,11 @@ module.exports = (sequelize, Sequelize) => {
   );
   InstructorHasLeave.associate = (models) => {
     InstructorHasLeave.belongsTo(models.InstituteInstructor, {
-      foreignKey: 'InstituteInstructorId',
+      foreignKey: 'instituteInstructorId',
       targetKey: 'id',
     });
     InstructorHasLeave.belongsTo(models.LeaveTypes, {
-      foreignKey: 'LeaveTypeId',
+      foreignKey: 'leaveTypeId',
       targetKey: 'id',
     });
     // InstructorHasLeave.belongsTo(models.LeaveTypes, {

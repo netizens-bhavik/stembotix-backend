@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      Date: {
+      date: {
         type: Sequelize.DATE,
         allowNull: false,
       },
