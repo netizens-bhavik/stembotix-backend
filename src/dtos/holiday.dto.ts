@@ -1,4 +1,4 @@
-import { IsDateString, IsUUID } from 'class-validator';
+import { IsDateString, IsOptional, IsUUID } from 'class-validator';
 
 export class HolidayDTO {
   @IsDateString()
@@ -6,4 +6,9 @@ export class HolidayDTO {
 
   @IsUUID()
   public holidayListId: string;
+
+
+  @IsUUID()
+  @IsOptional()
+  public instituteId: string;
 }

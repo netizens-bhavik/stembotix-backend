@@ -18,7 +18,7 @@ class HolidayListRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `${this.path}/`,
+      `${this.path}`,
       [passport.authenticate('jwt', { session: false })],
       this.holidayListController.getHolidayList
     );
@@ -30,7 +30,7 @@ class HolidayListRoute implements Routes {
     );
 
     this.router.post(
-      `${this.path}/`,
+      `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
         validationMiddleware(HolidayListDTO, 'body'),

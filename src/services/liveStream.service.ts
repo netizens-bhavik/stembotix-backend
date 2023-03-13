@@ -18,6 +18,9 @@ class LiveStreamService {
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
   }
+  public isUser(user): boolean {
+    return user.role === 'Student';
+  }
   public async createLiveStream({
     file,
     user,
@@ -69,10 +72,10 @@ class LiveStreamService {
   public async updateLiveStream({
     livestreamDetails,
     file,
-    trainer,
-    livestreamId
+    user,
+    livestreamId,
   }): Promise<{ count: number; rows: LiveStream[] }> {
-    if (!this.isTrainer(trainer) || !trainer.isEmailVerified)
+    if (this.isUser(user) || !user.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
 
     const record = await this.liveStream.findOne({
@@ -80,7 +83,10 @@ class LiveStreamService {
         id: livestreamId,
       },
     });
-    if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (!record) throw new HttpException(404, 'No stream Found');
+
+    if (user.id !== record.userId && user.id !== record.instituteId)
+      throw new HttpException(403, "You don't have Authority to Update Event");
 
     const thumbnail = file;
     if (thumbnail) {
@@ -105,10 +111,10 @@ class LiveStreamService {
   }
 
   public async deleteLiveStream({
-    trainer,
+    user,
     livestreamId,
   }): Promise<{ count: number }> {
-    if (!this.isTrainer(trainer))
+    if (this.isUser(user))
       throw new HttpException(401, "You don't have Authority to Delete Event");
 
     let record = await this.liveStream.findOne({
@@ -122,6 +128,10 @@ class LiveStreamService {
       ],
     });
     if (!record) throw new HttpException(404, 'No Record Found');
+
+    if (user.id !== record.userId && user.id !== record.instituteId)
+      throw new HttpException(403, "You don't have Authority to Delete Event");
+
     const res = await this.liveStream.destroy({
       where: {
         id: record.id,
@@ -160,7 +170,13 @@ class LiveStreamService {
           [searchCondition]: search,
         },
       },
-      include: { model: this.user },
+      include: [
+        { model: this.user },
+        {
+          model: this.user,
+          as: 'Institute',
+        },
+      ],
 
       limit: pageSize,
       offset: pageNo,
@@ -198,6 +214,10 @@ class LiveStreamService {
           where: {
             id: trainerRecord.user_id,
           },
+        },
+        {
+          model: this.user,
+          as: 'Institute',
         },
       ],
       limit: pageSize,

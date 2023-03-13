@@ -163,7 +163,7 @@ class ProductService {
       include: [
         {
           model: this.user,
-          through: [],
+          through: { attributes: [] },
           where: {
             id: creatorRecord.id,
           },
@@ -253,7 +253,7 @@ class ProductService {
       include: [
         {
           model: this.user,
-          through: [],
+          through: { attributes: [] },
         },
         {
           model: this.productDimension,

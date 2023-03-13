@@ -79,12 +79,11 @@ class HolidayListController {
       const loggedUser = req.user;
       const holidayListId = req.params.id;
       const holidayListData: HolidayList = req.body;
-      const holidayList: HolidayList =
-        await this.holidayListService.updateHolidayList({
-          loggedUser,
-          holidayListId,
-          holidayListData,
-        });
+      const holidayList = await this.holidayListService.updateHolidayList({
+        loggedUser,
+        holidayListId,
+        holidayListData,
+      });
 
       res.status(200).send(holidayList);
     } catch (error) {
@@ -100,7 +99,7 @@ class HolidayListController {
     try {
       const loggedUser = req.user;
       const holidayListId = req.params.id;
-      const holidayList: HolidayList =
+      const holidayList: { count: number } =
         await this.holidayListService.deleteHolidayList({
           loggedUser,
           holidayListId,

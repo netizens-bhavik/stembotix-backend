@@ -19,11 +19,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM('Sick', 'Paid', 'Unpaid'),
         allowNull: false,
       },
-      // IsEnable: {
-      //   type: Sequelize.BOOLEAN,
-      //   allowNull: false,
-      //   defaultValue: true,
-      // },
     },
     { paranoid: true }
   );
