@@ -96,7 +96,7 @@ class LeaveManagementRoute implements Routes {
     //approve leave by id
     this.router.put(
       `${this.path}/approve/:leaveId`,
-        passport.authenticate('jwt', { session: false }),
+      passport.authenticate('jwt', { session: false }),
       this.leaveManagementController.approveLeaveById
     );
   }

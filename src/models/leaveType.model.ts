@@ -7,15 +7,15 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      LeaveName: {
+      leaveName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      LeaveDescription: {
+      leaveDescription: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      Type: {
+      type: {
         type: Sequelize.ENUM('Sick', 'Paid', 'Unpaid'),
         allowNull: false,
       },
@@ -24,12 +24,11 @@ module.exports = (sequelize, Sequelize) => {
   );
   LeaveTypes.associate = (models) => {
     LeaveTypes.hasMany(models.InstructorHasLeave, {
-      foreignKey: 'LeaveTypeId',
+      foreignKey: 'leaveTypeId',
       sourceKey: 'id',
-      as: 'LeaveType',
     });
     LeaveTypes.hasMany(models.ManageLeaves, {
-      foreignKey: 'LeaveTypeId',
+      foreignKey: 'leaveTypeId',
       sourceKey: 'id',
     });
   };
