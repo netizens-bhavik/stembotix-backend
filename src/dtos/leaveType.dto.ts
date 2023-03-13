@@ -2,11 +2,11 @@ import { IsString, IsBoolean, IsEnum } from 'class-validator';
 
 export class LeaveTypeDTO {
   @IsString()
-  public LeaveName: string;
+  public leaveName: string;
 
   @IsString()
-  public LeaveDescription: string;
+  public leaveDescription: string;
 
   @IsEnum(['Sick', 'Paid', 'Unpaid'])
-  public Type: string;
+  public type: string;
 }

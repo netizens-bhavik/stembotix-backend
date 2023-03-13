@@ -41,18 +41,16 @@ class InstituteInstructorService {
 
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
-        InstituteId: loggedUser.id,
-        instructor_id: instructorDetail.instructorId,
+        instituteId: loggedUser.id,
+        instructorId: instructorDetail.instructorId,
       },
     });
     if (findInstituteInstructor)
       throw new HttpException(409, 'Request already sent');
 
     const createInstituteInstructor = await this.instituteInstructor.create({
-      InstituteId: loggedUser.id,
-      InstructorId: instructorDetail.instructorId,
-      proposal: instructorDetail.proposal,
-      email: instructorDetail.email,
+      ...instructorDetail,
+      instituteId: loggedUser.id,
     });
     if (createInstituteInstructor) {
       const mailData: Mail = {
@@ -130,7 +128,7 @@ class InstituteInstructorService {
       : ['', DB.Sequelize.Op.ne];
 
     const resposnse = await this.instituteInstructor.findAndCountAll({
-      where: { InstituteId: loggedUser.id },
+      where: { instituteId: loggedUser.id },
       include: [
         {
           model: this.user,
@@ -251,7 +249,7 @@ class InstituteInstructorService {
           model: this.user,
           // attributes:['firstName','lastName','fullName'],
           as: 'Institute',
-          required:true
+          required: true,
         },
       ],
     });

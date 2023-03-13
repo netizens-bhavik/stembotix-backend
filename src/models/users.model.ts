@@ -130,12 +130,12 @@ module.exports = (sequelize, Sequelize) => {
     });
 
     User.hasMany(models.InstituteInstructor, {
-      foreignKey: 'InstructorId',
+      foreignKey: 'instructorId',
       targetKey: 'id',
       as: 'Instructor',
     });
     User.hasMany(models.InstituteInstructor, {
-      foreignKey: 'InstituteId',
+      foreignKey: 'instituteId',
       targetKey: 'id',
       as: 'Institute',
     });

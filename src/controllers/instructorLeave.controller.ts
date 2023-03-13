@@ -59,13 +59,12 @@ class InstructorLeaveController {
     try {
       const loggedUser = req.user;
       const leaveData = req.body;
-      const IntructorLeaveId = req.params.id;
-
+      const intructorLeaveId = req.params.id;
       const instructorLeaves =
         await this.instructorLeaveService.updateInstructorLeave({
           loggedUser,
           leaveData,
-          IntructorLeaveId,
+          intructorLeaveId,
         });
 
       res.status(200).send(instructorLeaves);
@@ -81,12 +80,12 @@ class InstructorLeaveController {
   ) => {
     try {
       const loggedUser = req.user;
-      const IntructorLeaveId = req.params.id;
+      const intructorLeaveId = req.params.id;
 
       const instructorLeaves =
         await this.instructorLeaveService.deleteInstructorLeave({
           loggedUser,
-          IntructorLeaveId,
+          intructorLeaveId,
         });
 
       res.status(200).send(instructorLeaves);

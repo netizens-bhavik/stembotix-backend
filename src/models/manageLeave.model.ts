@@ -7,11 +7,11 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      Date: {
+      date: {
         type: Sequelize.DATEONLY,
         allowNull: false,
       },
-      LeaveReason: {
+      leaveReason: {
         type: Sequelize.TEXT,
         allowNull: false,
       },
@@ -34,7 +34,7 @@ module.exports = (sequelize, Sequelize) => {
     });
 
     ManageLeaves.belongsTo(models.LeaveTypes, {
-      foreignKey: 'LeaveTypeId',
+      foreignKey: 'leaveTypeId',
       targetKey: 'id',
     });
   };

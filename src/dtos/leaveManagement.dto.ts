@@ -14,21 +14,21 @@ import {
 
 export class leaveManagementRequestDTO {
   @IsDateString()
-  public Date: Date;
+  public date: Date;
 
   @IsString()
-  public LeaveReason: string;
+  public leaveReason: string;
 
   @IsUUID()
-  public LeaveTypeId: string;
+  public leaveTypeId: string;
 
   @IsUUID()
-  public LiveStream: string;
+  public liveStreamId: string;
 }
 
 export class leaveManagementDateRequestDTO {
   @IsDateString()
-  public Date: Date;
+  public date: Date;
 }
 
 export class leaveManagementBulkRequestDTO {
