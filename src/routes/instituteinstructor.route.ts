@@ -62,9 +62,7 @@ class InstituteInstroctorRoute implements Routes {
     //for instructor to approve
     this.router.put(
       `${this.path}/request-instructor/:offerId`,
-
       passport.authenticate('jwt', { session: false }),
-
       this.instituteInstuctorController.acceptInstructorRequest
     );
 
@@ -96,6 +94,12 @@ class InstituteInstroctorRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.viewRequest
     );
+    this.router.get(
+      `/instructor${this.path}/allInstitute`,
+      passport.authenticate('jwt', { session: false }),
+      this.instituteInstuctorController.viewInstituteByInstructor
+    );
+
   }
 }
 

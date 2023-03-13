@@ -45,10 +45,6 @@ class HolidayService {
     loggedUser,
     queryObject,
   }): Promise<AllHolidaywithDetails> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    // if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
-    //   throw new HttpException(403, 'Forbidden Resource');
-    // }
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'ASC' ? 'ASC' : 'DESC';
     // pagination
@@ -82,11 +78,6 @@ class HolidayService {
   }
 
   public async getAllHolidays({ loggedUser }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    // if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
-    //   throw new HttpException(403, 'Forbidden Resource');
-    // }
-
     const findLeave = await this.holiday.findAll({
       // attributes: ['id', 'date'],
       include: [
@@ -98,11 +89,10 @@ class HolidayService {
       ],
     });
 
-    return { data: findLeave };
+    return findLeave;
   }
 
   public async createHoliday({ loggedUser, holidayData }): Promise<any> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -127,7 +117,6 @@ class HolidayService {
     holidayId,
     holidayData,
   }): Promise<any> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -145,12 +134,12 @@ class HolidayService {
       throw new HttpException(409, `Holiday already exists`);
 
     const updateHolidayData = await this.holiday.update(
-      { ...holidayData, instituteId: loggedUser.id },
+      { ...holidayData },
       {
         where: { id: holidayId },
+        returning: true,
       }
     );
-
     if (!updateHolidayData)
       throw new HttpException(409, `Something went wrong`);
 
@@ -158,7 +147,6 @@ class HolidayService {
   }
 
   public async deleteHoliday({ loggedUser, holidayId }): Promise<HolidayList> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }

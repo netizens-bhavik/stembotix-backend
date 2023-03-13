@@ -170,5 +170,19 @@ class InstituteInstructorController {
       next(error);
     }
   };
+  public viewInstituteByInstructor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const response =
+        await this.instituteInstructionService.viewInstituteByInstructor(user);
+        res.status(200).send(response)
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 export default InstituteInstructorController;

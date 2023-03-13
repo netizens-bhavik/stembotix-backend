@@ -27,7 +27,7 @@ import LeaveManagementRoute from './routes/leaveManagement.route';
 import UniversalSearchRoute from './routes/universalSearch.route';
 import LeaveTypeRoute from './routes/leaveType.route';
 import InstructorLeaveRoute from './routes/instructorHasLeave.route';
-import CourseTypeRoute from './routes/couresType.route';
+import CourseTypeRoute from './routes/courseType.route';
 import HolidayListRoute from './routes/holidayList.route';
 import HolidayRoute from './routes/holiday.route';
 

@@ -19,8 +19,10 @@ class OrderService {
   public orderItem = DB.OrderItem;
   public cartItem = DB.CartItem;
   public cart = DB.Cart;
-  public course = DB.Coures;
+  public course = DB.Course;
   public product = DB.Product;
+  public review = DB.Review;
+  public trainer = DB.Trainer;
   public orderData = new OrderData();
 
   public isTrainer(user): boolean {
@@ -33,11 +35,6 @@ class OrderService {
     });
     return OrderData;
   }
-
-  // public isTrainer(user): boolean {
-  //   return user.role === 'Instructor' || user.role === 'Admin';
-  // }
-
   public async listOrders(userId: string) {
     const data = await this.order.findAll({
       where: { user_id: userId },
@@ -45,14 +42,27 @@ class OrderService {
         model: this.orderItem,
         include: [
           {
-            model: DB.Product,
-          },
-          {
-            model: DB.Course,
+            model: this.product,
             include: [
               {
-                model: DB.Trainer,
-                include: { model: DB.User },
+                model: this.user,
+                through: { attributes: [] },
+              },
+              {
+                model: this.review,
+              },
+            ],
+          },
+          {
+            model: this.course,
+            include: [
+              {
+                model: this.trainer,
+                through: { attributes: [] },
+                include: { model: this.user },
+              },
+              {
+                model: this.review,
               },
             ],
           },
@@ -63,92 +73,6 @@ class OrderService {
     if (!data) throw new HttpException(404, 'No order exist');
     return data;
   }
-
-  // public async listOrdersByAdmin({
-  //   trainer,
-  //   queryObject,
-  // }): Promise<{ totalCount: number; records: (OrderItem | undefined)[] }> {
-  //   if (!this.isTrainer(trainer)) {
-  //     throw new HttpException(403, 'Forbidden Resource');
-  //   }
-  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-  //   const order = queryObject.order || 'DESC';
-  //   // pagination
-  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-  //   // Search
-  //   const [search, searchCondition] = queryObject.search
-  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-  //     : ['', DB.Sequelize.Op.ne];
-
-  //   const orderData = await this.orderItem.findAndCountAll({
-  //     where: { deletedAt: null },
-  //   });
-
-  //   const data = await this.order.findAll({
-  //     include: [
-  //       {
-  //         model: DB.User,
-  //         where: DB.Sequelize.or(
-  //           {
-  //             firstName: {
-  //               [searchCondition]: search,
-  //             },
-  //           },
-  //           {
-  //             lastName: {
-  //               [searchCondition]: search,
-  //             },
-  //           }
-  //           ),
-  //         },
-  //         {
-  //           model: DB.OrderItem,
-  //           // where: DB.Sequelize.or({
-  //           //   item_type: {
-  //           //     [searchCondition]: search,
-  //           //   },
-  //           // }),
-  //         },
-  //       ],
-  //     subQuery: false,
-  //     limit: pageSize,
-  //     offset: pageNo,
-  //     order: [[`${sortBy}`, `${order}`]],
-  //   });
-  //   return { totalCount: orderData.count, records: data };
-  // }
-
-  // public async listOrdersByAdmin({
-  //   trainer,
-  //   queryObject,
-  // }): Promise<{ totalCount: number; records: (OrderItem | undefined)[] }> {
-  //   if (!this.isTrainer(trainer)) {
-  //     throw new HttpException(403, 'Forbidden Resource');
-  //   }
-  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-  //   const order = queryObject.order || 'DESC';
-  //   // pagination
-  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-  //   // Search
-  //   const [search, searchCondition] = queryObject.search
-  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-  //     : ['', DB.Sequelize.Op.ne];
-
-  //   const orderData = await this.orderItem.findAndCountAll({
-  //     where: { deletedAt: null },
-  //   });
-  //   const data = await this.orderItem.findAll({
-  //     where: {
-  //       item_type: { [searchCondition]: search },
-  //     },
-  //     limit: pageSize,
-  //     offset: pageNo,
-  //     order: [[`${sortBy}`, `${order}`]],
-  //   });
-  //   return { totalCount: orderData.count, records: data };
-  // }
 
   public async addOrder(user, amount) {
     // Razorpay Instance
@@ -198,10 +122,10 @@ class OrderService {
     const keySecret = RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac('sha256', keySecret);
     hmac.update(razorpay_order_id + '|' + payment_id);
-    // const digest = hmac.digest('hex');
+    const digest = hmac.digest('hex');
 
-    // if (digest !== razorpay_signature)
-    //   throw new HttpException(400, 'Transaction is not legit');
+    if (digest !== razorpay_signature)
+      throw new HttpException(400, 'Transaction is not legit');
 
     // If payment is verified
     const paymentData = {

@@ -60,7 +60,7 @@ class LeaveTypeService {
     });
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
-  public async getAllLeaveType( loggedUser) {
+  public async getAllLeaveType(loggedUser) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     const findLeave = await this.leaveType.findAndCountAll();
     return { totalCount: findLeave.count, records: findLeave.rows };
@@ -76,7 +76,6 @@ class LeaveTypeService {
       where: {
         LeaveName: leaveTypeData.LeaveName,
         Type: leaveTypeData.Type,
-        // IsEnable: true,
       },
     });
 
@@ -88,7 +87,6 @@ class LeaveTypeService {
       LeaveName: leaveTypeData.LeaveName,
       LeaveDescription: leaveTypeData.LeaveDescription,
       Type: leaveTypeData.Type,
-      // IsEnable: true,
     });
 
     return createLeaveType;
@@ -116,9 +114,10 @@ class LeaveTypeService {
 
     const updateLeaveType = await this.leaveType.update(
       {
-        LeaveName: leaveTypeData.LeaveName,
-        LeaveDescription: leaveTypeData.LeaveDescription,
-        Type: leaveTypeData.Type,
+        ...leaveTypeData,
+        //   LeaveName: leaveTypeData.LeaveName,
+        //   LeaveDescription: leaveTypeData.LeaveDescription,
+        //   Type: leaveTypeData.Type,
       },
       {
         where: {

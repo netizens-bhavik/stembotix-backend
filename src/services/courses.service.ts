@@ -158,7 +158,6 @@ class CourseService {
       thumbnail: thumbnailPath,
     });
 
-
     newCourse.addTrainer(trainerRecord);
     if (newCourse) {
       const mailData: Mail = {
@@ -199,7 +198,7 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          through: [],
+          through: { attributes: [] },
           include: [
             {
               model: this.user,
@@ -552,7 +551,7 @@ class CourseService {
       include: [
         {
           model: this.trainer,
-          through: [],
+          through: { attributes: [] },
           where: {
             trainer_id: trainerRecord.trainer_id,
           },
@@ -607,6 +606,7 @@ class CourseService {
               },
             ],
           },
+          subQuery: false,
         },
         {
           model: this.course,
@@ -617,7 +617,6 @@ class CourseService {
           include: [
             {
               model: this.review,
-              // separate:true,
               attributes: ['rating'],
               separate: true,
             },
@@ -631,7 +630,6 @@ class CourseService {
           ],
         },
       ],
-      subQuery: false,
       limit: pageSize,
       offset: pageNo,
       order: [
