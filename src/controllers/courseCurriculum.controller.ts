@@ -13,8 +13,10 @@ class CurriculumSectionController {
   ) => {
     try {
       const curriculumDetails = req.body;
+      const user = req.user;
       const response = await this.curriculumSectionService.addSection({
         curriculumDetails,
+        user,
       });
       res.status(200).send(response);
     } catch (error) {
@@ -53,11 +55,11 @@ class CurriculumSectionController {
       const { curriculumId } = req.params;
       const curriculumDetails = req.body;
       const trainer = req.user;
-      curriculumDetails['id'] = curriculumId;
 
       const response = await this.curriculumSectionService.updateSection({
         curriculumDetails,
         trainer,
+        curriculumId,
       });
       res.status(200).send(response);
     } catch (error) {
