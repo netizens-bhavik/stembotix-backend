@@ -41,7 +41,6 @@ class LeaveManagementService {
     loggedUser,
     queryObject,
   }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (
       this.isInstructor(loggedUser) ||
       (this.isStudent(loggedUser) && !this.isInstitute(loggedUser))
@@ -90,7 +89,6 @@ class LeaveManagementService {
     loggedUser,
     queryObject,
   }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -129,7 +127,6 @@ class LeaveManagementService {
   }
 
   public async getLeaveTypeforInstructor({ loggedUser, livestreamId }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -166,7 +163,6 @@ class LeaveManagementService {
   }
 
   public async createLeave(loggedUser, leaveData): Promise<AddLeaveData> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -263,7 +259,6 @@ class LeaveManagementService {
   }
 
   public async getLeaveById(loggedUser, leaveId) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser) && !this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -284,15 +279,15 @@ class LeaveManagementService {
   }
 
   public async updateLeaveById(loggedUser, leaveId, leaveData) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
 
     const findLeave = await this.manageLeave.findByPk(leaveId);
+    
     if (!findLeave) throw new HttpException(409, 'Leave not found');
-
+    
     const findLivestream = await this.livestream.findOne({
       id: leaveData.liveStreamId,
     });
@@ -340,7 +335,6 @@ class LeaveManagementService {
   }
 
   public async deleteLeaveById(loggedUser, leaveId) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstructor(loggedUser) && !this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -454,7 +448,6 @@ class LeaveManagementService {
   }
 
   public async getLeaveByInstitute({ loggedUser, queryObject }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
