@@ -100,11 +100,11 @@ class InstructorLeaveService {
   }
 
   public async addInstructorLeave({ loggedUser, leaveData }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     const { instituteInstructorId, leaveTypeId, leaveCount } = leaveData;
+
     const findInstructor = await this.instituteInstructor.findOne({
       where: { id: instituteInstructorId },
     });
@@ -129,12 +129,10 @@ class InstructorLeaveService {
     }
 
     const createLeave = await this.instructorHasLeave.create({
-      instituteInstructorId,
-      leaveTypeId,
-      leaveCount,
+      ...leaveData,
     });
 
-    return { message: 'Leave added successfully' };
+    return createLeave;
   }
 
   public async updateInstructorLeave({
@@ -142,7 +140,6 @@ class InstructorLeaveService {
     leaveData,
     intructorLeaveId,
   }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -178,21 +175,16 @@ class InstructorLeaveService {
     }
 
     const updateLeave = await this.instructorHasLeave.update(
-      {
-        instituteInstructorId,
-        leaveTypeId,
-        leaveCount,
-      },
+      { ...leaveData },
       { where: { id: intructorLeaveId } }
     );
-    return { message: 'Leave updated successfully' };
+    return updateLeave;
   }
 
   public async deleteInstructorLeave({
     loggedUser,
     intructorLeaveId,
   }): Promise<{ count: number }> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -202,12 +194,16 @@ class InstructorLeaveService {
     if (!findLeave) {
       throw new HttpException(404, 'Leave not found');
     }
+    if (
+      loggedUser.id !== findLeave.instituteInstructorId &&
+      loggedUser.role !== 'Admin'
+    )
+      throw new HttpException(403, "You don't have Authority to Delete Leave");
     const deleteLeave = await this.instructorHasLeave.destroy({
       where: { id: intructorLeaveId },
     });
-
-    let message =
-      deleteLeave === 1 ? 'Leave deleted successfully' : 'Leave not found';
+    if (deleteLeave === 1)
+      throw new HttpException(200, 'Leave Deleted Successfully');
 
     return {
       count: deleteLeave,

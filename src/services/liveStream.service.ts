@@ -85,7 +85,11 @@ class LiveStreamService {
     });
     if (!record) throw new HttpException(404, 'No stream Found');
 
-    if (user.id !== record.userId && user.id !== record.instituteId)
+    if (
+      user.id !== record.userId &&
+      user.id !== record.instituteId &&
+      user.role !== 'Admin'
+    )
       throw new HttpException(403, "You don't have Authority to Update Event");
 
     const thumbnail = file;
@@ -129,7 +133,11 @@ class LiveStreamService {
     });
     if (!record) throw new HttpException(404, 'No Record Found');
 
-    if (user.id !== record.userId && user.id !== record.instituteId)
+    if (
+      user.id !== record.userId &&
+      user.id !== record.instituteId &&
+      user.role !== 'Admin'
+    )
       throw new HttpException(403, "You don't have Authority to Delete Event");
 
     const res = await this.liveStream.destroy({

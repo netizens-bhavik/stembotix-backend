@@ -395,6 +395,8 @@ class CourseService {
       },
     });
     if (!record) throw new HttpException(404, 'No Data Found');
+    if (trainer.id !== record.user_id && trainer.role !== 'Admin')
+      throw new HttpException(403, "You don't have Authority to Update Course");
 
     const { trailer, thumbnail } = file;
 
@@ -430,7 +432,7 @@ class CourseService {
 
   public async deleteCourse({ trainer, courseId }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
-    const courseRecord: Course = await this.course.findOne({
+    const courseRecord = await this.course.findOne({
       where: {
         id: courseId,
       },
@@ -461,6 +463,12 @@ class CourseService {
         'This course is published and can not be deleted. Please unpublished this course first with the help of Admin'
       );
     }
+    if (
+      trainer.id !== courseRecord.Trainers[0].UserId &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(403, "You don't have Authority to Delete Course");
+
     const responses = await this.orderitem.findAll({
       where: {
         course_id: courseId,

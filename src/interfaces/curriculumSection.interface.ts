@@ -3,4 +3,5 @@ export interface CurriculumSection {
   title: string;
   objective: string;
   course_id: string;
+  userId: string;
 }
