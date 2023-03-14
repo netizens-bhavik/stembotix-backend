@@ -19,8 +19,12 @@ class CurriculumSectionService {
 
   public async addSection({
     curriculumDetails,
+    user,
   }): Promise<CurriculumSection | Course> {
-    const response: Course = await this.course.findOne({
+    if (!this.isTrainer(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+    const response = await this.course.findOne({
       where: {
         id: curriculumDetails.course_id,
       },
@@ -36,16 +40,23 @@ class CurriculumSectionService {
         },
       ],
     });
-    if (!response) throw new HttpException(403, 'Forbidden Resource');
 
+    if (!response) throw new HttpException(403, 'Forbidden Resource');
+    if (user.id !== response.Trainer[0].userId && user.role !== 'Admin')
+      throw new HttpException(
+        403,
+        "You don't have Authority to Add CourseCurriculumn"
+      );
     const newCurriculum = await this.curriculumSection.create({
       ...curriculumDetails,
+      userId: user.id,
     });
     return {
       id: newCurriculum.id,
       title: newCurriculum.title,
       objective: newCurriculum.objective,
       course_id: response.id,
+      userId: user.id,
     };
   }
 
@@ -58,8 +69,8 @@ class CurriculumSectionService {
   }> {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order || 'DESC'
-        // pagination
+    const order = queryObject.order || 'DESC';
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -98,18 +109,23 @@ class CurriculumSectionService {
   public async updateSection({
     curriculumDetails,
     trainer,
+    curriculumId,
   }): Promise<{ count: number; rows: CurriculumSection[] }> {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
+    // const record = await this.curriculumSection.findOne({
+    //   where: {
+    //     id: curriculumId,
+    //   },
+    // });
     const updateSection = await this.curriculumSection.update(
       {
         ...curriculumDetails,
       },
       {
         where: {
-          id: curriculumDetails.id,
+          id: curriculumId,
         },
         returning: true,
       }

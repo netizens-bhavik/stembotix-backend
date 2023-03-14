@@ -75,10 +75,6 @@ class InstituteInstructorService {
     if (!this.isInstructor(loggedUser))
       throw new HttpException(403, 'Forbidden Resource');
 
-    if (!loggedUser) {
-      throw new HttpException(401, 'Unauthorized');
-    }
-
     const findInstituteInstructor = await this.instituteInstructor.findOne({
       where: {
         id: offerId,
@@ -87,7 +83,14 @@ class InstituteInstructorService {
     if (!findInstituteInstructor) {
       throw new HttpException(409, 'Your Request is not found');
     }
-
+    if (
+      loggedUser.id !== findInstituteInstructor.instructorId &&
+      loggedUser.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Accept Proposal"
+      );
     let isAccepted = isAcceptedCount.count === 0 ? 'Accepted' : 'Rejected';
 
     const updateOffer = await this.instituteInstructor.update(
@@ -96,15 +99,26 @@ class InstituteInstructorService {
         where: {
           id: offerId,
         },
+        returning: true,
       }
     );
-    return { count: isAcceptedCount.count };
+    return { count: updateOffer };
   }
 
   public async deleteInstituteRequest(loggedUser, offerId) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Unauthorized');
     }
+    const record = await this.instituteInstructor.findOne({
+      where: {
+        id: offerId,
+      },
+    });
+    if (loggedUser.id !== record.instituteId && loggedUser.role !== 'Admin')
+      throw new HttpException(
+        403,
+        "You don't have Authority to Delete Proposal"
+      );
     const deleteRequest = await this.instituteInstructor.destroy({
       where: { id: offerId },
     });

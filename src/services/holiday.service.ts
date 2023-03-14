@@ -123,7 +123,7 @@ class HolidayService {
     const findHoliday: HolidayList = await this.holiday.findByPk(holidayId);
     if (!findHoliday) throw new HttpException(409, `Holiday List not found`);
 
-    const findHolidayList: HolidayList = await this.holiday.findOne({
+    const findHolidayList = await this.holiday.findOne({
       where: {
         date: holidayData.date,
         holidayListId: holidayData.holidayListId,
@@ -132,6 +132,11 @@ class HolidayService {
 
     if (findHolidayList && findHolidayList.id !== holidayId)
       throw new HttpException(409, `Holiday already exists`);
+    if (
+      loggedUser.id !== findHolidayList.instituteId &&
+      loggedUser.role !== 'Admin'
+    )
+      throw new HttpException(403, "You don't have Authority to Edit Holiday");
 
     const updateHolidayData = await this.holiday.update(
       { ...holidayData },
@@ -152,6 +157,15 @@ class HolidayService {
     }
     const findHoliday = await this.holiday.findByPk(holidayId);
     if (!findHoliday) throw new HttpException(409, `Holiday not found`);
+
+    if (
+      loggedUser.id !== findHoliday.instituteId &&
+      loggedUser.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Delete Holiday"
+      );
 
     const deleteHolidayData = await this.holiday.destroy({
       where: { id: holidayId },
