@@ -43,7 +43,6 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -73,7 +72,6 @@ class EmailService {
       );
       const { templateData, mailerData } = payload;
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -103,7 +101,6 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -133,7 +130,6 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
@@ -163,7 +159,6 @@ class EmailService {
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `${mailData.from}`,
@@ -193,7 +188,6 @@ class EmailService {
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `${mailData.from}`,
@@ -223,7 +217,6 @@ class EmailService {
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `${mailData.from}`,
@@ -253,7 +246,6 @@ class EmailService {
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `${mailData.from}`,
@@ -283,7 +275,6 @@ class EmailService {
       const { templateData, mailData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `${mailData.from}`,
@@ -309,7 +300,6 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        if (err) return err;
         try {
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,

@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "postgres",
-    "password": "Admin@123",
+    "password": "12345",
     "database": "stembotix",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": "Admin@123",
+    "password": "12345",
     "database": "stembotix",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
-    "password": "Admin@123",
+    "password": "12345",
     "database": "stembotix",
     "host": "127.0.0.1",
     "dialect": "postgres"

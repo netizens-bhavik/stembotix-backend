@@ -30,9 +30,6 @@ class InstructorLeaveService {
     return loggedUser.role === 'Instructor';
   }
 
-  public isStudent(loggedUser): boolean {
-    return loggedUser.role === 'Student';
-  }
 
   public async getInstructorLeave({ loggedUser, queryObject }) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');

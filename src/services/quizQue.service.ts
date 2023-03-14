@@ -1,15 +1,12 @@
 import DB from '@databases';
-import { Quiz } from '@/interfaces/quiz.interface';
 import { QuizQue } from '@/interfaces/quizQue.interface';
 import { HttpException } from '@/exceptions/HttpException';
+import { capitalize } from '@/utils/util';
 
 export type updateQuizQueAns = {
   updateQuizQueAns: string;
   options: string;
 };
-
-import { capitalize } from '@/utils/util';
-
 class QuizQueAnsService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -80,7 +77,7 @@ class QuizQueAnsService {
   ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -146,7 +143,7 @@ class QuizQueAnsService {
       );
     });
 
-    return {updateQuizQueAns,options}
+    return { updateQuizQueAns, options };
   }
 
   public async deleteQuizQueAns({

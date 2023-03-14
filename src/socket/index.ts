@@ -9,13 +9,10 @@ const liveStreamchatService = new LiveStreamChatService();
 let users = [];
 const initEvents = (io: Server) => {
   io.on('connection', (socket) => {
-    console.log(`⚡: ${socket.id} user just connected!`);
     socket.on('get-data', (data) => console.log('data', data));
     socket.on('join', async (data) => {
-      // console.log('🔥: A user joined', data);
       try {
         if (data.roomId && data.userId) {
-          //console.log('🔥: A user joined', data);
           await liveStreamchatlogsService.newUserJoined({
             livestreamId: data.roomId,
             userId: data.userId,
@@ -35,7 +32,7 @@ const initEvents = (io: Server) => {
           );
         }
       } catch (err) {
-        console.log(err);
+        return err;
       }
     });
     socket.on('message', async (data) => {
@@ -51,7 +48,7 @@ const initEvents = (io: Server) => {
           await liveStreamchatService.getLiveStreamChatMsg(data.livestreamId)
         );
       } catch (err) {
-        console.log(err);
+        return err;
       }
     });
     socket.on('typing', (data) => {
@@ -81,7 +78,6 @@ const initEvents = (io: Server) => {
 
     // change user status to offline when user disconnect
     socket.on('disconnect', async () => {
-      console.log('🔥: A user disconnected');
       const livestreamId = await liveStreamchatlogsService.userDisconnected({
         socketId: socket.id,
       });
@@ -101,7 +97,7 @@ const fetchActiveLiveStreamUsers = async (livestreamId) => {
       await liveStreamchatlogsService.fetchActiveLiveStreamUsers(livestreamId);
     return dataresponce;
   } catch (err) {
-    console.log(err);
+    return err;
   }
 };
 

@@ -36,7 +36,7 @@ class LeaveTypeController {
     try {
       const loggedUser = req.user;
       const leaveTypes = await this.leaveTypeService.getAllLeaveType(
-        loggedUser,
+        loggedUser
       );
 
       res.status(200).send(leaveTypes);
@@ -72,13 +72,13 @@ class LeaveTypeController {
   ) => {
     try {
       const loggedUser = req.user;
-      const leaveTypeData: LeaveTypeDTO = req.body;
-      const leaveTypeId = req.params.id;
+      const leaveTypeData = req.body;
+      const { leavetypeId } = req.params;
 
       const updateLeave = await this.leaveTypeService.updateLeaveType({
         loggedUser,
         leaveTypeData,
-        leaveTypeId,
+        leavetypeId,
       });
 
       res.status(200).send(updateLeave);
@@ -96,10 +96,11 @@ class LeaveTypeController {
       const loggedUser = req.user;
       const leaveTypeId = req.params.id;
 
-      const deleteLeave = await this.leaveTypeService.deleteLeaveType({
-        loggedUser,
-        leaveTypeId,
-      });
+      const deleteLeave: { count: number } =
+        await this.leaveTypeService.deleteLeaveType({
+          loggedUser,
+          leaveTypeId,
+        });
 
       res.status(200).send(deleteLeave);
     } catch (error) {

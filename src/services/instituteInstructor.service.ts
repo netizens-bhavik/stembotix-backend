@@ -187,7 +187,7 @@ class InstituteInstructorService {
       throw new HttpException(401, 'Unauthorized');
     }
 
-    // // sorting
+    // sorting
     const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;

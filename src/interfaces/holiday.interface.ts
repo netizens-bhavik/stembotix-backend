@@ -5,10 +5,11 @@ export interface HolidayList {
   type: string;
 }
 
-export interface Holiday {
+export interface createHolidayData {
   id: string;
   date: Date;
   holidayListId: string;
+  instituteId: string;
 }
 
 export interface HolidaywithDetails {

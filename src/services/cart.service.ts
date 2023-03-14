@@ -1,6 +1,6 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { Cart, CartItem } from '@/interfaces/cart.interface';
+import { CartItem } from '@/interfaces/cart.interface';
 import { QuantityOperation } from '@dtos/cart.dto';
 enum ItemTypes {
   Product = 'Product',

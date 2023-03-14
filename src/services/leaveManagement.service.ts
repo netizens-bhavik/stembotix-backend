@@ -1,17 +1,8 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import EmailService from './email.service';
-import { Mail } from '@/interfaces/mailPayload.interface';
-import { User } from 'aws-sdk/clients/budgets';
-import { clearConfigCache } from 'prettier';
 import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
-
 class LeaveManagementService {
   public user = DB.User;
   public instructor = DB.Instructor;
@@ -92,6 +83,7 @@ class LeaveManagementService {
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -168,12 +160,10 @@ class LeaveManagementService {
     }
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
 
-    // console.log(leaveData);
-
     const findLivestream = await this.livestream.findOne({
       id: leaveData.livestreamId,
     });
-    // console.log(findLivestream);
+
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     const findInstitute = await this.instituteInstructor.findOne({
@@ -317,7 +307,6 @@ class LeaveManagementService {
     if (checkHoliday)
       throw new HttpException(409, 'You cannot take leave on holiday');
 
-    const instituteInstructorId = findInstitute.id;
 
     const updateLeave = await this.manageLeave.update(
       {
@@ -451,7 +440,7 @@ class LeaveManagementService {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
+    // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
     // pagination

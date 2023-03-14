@@ -18,7 +18,7 @@ class HolidayRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `${this.path}/`,
+      `${this.path}`,
       [passport.authenticate('jwt', { session: false })],
       this.holidayController.getHoliday
     );
@@ -30,7 +30,7 @@ class HolidayRoute implements Routes {
     );
 
     this.router.post(
-      `${this.path}/`,
+      `${this.path}`,
       [
         passport.authenticate('jwt', { session: false }),
         validationMiddleware(HolidayDTO, 'body'),
@@ -39,16 +39,14 @@ class HolidayRoute implements Routes {
     );
 
     this.router.put(
-      `${this.path}/:id`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(HolidayDTO, 'body'),
-      ],
+      `${this.path}/:holidayId`,
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(HolidayDTO, 'body'),
       this.holidayController.updateHoliday
     );
 
     this.router.delete(
-      `${this.path}/:id`,
+      `${this.path}/:holidayId`,
       [passport.authenticate('jwt', { session: false })],
       this.holidayController.deleteHoliday
     );

@@ -1,9 +1,7 @@
 import { ReviewDTO } from '@/dtos/review.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { Review } from '@/interfaces/review.interface';
-import { capitalize } from '@/utils/util';
 import DB from '@databases';
-import { clearConfigCache } from 'prettier';
 
 class ReviewService {
   public user = DB.User;

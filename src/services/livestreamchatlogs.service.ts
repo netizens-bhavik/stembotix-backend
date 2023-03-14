@@ -1,9 +1,6 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
-import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
-import crypto from 'crypto';
-
 class LiveStreamChatLogsService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
@@ -47,9 +44,6 @@ class LiveStreamChatLogsService {
 
   public async userDisconnected(data) {
     const { socketId } = data;
-    var res = '';
-
-    if (isEmpty(socketId)) res = 'SocketId can not be empty';
 
     var liveStreamChatLogsData = await this.liveStreamChatLogs.update(
       { isOnline: false },

@@ -279,6 +279,11 @@ class ProductService {
       },
     });
     if (!record) throw new HttpException(403, 'Forbidden Resource');
+    if (
+      user.id !== record.Products[0].ProductUser.userId &&
+      user.role !== 'Admin'
+    )
+      throw new HttpException(403, "You don't have Authority to Edit Product");
     if (file) {
       const filePath = `${API_BASE}/media/${file.path
         .split('/')
@@ -303,7 +308,7 @@ class ProductService {
   public async deleteProduct({ user, productId }): Promise<{ count: number }> {
     if (user.Role.roleName === 'Student')
       throw new HttpException(401, 'Unauthorized');
-    const productRecord: Product = await this.product.findOne({
+    const productRecord = await this.product.findOne({
       where: { id: productId },
       include: [
         {
@@ -314,8 +319,13 @@ class ProductService {
     const adminRecord = await this.user.findAll({
       where: { role: 'Admin' },
     });
-
     if (!productRecord) throw new HttpException(403, 'Forbidden Resource');
+    if (user.id !== productRecord.userId && user.role !== 'Admin')
+      throw new HttpException(
+        403,
+        "You don't have Authority to Delete Product"
+      );
+
     if (productRecord.status === 'Published') {
       const mailData: Mail = {
         templateData: {

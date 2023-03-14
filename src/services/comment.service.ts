@@ -1,11 +1,7 @@
-import courseData from '@/boot/data/course';
 import { API_BASE } from '@/config';
-import { HttpException } from '@/exceptions/HttpException';
 import { Comment } from '@/interfaces/comment.interface';
-import { isEmpty } from '@/utils/util';
 import DB from '@databases';
 import _ from 'lodash';
-
 class CommentService {
   public comment = DB.Comment;
   public trainer = DB.Trainer;
@@ -51,7 +47,7 @@ class CommentService {
     });
     return response;
   }
-  
+
   public async viewComment(
     queryObject,
     user
