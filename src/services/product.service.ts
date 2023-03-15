@@ -2,7 +2,6 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { API_BASE } from '@config';
 import { Product } from '@/interfaces/product.interface';
-import { getFileStream, uploadFileS3 } from '@utils/s3/s3Uploads';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 
@@ -17,6 +16,10 @@ class ProductService {
   public cart = DB.Cart;
   public order = DB.Order;
   public review = DB.Review;
+
+  public isAdmin(user): boolean {
+    return user.role === 'Admin';
+  }
 
   public async viewProducts(
     queryObject
@@ -152,7 +155,7 @@ class ProductService {
         },
       ],
     });
-    const courses = await this.product.findAll({
+    const product = await this.product.findAll({
       where: DB.Sequelize.or(
         { title: { [searchCondition]: search } },
         { sku: { [searchCondition]: search } }
@@ -173,7 +176,7 @@ class ProductService {
         },
       ],
     });
-    return { totalCount: count, records: courses };
+    return { totalCount: count, records: product };
   }
 
   public async addProduct({ productDetails, file, user }): Promise<Product> {
@@ -383,7 +386,7 @@ class ProductService {
           productName: productRecord.title,
         },
         mailerData: {
-          to: [...users, 'admin1@yopmail.com'],
+          to: users,
         },
       };
       this.emailService.sendMailDeleteProduct(mailerData);
@@ -392,9 +395,8 @@ class ProductService {
   }
 
   public async togglePublish({ user, productId }): Promise<{ count: number }> {
-    if (user.Role.roleName === 'Student')
-      throw new HttpException(403, 'Forbidden Resource');
-    const courseRecord = await this.product.findOne({
+    if (!this.isAdmin(user)) throw new HttpException(403, 'Forbidden Resource');
+    const productRecord = await this.product.findOne({
       where: {
         id: productId,
       },
@@ -405,9 +407,9 @@ class ProductService {
       ],
     });
 
-    if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
-    const status = courseRecord.status === 'Drafted' ? 'Published' : 'Drafted';
-    const res = await courseRecord.update({ status });
+    if (!productRecord) throw new HttpException(403, 'Forbidden Resource');
+    const status = productRecord.status === 'Drafted' ? 'Published' : 'Drafted';
+    const res = await productRecord.update({ status });
     let count = res.status === 'Drafted' ? 0 : 1;
     return { count };
   }

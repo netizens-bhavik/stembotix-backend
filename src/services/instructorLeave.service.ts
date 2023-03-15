@@ -1,16 +1,6 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import EmailService from './email.service';
-import { Mail } from '@/interfaces/mailPayload.interface';
-import { User } from 'aws-sdk/clients/budgets';
-import { clearConfigCache } from 'prettier';
-import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 
 class InstructorLeaveService {
   public user = DB.User;
@@ -29,7 +19,6 @@ class InstructorLeaveService {
   public isInstructor(loggedUser): boolean {
     return loggedUser.role === 'Instructor';
   }
-
 
   public async getInstructorLeave({ loggedUser, queryObject }) {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
@@ -78,20 +67,6 @@ class InstructorLeaveService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-
-    // findEvents.map((event) => {
-    //   return {
-    //     id: event.id,
-    //     date: event.date,
-    //     startTime: event.startTime,
-    //     endTime: event.endTime,
-    //     title: event.title,
-    //   };
-    // });
-
-    // const mydata = findLeave.rows.map((data) => {
-    //   console.log(data);
-    // });
 
     return { totalCount: findLeave.count, records: findLeave.rows };
   }

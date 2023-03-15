@@ -33,12 +33,11 @@ class LiveStreamController {
   ) => {
     try {
       const user = req.user;
-
-      const coursesData: {
+      const liveStreamData: {
         totalCount: number;
         records: (LiveStream | undefined)[];
       } = await this.liveStreamService.viewLiveStream(user);
-      res.status(200).send(coursesData);
+      res.status(200).send(liveStreamData);
     } catch (error) {
       next(error);
     }
@@ -50,10 +49,10 @@ class LiveStreamController {
   ) => {
     try {
       const { livestreamId } = req.params;
-      const coursesData = await this.liveStreamService.viewLiveStreambyId(
+      const liveStreamData = await this.liveStreamService.viewLiveStreambyId(
         livestreamId
       );
-      res.status(200).send(coursesData);
+      res.status(200).send(liveStreamData);
     } catch (error) {
       next(error);
     }

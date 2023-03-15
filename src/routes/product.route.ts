@@ -24,7 +24,7 @@ class ProductRoute implements Routes {
     // view all product by admin with pagination (without bearer)
     this.router.get(
       `${this.path}/admin`,
-      this.productController.viewCoursesAdmin
+      this.productController.viewProductAdmin
     );
 
     // view own courses

@@ -197,7 +197,7 @@ class InstituteInstructorService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const coursesCount = await this.instituteInstructor.findAndCountAll({
+    const dataCount = await this.instituteInstructor.findAndCountAll({
       include: {
         model: this.user,
         attributes: [
@@ -228,7 +228,7 @@ class InstituteInstructorService {
       ],
     });
 
-    return { totalCount: coursesCount.count, records: coursesCount.rows };
+    return { totalCount: dataCount.count, records: dataCount.rows };
   }
 
   public async viewRequest(user, instructor) {
