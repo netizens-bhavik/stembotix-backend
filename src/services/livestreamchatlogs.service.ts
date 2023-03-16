@@ -3,12 +3,16 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
 import crypto from 'crypto';
+import { Op } from 'sequelize';
+import EmailService from './email.service';
+import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 
 class LiveStreamChatLogsService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
   public subscribeEvent = DB.SubscribeEvent;
   public liveStreamChatLogs = DB.LiveStreamChatLogs;
+  public emailService = new EmailService();
 
   public async newUserJoined(data) {
     const { livestreamId, userId, socketId } = data;
@@ -26,7 +30,10 @@ class LiveStreamChatLogsService {
 
     const [liveStreamChatLogs, created] =
       await this.liveStreamChatLogs.findOrCreate({
-        where: { livestreamId, userId },
+        where: {
+          livestreamId,
+          userId,
+        },
         defaults: {
           livestreamId,
           userId,
@@ -42,6 +49,41 @@ class LiveStreamChatLogsService {
         { where: { livestreamId, userId } }
       );
     }
+
+    if (created) {
+      const liveStream = await this.liveStream.findByPk(livestreamId);
+      if (userId == liveStream.userId) {
+        const subscribedUsers = await this.subscribeEvent.findAll({
+          where: {
+            livestreamId,
+            payment_id: {
+              [Op.ne]: null,
+            },
+            razorpay_signature: {
+              [Op.ne]: null,
+            },
+            razorpay_order_id: {
+              [Op.ne]: null,
+            },
+          },
+          include: [
+            {
+              model: this.user,
+              attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
+            },
+          ],
+        });
+        const mailData = {
+          templateData: {
+            eventName: liveStream.title,
+          },
+          mailData: {
+            to: subscribedUsers.map((user) => user.User.email),
+          },
+        };
+        this.emailService.sendEventStartNotification(mailData);
+      }
+    }
     return liveStreamChatLogs;
   }
 
@@ -56,7 +98,6 @@ class LiveStreamChatLogsService {
       { where: { socketId } }
     );
 
-    //get liveStreamId from liveStreamChatLogsData
     const liveStreamChatLogs = await this.liveStreamChatLogs.findOne({
       where: { socketId },
       attributes: ['livestreamId'],
@@ -74,7 +115,6 @@ class LiveStreamChatLogsService {
       include: [
         {
           model: this.user,
-          // attributes: ['id', 'first_name', 'last_name', 'email', 'role'],
         },
       ],
     });

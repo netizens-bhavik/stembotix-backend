@@ -20,6 +20,18 @@ class SubscriptionService {
       key_id: RAZORPAY_KEY_ID,
       key_secret: RAZORPAY_KEY_SECRET,
     });
+
+    const checkLivestream = await this.livestream.findByPk(liveStreamId);
+    if (!checkLivestream) {
+      throw new HttpException(404, 'Event Not Found');
+    }
+
+    const currentDay = new Date();
+    const eventDate = new Date(checkLivestream.date);
+    if (currentDay > eventDate) {
+      throw new HttpException(400, 'Event is Already Expired');
+    }
+
     const restrictedUser = await this.user.findOne({
       where: DB.Sequelize.and(
         {

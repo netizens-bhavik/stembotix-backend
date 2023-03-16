@@ -99,7 +99,6 @@ class InstituteInstroctorRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.instituteInstuctorController.viewInstituteByInstructor
     );
-
   }
 }
 
