@@ -3446,10 +3446,10 @@ components:
           example: Best Course to learn
         thumbnail:
           type: string
-          example: http://192.168.1.18:5000/media/thumbnail/thumbnail_1675061632094.jpg
+          example: http://192.168.1.19:5000/media/thumbnail/thumbnail_1675061632094.jpg
         trailer:
           type: string
-          example: http://192.168.1.18:5000/media/trailer/trailer_1675061632267.mp4
+          example: http://192.168.1.19:5000/media/trailer/trailer_1675061632267.mp4
         createdAt:
           type: string
           example: 2022-12-09T04:17:17.962Z
