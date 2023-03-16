@@ -6,6 +6,7 @@ import { API_BASE } from '@config';
 // const sgMail = require('@sendgrid/mail');
 import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
+import _ from 'lodash';
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -20,6 +21,7 @@ class CourseService {
   public cart = DB.Cart;
   public order = DB.Order;
   public coursetype = DB.CourseType;
+  public instituteinstructor = DB.InstituteInstructor;
   public emailService = new EmailService();
 
   public isTrainer(user): boolean {
@@ -53,6 +55,9 @@ class CourseService {
         },
       }),
       include: [
+        {
+          model: this.coursetype,
+        },
         {
           model: this.trainer,
           include: [
@@ -109,6 +114,9 @@ class CourseService {
         },
       }),
       include: [
+        {
+          model: this.coursetype,
+        },
         {
           model: this.trainer,
           include: [
@@ -422,6 +430,7 @@ class CourseService {
         .join('/')}`;
       courseDetails.thumbnail = thumbnailPath;
     }
+    console.log(courseDetails)
 
     const updateCourse = await this.course.update(
       {
@@ -606,6 +615,11 @@ class CourseService {
     const trainerRecord = await this.trainer.findAll();
     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
 
+    const approvalCheck = await this.instituteinstructor.findAll({
+      where: DB.Sequelize.and({
+        institute_id: trainer.id,
+      }),
+    });
     const trainerData = await this.trainer.findAndCountAll({
       include: [
         {
@@ -687,7 +701,39 @@ class CourseService {
       avgRatingResponse.push(row);
       allUserResponse.push(row);
     });
-    return { totalCount: trainerData.rows.length, records: avgRatingResponse };
+
+    // const records = avgRatingResponse.map((row) => {
+    //   const isRequested = approvalCheck.some((instructor) => instructor.instructorId === row.userId);
+    //   return {
+    //     ...row,
+    //     isRequested
+    //   };
+    // });
+
+    const trainerDataWithRequestStatus = trainerData.rows.map((row) => {
+      const userId = row.userId;
+      const hasRequest = approvalCheck.some(
+        (approval) => approval.instructorId === userId
+      );
+      const approvalStatus = approvalCheck.find(
+        (approval) => approval.instructorId === userId
+      );
+      const isAcceptedStatus = approvalStatus
+      ? approvalStatus.isAccepted
+      : 'notRequested';
+
+
+      return {
+        ...row.toJSON(),
+        isRequested: hasRequest,
+        isAcceptedStatus: isAcceptedStatus,
+      };
+    });
+
+    return {
+      totalCount: trainerData.rows.length,
+      records: trainerDataWithRequestStatus,
+    };
   }
 
   public async togglePublish({
