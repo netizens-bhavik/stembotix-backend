@@ -179,7 +179,7 @@ class InstituteInstructorController {
       const user = req.user;
       const response =
         await this.instituteInstructionService.viewInstituteByInstructor(user);
-        res.status(200).send(response)
+      res.status(200).send(response);
     } catch (err) {
       next(err);
     }

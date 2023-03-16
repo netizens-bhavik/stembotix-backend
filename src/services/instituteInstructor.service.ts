@@ -52,10 +52,18 @@ class InstituteInstructorService {
       ...instructorDetail,
       instituteId: loggedUser.id,
     });
+
+    const instituteInfo = await this.user.findByPk(loggedUser.id);
+    const instructorInfo = await this.user.findByPk(
+      instructorDetail.instructorId
+    );
+
     if (createInstituteInstructor) {
       const mailData: Mail = {
         templateData: {
           proposal: instructorDetail.proposal,
+          institute: instituteInfo,
+          instructor: instructorInfo,
         },
         mailData: {
           from: loggedUser.email,

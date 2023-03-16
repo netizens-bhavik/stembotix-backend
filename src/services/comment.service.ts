@@ -34,16 +34,16 @@ class CommentService {
     return newComment;
   }
 
-  public async getCommentById(commentId: string): Promise<Comment> {
-    const response: Comment = await this.comment.findOne({
+  public async getCommentById(commentId): Promise<Comment> {
+    const response = await this.comment.findAll({
       where: {
         id: commentId,
-        include: [
-          {
-            model: this.likedislike,
-          },
-        ],
       },
+      include: [
+        {
+          model: this.likedislike,
+        },
+      ],
     });
     return response;
   }

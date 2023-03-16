@@ -35,7 +35,8 @@ const initEvents = (io: Server) => {
           );
         }
       } catch (err) {
-        console.log(err);
+        io.emit('errMessage', { message: err.message, type: 'error' });
+        // console.log('join', err.message);
       }
     });
     socket.on('message', async (data) => {
@@ -51,7 +52,8 @@ const initEvents = (io: Server) => {
           await liveStreamchatService.getLiveStreamChatMsg(data.livestreamId)
         );
       } catch (err) {
-        console.log(err);
+        io.emit('errMessage', { message: err.message, type: 'error' });
+        // console.log('join', err.message);
       }
     });
     socket.on('typing', (data) => {
@@ -587,7 +589,7 @@ const initEvents = (io: Server) => {
 
     // change user status to offline when user disconnect
     socket.on('disconnect', async () => {
-      console.log('🔥: A user disconnected');
+      // console.log('🔥: A user disconnected');
       const livestreamId = await liveStreamchatlogsService.userDisconnected({
         socketId: socket.id,
       });
@@ -607,7 +609,7 @@ const fetchActiveLiveStreamUsers = async (livestreamId) => {
       await liveStreamchatlogsService.fetchActiveLiveStreamUsers(livestreamId);
     return dataresponce;
   } catch (err) {
-    console.log(err);
+    // console.log('fetchActiveLiveStreamUsers', err.message);
   }
 };
 

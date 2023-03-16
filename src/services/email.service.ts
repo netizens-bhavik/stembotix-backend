@@ -316,5 +316,35 @@ class EmailService {
       return err;
     }
   }
+
+  public async sendEventStartNotification(payload) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/sendEventStartNotification.ejs'
+      );
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        if (err) return err;
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailData.to,
+            subject: 'Event Start Notification',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
 }
 export default EmailService;
