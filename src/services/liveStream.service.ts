@@ -2,7 +2,7 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 // import 'reflect-metadata';
-import { API_BASE, API_SECURE_BASE, CLIENT_URL } from '@config';
+import { API_BASE } from '@config';
 import {
   LiveStream,
   LiveStreamUserRecord,
@@ -252,9 +252,8 @@ class LiveStreamService {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
-    const response = await this.livestreamchatlogs.findAll({
+    const response = await this.livestreamchatlogs.findAndCountAll({
       where: { livestream_id: livestreamId },
-      // attributes: ['socketId', 'createdAt', 'updatedAt'],
       include: [
         {
           model: this.user,
@@ -276,7 +275,7 @@ class LiveStreamService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
-    return response;
+    return { totalCount: response.count, records: response.rows };
   }
   public async deleteUserAttendance(
     livestreamchatlogsId,
@@ -289,6 +288,9 @@ class LiveStreamService {
     });
     if (record === 1)
       throw new HttpException(200, 'Attendence Deleted Successfully');
+      if(record === 0)
+      throw new HttpException(404, 'No Data found');
+
     return { count: record };
   }
 }

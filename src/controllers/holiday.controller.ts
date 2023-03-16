@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import { clearConfigCache } from 'prettier';
 import {
   HolidayList,
-  Holiday,
+  createHolidayData,
   HolidaywithDetails,
   AllHolidaywithDetails,
 } from '@/interfaces/holiday.interface';
@@ -59,10 +59,10 @@ class HolidayController {
     try {
       const loggedUser = req.user;
       const holidayData = req.body;
-      const holidayList = await this.holidayService.createHoliday({
+      const holidayList = await this.holidayService.createHoliday(
         loggedUser,
-        holidayData,
-      });
+        holidayData
+      );
 
       res.status(200).send(holidayList);
     } catch (error) {
@@ -77,9 +77,9 @@ class HolidayController {
   ) => {
     try {
       const loggedUser = req.user;
-      const holidayId = req.params.id;
-      const holidayData: any = req.body;
-      const holidayInfo: any = await this.holidayService.updateHoliday({
+      const { holidayId } = req.params;
+      const holidayData = req.body;
+      const holidayInfo = await this.holidayService.updateHoliday({
         loggedUser,
         holidayId,
         holidayData,
@@ -98,11 +98,12 @@ class HolidayController {
   ) => {
     try {
       const loggedUser = req.user;
-      const holidayId = req.params.id;
-      const holidayList: HolidayList = await this.holidayService.deleteHoliday({
-        loggedUser,
-        holidayId,
-      });
+      const { holidayId } = req.params;
+      const holidayList: { count: number } =
+        await this.holidayService.deleteHoliday({
+          loggedUser,
+          holidayId,
+        });
 
       res.status(200).send(holidayList);
     } catch (error) {

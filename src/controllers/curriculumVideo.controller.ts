@@ -53,13 +53,12 @@ class CurriculumVideoController {
       const { videoId } = req.params;
       const curriculumVideoDetails = req.body;
       const file = req.file;
-      const trainer = req.user;
-      curriculumVideoDetails['id'] = videoId;
-
+      const trainer = req.user
       const response = await this.curriculumVideoService.updatevideo({
         curriculumVideoDetails,
         file,
         trainer,
+        videoId
       });
       res.status(200).send(response);
     } catch (error) {

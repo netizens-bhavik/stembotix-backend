@@ -12,8 +12,7 @@ class UsersController {
       const queryObject = { search, pageRecord, pageNo, sortBy, order, role };
       const findAllUsersData: { totalCount: number; records: User[] } =
         await this.userService.findAllUser(loggedUser, queryObject);
-
-      res.status(200).json(findAllUsersData);
+      res.status(200).send(findAllUsersData);
     } catch (error) {
       next(error);
     }

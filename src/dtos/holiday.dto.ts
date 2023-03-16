@@ -7,8 +7,4 @@ export class HolidayDTO {
   @IsUUID()
   public holidayListId: string;
 
-
-  @IsUUID()
-  @IsOptional()
-  public instituteId: string;
 }

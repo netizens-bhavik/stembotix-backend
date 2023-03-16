@@ -52,11 +52,11 @@ class SubscriptionController {
   ) => {
     try {
       const { livestreamId } = req.params;
-      const coursesData: Subscribe =
+      const subscribeEventData: Subscribe =
         await this.subscriptionService.getVerifiedSubscriptionUser(
           livestreamId
         );
-      res.status(200).send(coursesData);
+      res.status(200).send(subscribeEventData);
     } catch (error) {
       next(error);
     }

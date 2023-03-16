@@ -1,13 +1,16 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import { CurriCulumVideoDto } from '@/dtos/curriculumVideo.dto';
 import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
-import { API_BASE, API_SECURE_BASE } from '@/config';
+import { API_BASE } from '@/config';
 
 class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
   public curriculumSection = DB.CurriculumSection;
+  public course = DB.Course;
+  public trainer = DB.Trainer;
+  public user = DB.User;
+  public courseTrainer = DB.CoursesTrainers;
+
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
   }
@@ -22,12 +25,36 @@ class CurriculumVideoService {
     }
 
     const fetchSection = await this.curriculumSection.findOne({
-      where: { id: curriculumId.curriculumId },
+      where: {
+        id: curriculumId.curriculumId,
+      },
+      include: [
+        {
+          model: this.course,
+          include: {
+            model: this.trainer,
+            through: { attributes: [] },
+            include: [
+              {
+                model: this.user,
+              },
+            ],
+          },
+        },
+      ],
     });
 
     if (!fetchSection) {
       throw new HttpException(403, 'No section found');
     }
+    if (
+      trainer.id !== fetchSection.Course.Trainers[0].User.id &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Add CurriculumnVideo"
+      );
     const filePath = `${API_BASE}/media/${file.path
       .split('/')
       .splice(-2)
@@ -52,7 +79,7 @@ class CurriculumVideoService {
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -89,10 +116,41 @@ class CurriculumVideoService {
     curriculumVideoDetails,
     file,
     trainer,
+    videoId,
   }): Promise<{ count: number; rows: CurriCulumVideo[] }> {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const record = await this.curriculumVideo.findOne({
+      where: {
+        id: videoId,
+      },
+      include: {
+        model: this.curriculumSection,
+        include: {
+          model: this.course,
+          include: {
+            model: this.trainer,
+            through: { attributes: [] },
+            include: [
+              {
+                model: this.user,
+              },
+            ],
+          },
+        },
+      },
+    });
+    console.log(record.CurriculumSection.Course.Trainers[0].User.id);
+
+    if (
+      trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Edit CurriculumnVideo"
+      );
     const filePath = `${API_BASE}/media/${file?.path
       .split('/')
       .splice(-2)
@@ -105,7 +163,7 @@ class CurriculumVideoService {
       },
       {
         where: {
-          id: curriculumVideoDetails.id,
+          id: videoId,
         },
         returning: true,
       }
@@ -115,12 +173,44 @@ class CurriculumVideoService {
 
   public async deleteVideo({ trainer, videoId }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
+
+    const record = await this.curriculumVideo.findOne({
+      where: {
+        id: videoId,
+      },
+      include: {
+        model: this.curriculumSection,
+        include: {
+          model: this.course,
+          include: {
+            model: this.trainer,
+            through: { attributes: [] },
+            include: [
+              {
+                model: this.user,
+              },
+            ],
+          },
+        },
+      },
+    });
+    if (!record)
+    throw new HttpException(404, 'No data found');
+    if (
+      trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Delete CurriculumnVideo"
+      );
     const res: number = await this.curriculumVideo.destroy({
       where: {
         id: videoId,
       },
     });
-
+    if (res === 1)
+      throw new HttpException(200, 'CurriculumnVideo Deleted Successfully');
     return { count: res };
   }
 }

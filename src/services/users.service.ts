@@ -1,10 +1,8 @@
-import { hash } from 'bcrypt';
 import DB from '@databases';
-import { RegisterUserDto, LoginUserDto, RegisterUserDTO } from '@dtos/users.dto';
+import { RegisterUserDTO } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
-
 class UserService {
   public users = DB.User;
   public course = DB.Course;

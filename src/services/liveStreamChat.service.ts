@@ -1,11 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
 import { LiveStreamChat } from '@/interfaces/liveStramChat.interface';
 
 class LiveStreamChatService {
@@ -77,7 +71,6 @@ class LiveStreamChatService {
       include: [
         {
           model: this.user,
-          // attributes: ['id', 'firstName', 'lastName', 'email'],
         },
       ],
       attributes: ['id', 'messages', 'userId', 'createdAt'],

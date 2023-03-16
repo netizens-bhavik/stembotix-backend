@@ -1,6 +1,4 @@
-import { isEmpty } from '@/utils/util';
 import DB from '@databases';
-import courseData from '@/boot/data/course';
 import { API_BASE } from '@/config';
 import { Reply } from '@/interfaces/reply.interface';
 import _ from 'lodash';
