@@ -234,6 +234,7 @@ class LeaveManagementService {
 
     const createLeave = await this.manageLeave.create({
       ...leaveData,
+      livestreamId: leaveData.liveStreamId,
       userId: loggedUser.id,
     });
 
@@ -285,9 +286,9 @@ class LeaveManagementService {
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
 
     const findLeave = await this.manageLeave.findByPk(leaveId);
-    
+
     if (!findLeave) throw new HttpException(409, 'Leave not found');
-    
+
     const findLivestream = await this.livestream.findOne({
       id: leaveData.liveStreamId,
     });

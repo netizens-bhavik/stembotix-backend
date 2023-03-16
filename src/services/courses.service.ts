@@ -19,6 +19,7 @@ class CourseService {
   public cartitem = DB.CartItem;
   public cart = DB.Cart;
   public order = DB.Order;
+  public coursetype = DB.CourseType;
   public emailService = new EmailService();
 
   public isTrainer(user): boolean {
@@ -197,6 +198,9 @@ class CourseService {
       },
       include: [
         {
+          model: this.coursetype,
+        },
+        {
           model: this.trainer,
           through: { attributes: [] },
           include: [
@@ -205,6 +209,7 @@ class CourseService {
             },
           ],
         },
+
         {
           model: DB.CurriculumSection,
           include: [
@@ -557,6 +562,9 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
       include: [
+        {
+          model: this.coursetype,
+        },
         {
           model: this.trainer,
           through: { attributes: [] },
