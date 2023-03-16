@@ -38,7 +38,6 @@ class LiveStreamChatService {
       var subscribeEventId = subscribeEvent.id ?? null;
     }
     const loggedUserId = loggedUser.id;
-   // const subscribeEventId = subscribeEvent.id;
 
     const sendLiveStreamChatMsg = await this.liveStreamChat.create({
       messages: message,
