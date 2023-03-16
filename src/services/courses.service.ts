@@ -430,7 +430,6 @@ class CourseService {
         .join('/')}`;
       courseDetails.thumbnail = thumbnailPath;
     }
-    console.log(courseDetails)
 
     const updateCourse = await this.course.update(
       {
