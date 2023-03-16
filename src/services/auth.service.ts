@@ -20,6 +20,8 @@ class AuthService {
   public emailService = new EmailService();
   private accessTokenExpiry: number = 60 * 60 * 24;
   public passwordToken = DB.ResetPasswordToken;
+  public attempts: number = 0;
+  public ATTEMPTS_LIMIT: number = 5;
 
   public async signup(
     userData: RegisterUserDto
@@ -27,12 +29,7 @@ class AuthService {
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUser: User = await this.users.findOne({
-      where: DB.Sequelize.and(
-        { email: userData.email },
-        // {
-        //   is_email_verified: true,
-        // }
-      ),
+      where: DB.Sequelize.and({ email: userData.email }),
     });
     if (findUser)
       throw new HttpException(
@@ -94,21 +91,6 @@ class AuthService {
     refreshToken: string;
     user: User;
   }> {
-    // const verifiedAccount = await this.user.findOne({
-    //   where: DB.Sequelize.and(
-    //     {
-    //       is_email_verified: true,
-    //     },
-    //     {
-    //       email: userData.email,
-    //     }
-    //   ),
-    // });
-    // if (!verifiedAccount)
-    //   throw new HttpException(
-    //     401,
-    //     'Your account is not verified. To verify account signup again'
-    //   );
     let refreshToken = userData?.cookie || null;
 
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
@@ -126,7 +108,20 @@ class AuthService {
       userData.password,
       findUser.password
     );
-    if (!isPasswordMatching) throw new HttpException(409, 'Wrong Password');
+    if (!isPasswordMatching) {
+      this.attempts++;
+      if (this.attempts >= this.ATTEMPTS_LIMIT) {
+        setTimeout(() => {
+          this.attempts = 0;
+        }, 300000);
+
+        throw new HttpException(
+          429,
+          'Your account has been temporary disable because of too many wrong attempt please try again after sometime or click on forgotten password to reset password'
+        );
+      }
+      throw new HttpException(409, 'Wrong Password');
+    }
 
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
       expiresIn: this.accessTokenExpiry,

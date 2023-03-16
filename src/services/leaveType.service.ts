@@ -1,17 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import EmailService from './email.service';
-import { Mail } from '@/interfaces/mailPayload.interface';
-import { User } from 'aws-sdk/clients/budgets';
-import { clearConfigCache } from 'prettier';
-import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
-
 class LeaveTypeService {
   public user = DB.User;
   public instructor = DB.Instructor;
@@ -20,7 +8,6 @@ class LeaveTypeService {
   public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
   public leaveType = DB.LeaveTypes;
-  public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
     return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
@@ -30,12 +17,7 @@ class LeaveTypeService {
     return loggedUser.role === 'Instructor';
   }
 
-  public isStudent(loggedUser): boolean {
-    return loggedUser.role === 'Student';
-  }
-
   public async getLeaveType({ loggedUser, queryObject }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -61,7 +43,6 @@ class LeaveTypeService {
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
   public async getAllLeaveType(loggedUser) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     const findLeave = await this.leaveType.findAndCountAll();
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
@@ -76,7 +57,6 @@ class LeaveTypeService {
       where: {
         leaveName: leaveTypeData.leaveName,
         type: leaveTypeData.type,
-        // IsEnable: true,
       },
     });
 
@@ -91,19 +71,14 @@ class LeaveTypeService {
     return createLeaveType;
   }
 
-  public async updateLeaveType({
-    loggedUser,
-    leaveTypeData,
-    leaveTypeId,
-  }): Promise<{ records: object; message: string }> {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  public async updateLeaveType({ loggedUser, leaveTypeData, leavetypeId }) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
     const findLeaveType = await this.leaveType.findOne({
       where: {
-        id: leaveTypeId,
+        id: leavetypeId,
       },
     });
 
@@ -117,18 +92,18 @@ class LeaveTypeService {
       },
       {
         where: {
-          id: leaveTypeId,
+          id: leavetypeId,
         },
+        returning: true,
       }
     );
-    return {
-      records: updateLeaveType,
-      message: 'Leave Type updated successfully',
-    };
+    return updateLeaveType;
   }
 
-  public async deleteLeaveType({ loggedUser, leaveTypeId }) {
-    if (!loggedUser) throw new HttpException(401, 'Unauthorized');
+  public async deleteLeaveType({
+    loggedUser,
+    leaveTypeId,
+  }): Promise<{ count: number }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -148,7 +123,9 @@ class LeaveTypeService {
         id: leaveTypeId,
       },
     });
-    return { message: 'Leave Type deleted successfully' };
+    if (deleteLeaveType === 1)
+      throw new HttpException(200, 'Leavetype deleted successfully');
+    return { count: deleteLeaveType };
   }
 
   // public async toggleLeaveType({ loggedUser, leaveTypeId }) {

@@ -2,9 +2,8 @@ import DB from '@databases';
 import Razorpay from 'razorpay';
 import { HttpException } from '@exceptions/HttpException';
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
-import { VerifyOrderDto } from '@/dtos/subscribeLiveEvent.dto';
 import crypto from 'crypto';
-import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
+import { MailPayloads } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 import { Op } from 'sequelize';
 import { Subscribe } from '@/interfaces/liveStream.interface';
@@ -20,6 +19,21 @@ class SubscriptionService {
       key_id: RAZORPAY_KEY_ID,
       key_secret: RAZORPAY_KEY_SECRET,
     });
+
+    const checkLivestream = await this.livestream.findByPk(liveStreamId);
+    const sortBy = 'updatedAt';
+    const orderBy = 'DESC';
+
+    if (!checkLivestream) {
+      throw new HttpException(404, 'Event Not Found');
+    }
+
+    const currentDay = new Date();
+    const eventDate = new Date(checkLivestream.date);
+    if (currentDay > eventDate) {
+      throw new HttpException(400, 'Event is Already Expired');
+    }
+
     const restrictedUser = await this.user.findOne({
       where: DB.Sequelize.and(
         {
@@ -38,6 +52,7 @@ class SubscriptionService {
         },
         { livestream_id: liveStreamId }
       ),
+      order: [[`${sortBy}`, `${orderBy}`]],
     });
     if (response?.payment_id && response?.razorpay_signature)
       throw new HttpException(400, 'Your Event is Already Booked');

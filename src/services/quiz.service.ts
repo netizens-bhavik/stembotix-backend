@@ -1,15 +1,7 @@
 import DB from '@databases';
 import { Quiz } from '@/interfaces/quiz.interface';
-import { API_BASE } from '@/config';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { QuizQueDTO } from '@/dtos/quiz.dto';
-import { QuizQue } from '@/interfaces/quizQue.interface';
-import QuizRoute from '@/routes/quiz.route';
-import { Sequelize, where } from 'sequelize/types';
-import { isEmpty } from '@/utils/util';
-import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
-import sequelize from 'sequelize';
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;

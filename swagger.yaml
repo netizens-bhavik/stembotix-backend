@@ -14,7 +14,26 @@ tags:
   - name: order
     description: Order items
   - name: quiz
-    description: Quiz
+    description: Quiz API
+  - name: comment
+    description: Comment API
+  - name: reply
+    description: Reply API
+  - name: LikeDislikes
+    description: LikeDislikes API
+  - name: livestream
+    description: livestream API
+  - name: leaveType
+    description: leaveType API
+  - name: instructorLeaves
+    description: instructorLeaves API
+  - name: leave
+    description: leave API
+  - name: holidayList
+    description: holidayList API
+  - name: holiday
+    description: holiday API
+
 servers:
   - url: 'http://192.168.1.106:5000/api/'
 
@@ -1081,7 +1100,7 @@ paths:
                     example: 1
         500:
           description: 'Server Error'
-  get/quiz:
+  /get/quiz:
     get:
       tags:
         - quiz question and answers
@@ -1102,7 +1121,7 @@ paths:
                     items:
                       type: object
                       $ref: '#/components/schemas/getquizRes'
-  getAll/quiz:
+  /getAll/quiz:
     get:
       tags:
         - quiz question and answers
@@ -1123,7 +1142,7 @@ paths:
                     items:
                       type: object
                       $ref: '#/components/schemas/getallquizRes'
-  get/admin:
+  /get/admin:
     get:
       tags:
         - quiz question and answers
@@ -1144,6 +1163,1392 @@ paths:
                     items:
                       type: object
                       $ref: '#/components/schemas/quizlistadminRes'
+
+  /comment:
+    get:
+      tags:
+        - comment
+      summary: View all comment
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/commentlistRes'
+        500:
+          description: 'Server Error'
+  /comment/{courseId}:
+    post:
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: Add comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/commentReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comment Added Successfully.
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/commentRes'
+        500:
+          description: 'Server Error'
+  /comment/{commentId}:
+    put:
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Update comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/updatecommentReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comment Updated Successfully.
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/updatecommentRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Remove comment
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
+
+  /courses/{courseId}/comment:
+    get:
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+      summary: View comment by course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/commentFullRes'
+        500:
+          description: 'Server Error'
+  /admin/course/{courseId}/comment:
+    get:
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name: Course ID
+          type: string
+          required: true
+          description: Unique ID associated with a course
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      summary: View comment by course
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/commentFullRes'
+        500:
+          description: 'Server Error'
+  /reply:
+    get:
+      tags:
+        - reply
+      summary: View all reply
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/replylistRes'
+        500:
+          description: 'Server Error'
+  /reply/{commentId}:
+    get:
+      tags:
+        - reply
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: View reply by comment
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  # totalCount:
+                  #   type: number
+                  #   example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/replylistRes'
+        500:
+          description: 'Server Error'
+    post:
+      tags:
+        - reply
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Add reply
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/replyReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reply Added Successfully.
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/replyRes'
+        500:
+          description: 'Server Error'
+    put:
+      tags:
+        - reply
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Update reply
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/updatereplyReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reply Updated Successfully.
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/updatereplyRes'
+        500:
+          description: 'Server Error'
+
+    delete:
+      tags:
+        - reply
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Remove reply
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+        500:
+          description: 'Server Error'
+  
+  /likedislike/{commentId}:
+    post:
+      tags:
+        - LikeDislikes
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: Add like dislike
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Like/Dislike Successfully.
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/likedislikeRes'
+        500:
+          description: 'Server Error'
+
+  /likedislike/{commentId}/like:
+    get:
+      tags:
+        - LikeDislikes
+      parameters:
+        - in: path
+          name: Comment ID
+          type: string
+          required: true
+          description: Unique ID associated with a comment
+      summary: View like by comment
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/likedislikeRes'
+        500:
+          description: 'Server Error'
+  /likedislike/reply/{replyId}/like:
+   get:
+      tags:
+        - LikeDislikes
+      parameters:
+        - in: path
+          name: Reply ID
+          type: string
+          required: true
+          description: Unique ID associated with a reply
+      summary: View like by reply
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/likedislikeRes'
+        500:
+          description: 'Server Error'
+  /likedislike/reply/{replyId}:
+    post:
+      tags:
+        - LikeDislikes
+      parameters:
+        - in: path
+          name: Reply ID
+          type: string
+          required: true
+          description: Unique ID associated with a reply
+      summary: Add like dislike
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Like/Dislike Successfully.
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/likedislikeRes'
+        500:
+          description: 'Server Error'
+
+  /livestream:
+    post:
+      tags:
+         - livestream
+      summary: Add/create livestream/event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/addLiveStreamReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/addLiveStreamRes'
+                    
+        500:
+          description: 'Server Error'
+  /livestream/{livestreamId}:
+    put:
+      tags:
+        - livestream
+      summary: Update livestream/event
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/addLiveStreamReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/addLiveStreamRes'
+                    
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - livestream
+      summary: Delete livestream/event
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Event has been deleted        
+        500:
+          description: 'Server Error'
+  /subscribe/{livestreamId}:
+    post:
+      tags:
+          - livestream
+      summary: Subscribe livestream/event
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionPrice:
+                  type: number
+                  example: 499
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/subscribeLiveStreamRes'
+        500:
+          description: 'Server Error'
+    get: 
+      tags:
+          - livestream
+      summary: Get subscription details
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/subscribeLiveStreamRes'
+        500:
+          description: 'Server Error'
+
+  /subscribe/verify/{livestreamId}:
+    post:
+      tags:
+          - livestream
+      summary: Subscribe Verify livestream/event
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                razorpayOrderId:
+                  type: string
+                  example: order_LJ6Nf7zkEAnEy8
+                payment_id: 
+                  type: string
+                  example: pay_LJ6Nf7zkEAnEy8
+                razorpay_signature:
+                  type: string
+                  example: 1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e2f3g4h5i6j7k8l9m0n1o2p3q4r5s6t7u8v9w0x1y2z3
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Payment has been done successfully
+        500:
+          description: 'Server Error'
+  /admin/livestream/user/{livestreamId}:
+    get: 
+      tags:
+        - livestream
+      summary: Get all subscribed user
+      parameters:
+        - in: path
+          name: livestream/event ID
+          type: string
+          required: true
+          description: Unique ID associated with a livestream/event
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/getAllSubscribedUserRes'
+        500:
+          description: 'Server Error'
+  /admin/livestream/user/{livestreamChatLogId}:
+    delete:
+      tags:
+        - livestream
+      summary: Delete all subscribed user
+      parameters:
+        - in: path
+          name: livestreamChatLogId
+          type: string
+          required: true
+          description: Unique ID associated with a livestreamChatLogId
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: All subscribed user has been deleted
+        500:
+          description: 'Server Error'
+
+  /admin/leave-type:
+    get:
+      tags:
+        - leaveType
+      summary: Get all leave type
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/leaveTypeRes'
+        500:
+          description: 'Server Error'
+    post:
+      tags:
+        - leaveType
+      summary: Create leave type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/leaveTypeReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/leaveTypeRes'
+        500:
+          description: 'Server Error'
+
+  /admin/leave-type/{leaveTypeId}:
+    put:
+      tags:
+        - leaveType
+      summary: Update leave type
+      parameters:
+        - in: path
+          name: leaveTypeId
+          type: string
+          required: true
+          description: Unique ID associated with a leave type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/leaveTypeReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/leaveTypeRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - leaveType
+      summary: Delete leave type
+      parameters:
+        - in: path
+          name: leaveTypeId
+          type: string
+          required: true
+          description: Unique ID associated with a leave type
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Leave type has been deleted
+        500:
+          description: 'Server Error'
+  /instructor-leaves:
+    get:
+      tags:
+        - instructorLeaves
+      summary: Get all instructor leaves
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/instructorLeavesRes'
+        500:
+          description: 'Server Error'
+    post:
+      tags:
+        - instructorLeaves
+      summary: Create instructor leaves
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/instructorLeavesReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/addinstructorLeavesRes'
+        500:
+          description: 'Server Error'
+
+  /instructor-leaves/{instructorLeavesId}:
+    put:
+      tags:
+        - instructorLeaves
+      summary: Update instructor leaves
+      parameters:
+        - in: path
+          name: instructorLeavesId
+          type: string
+          required: true
+          description: Unique ID associated with a instructor leaves
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/instructorLeavesReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/addinstructorLeavesRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - instructorLeaves
+      summary: Delete instructor leaves
+      parameters:
+        - in: path
+          name: instructorLeavesId
+          type: string
+          required: true
+          description: Unique ID associated with a instructor leaves
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Instructor's leaves has been deleted
+        500:
+          description: 'Server Error'
+  /instructor-leaves/instructors:
+    get:
+      tags:
+        - instructorLeaves
+      summary: Get all instructors
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/instituteInstructorRes'
+        500:
+          description: 'Server Error'
+  /admin/leave:
+    get:
+      tags:
+        - leave
+      summary: Get all leaves
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/adminLeaveRes'
+        500:
+          description: 'Server Error'
+  /instructor/leave: 
+    get:
+      tags:
+        - leave
+      summary: Get all leaves of instructor
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/adminLeaveRes'
+        500:
+          description: 'Server Error'
+
+  /leave:
+    post:
+      tags:
+        - leave
+      summary: Create leave
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/leaveReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Leave has been created
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/addLeaveRes'
+        500:
+          description: 'Server Error'
+  /leave/{leaveId}:
+    get:
+      tags:
+        - leave
+      summary: Get leave by id
+      parameters:
+        - in: path
+          name: leaveId
+          type: string
+          required: true
+          description: Unique ID associated with a leave
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Leave has been created
+                  leaveData:
+                    type: object
+                    $ref: '#/components/schemas/LeaveRes'
+        500:
+          description: 'Server Error'
+    put:
+      tags:
+        - leave
+      summary: Update leave
+      parameters:
+        - in: path
+          name: leaveId
+          type: string
+          required: true
+          description: Unique ID associated with a leave
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/leaveReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Leave has been updated
+                  response:
+                    type: object
+                    $ref: '#/components/schemas/addLeaveRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - leave
+      summary: Delete leave
+      parameters:
+        - in: path
+          name: leaveId
+          type: string
+          required: true
+          description: Unique ID associated with a leave
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: number
+                    example: 1
+                  message:
+                    type: string
+                    example: Leave has been deleted
+        500:
+          description: 'Server Error'
+  
+  /holiday-list:
+    get:
+      tags:
+        - holidayList
+      summary: Get all holidays
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/holidayListRes'
+        500:
+          description: 'Server Error'
+    post: 
+      tags:
+        - holidayList
+      summary: Create holiday
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/holidayListReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/holidayListFullRes'
+        500:
+          description: 'Server Error'
+  /holiday-list/{holidayListId}:
+    put:
+      tags:
+        - holidayList
+      summary: Update holiday
+      parameters:
+        - in: path
+          name: holidayListId
+          type: string
+          required: true
+          description: Unique ID associated with a holiday
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/holidayListReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/holidayListFullRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - holidayList
+      summary: Delete holiday
+      parameters:
+        - in: path
+          name: holidayListId
+          type: string
+          required: true
+          description: Unique ID associated with a holiday
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Holiday has been deleted
+        500:
+          description: 'Server Error'
+
+  /holiday:
+    get:
+      tags:
+        - holiday
+      summary: Get all holidays
+      parameters:
+        - in: query
+          name: search
+          type: string
+          example: Learn
+        - in: query
+          name: pageRecord
+          type: number
+          example: 5
+        - in: query
+          name: pageNo
+          type: number
+          example: 2
+        - in: query
+          name: sortBy
+          type: string
+          example: [title, price, level]
+        - in: query
+          name: order
+          type: string
+          example: [ASC, DESC]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCount:
+                    type: number
+                    example: 1
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/holidayRes'
+        500:
+          description: 'Server Error'
+    post:
+      tags:
+        - holiday
+      summary: Create holiday
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/holidayReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/holidayFullRes'
+        500:
+          description: 'Server Error'
+  /holiday/{holidayId}:
+    put:
+      tags:
+        - holiday
+      summary: Update holiday
+      parameters:
+        - in: path
+          name: holidayId
+          type: string
+          required: true
+          description: Unique ID associated with a holiday
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/holidayReq'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 1
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/holidayFullRes'
+        500:
+          description: 'Server Error'
+    delete:
+      tags:
+        - holiday
+      summary: Delete holiday
+      parameters:
+        - in: path
+          name: holidayId
+          type: string
+          required: true
+          description: Unique ID associated with a holiday
+      responses:
+        200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Holiday has been deleted
+        500:
+          description: 'Server Error'
+      
+
+
 # definitions
 definitions:
   users:
@@ -1182,7 +2587,7 @@ components:
           example: 2000-10-10
         role:
           type: string
-          example: student
+          example: Student
     RegisterUserRes:
       type: object
       properties:
@@ -1256,6 +2661,9 @@ components:
         trailer:
           type: file
           example: file
+        coursetypeId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
     AddCourseRes:
       type: object
       properties:
@@ -1283,6 +2691,9 @@ components:
         trailer:
           type: string
           example: http://192.168.1.106:5000/media/trailer/trailer_1670323749164.png
+        coursetypeId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
         status:
           type: string
           example: Drafted
@@ -1508,6 +2919,12 @@ components:
         deletedAt:
           type: [string, null]
           example: null
+        coursetypeId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        CourseType:
+          type: object
+          $ref: '#/components/schemas/CourseType'
         Trainers:
           type: array
           items:
@@ -1694,7 +3111,7 @@ components:
           example: 2000-10-10T00:00:00.000Z
         role:
           type: string
-          example: student
+          example: Student
         role_id:
           type: string
           example: e29d1afb-e3a0-41cb-a473-0549228de148
@@ -2029,10 +3446,10 @@ components:
           example: Best Course to learn
         thumbnail:
           type: string
-          example: http://192.168.1.18:5000/media/thumbnail/thumbnail_1675061632094.jpg
+          example: http://192.168.1.19:5000/media/thumbnail/thumbnail_1675061632094.jpg
         trailer:
           type: string
-          example: http://192.168.1.18:5000/media/trailer/trailer_1675061632267.mp4
+          example: http://192.168.1.19:5000/media/trailer/trailer_1675061632267.mp4
         createdAt:
           type: string
           example: 2022-12-09T04:17:17.962Z
@@ -2116,7 +3533,7 @@ components:
           example: 2000-07-10T18:30:00.000Z
         role:
           type: string
-          example: admin
+          example: Admin
         role_id:
           type: string
           example: 0d3c918f-ba90-4584-bfd2-ec65f9ce72e4
@@ -2541,3 +3958,926 @@ components:
         deletedAt:
           type: [string, null]
           example: null
+
+    commentlistRes:
+      type: object
+      properties:
+        records :
+          type: array
+          items:
+          $ref: '#/components/schemas/commentlist'
+
+    commentlist:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z   
+        deletedAt:
+          type: [string, null]
+          example: null
+        curriculum_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    commentReq:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: how are u
+        title:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619   
+        thumbnail:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    commentRes:
+       type: object
+       properties:
+          id:
+            type: string
+            example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+            comment:
+              type: string
+              example: how are u
+          title:
+              type: string
+              example: how are u
+          course_id:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+          userId:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+          thumbnail:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+          createdAt:
+              type: string
+              example: 2022-12-09T04:17:17.962Z
+          updatedAt:
+              type: string
+              example: 2022-12-09T04:17:17.962Z
+          deletedAt:
+              type: [string, null]
+              example: null
+
+    updatecommentReq:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: how are u
+        title:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619   
+        thumbnail:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    updatecommentRes:
+      type: object
+      properties:
+          count:
+            type: integer
+            example: 1
+          rows:
+            type: array
+            items:
+              $ref: '#/components/schemas/commentRes'
+
+    replylistRes: 
+      type: object
+      properties:
+        records :
+          type: array
+          items:
+          $ref: '#/components/schemas/replylist'
+
+    replylist:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        comment_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        reply:
+          type: string
+          example: how are u
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z   
+        deletedAt:
+          type: [string, null]
+          example: null
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        User:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+            name:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+            email:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+            password:
+              type: string
+              example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+            role:
+              type: string
+              example: Admin
+            createdAt:
+              type: string
+              example: 2022-12-09T04:17:17.962Z
+            updatedAt:
+              type: string
+              example: 2022-12-09T04:17:17.962Z
+            deletedAt:
+              type: [string, null]
+              example: null
+        LikeDislikes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LikeDislikesRes'
+
+
+    LikeDislikesRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        reply_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        is_like:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+          
+    replyReq:
+      type: object
+      properties:
+        reply:
+          type: string
+          example: how are u
+        thumbnail:
+          type: file
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+    
+    replyRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        reply:
+          type: string
+          example: how are u  
+        comment_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        thumbnail:
+          type: [string, null]
+          example: null
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    updatereplyReq:
+      type: object
+      properties:
+        reply:
+          type: string
+          example: how are u
+       
+    updatereplyRes:
+      type: object
+      properties:
+          count:
+            type: integer
+            example: 1
+          rows:
+            type: array
+            items:
+              $ref: '#/components/schemas/replyRes'
+    
+    
+    likedislikeRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        reply_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        is_like:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    
+    commentFullRes:
+      type: array
+      items: 
+        $ref: '#/components/schemas/commentFullResData'
+        
+    commentFullResData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: how are u
+        comment:
+          type: string
+          example: how are u
+        thumbnail:
+          type: [string, null]
+          example: null
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        courseId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        User:
+          $ref: '#/components/schemas/Users'
+        LikeDislikes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LikeDislikesRes'
+        Replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepliesRes'
+
+    RepliesRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        reply:
+          type: string
+          example: how are u
+        comment_id:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        thumbnail:
+          type: [string, null]
+          example: null
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        User:
+          $ref: '#/components/schemas/Users'
+        LikeDislikes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LikeDislikesRes'
+    
+    addLiveStreamReq:
+      type: object
+      properties:
+        title: 
+          type: string
+          example: JS For FUN
+        subscriptionPrice:
+          type: number
+          example: 499
+        categories:
+          type: string
+          example: development
+        description:
+          type: string
+          example: Learn Zero to Hero About Javascript in just 60 minutes.
+        date:
+          type: string
+          example: 2023-01-01
+        startTime:
+          type: string
+          example: 12:00
+        thumbnail:
+          type: file
+          example: file
+        endTime:
+          type: string
+          example: 13:00
+        instituteId:
+          type: [string,null]
+          example: null
+
+    addLiveStreamRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: ce9f9e25-c277-48bd-9dce-dbc77e1252f8
+        title:
+          type: string
+          example: JS For FUN
+        subscriptionPrice:
+          type: string
+          example: 499
+        categories:
+          type: string
+          example: development
+        description:
+          type: string
+          example: Learn Zero to Hero About Javascript in just 60 minutes.
+        date:
+          type: string
+          example: 2023-01-01T00:00:00.000Z
+        startTime:
+          type: string
+          example: 12:00:00
+        endTime:
+          type: string
+          example: 13:00:00
+        thumbnail:
+          type: string
+          example: http://192.168.1.151:5000/media/thumbnail/thumbnail_1678773620608.png
+        userId:
+          type: string
+          example: 16f72343-499e-4b75-a347-714a874fafaf
+        updatedAt:
+          type: string
+          example: 2023-03-14T06:00:20.617Z
+        createdAt:
+          type: string
+          example: 2023-03-14T06:00:20.617Z
+        is_active:
+          type: [string,null]
+          example: null
+        is_completed:
+          type: [string,null]
+          example: null
+        deletedAt:
+          type: [string,null]
+          example: null
+        instituteId:
+          type: [string,null]
+          example: null
+
+    subscribeLiveStreamRes:
+      type: object
+      properties: 
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        subscriptionPrice:
+          type: string
+          example: 499
+        razorpay_order_id:
+          type: string
+          example: order_LRJdxEYDdEA978
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        livestreamId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        payment_id:
+          type: [string, null]
+          example: null
+        razorpay_signature:
+          type: [string, null]
+          example: null
+        deletedAt:
+          type: [string, null]
+          example: null
+
+    getAllSubscribedUserRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        isOnline:
+          type: boolean
+          example: true
+        socketId:
+          type: [string, null]
+          example: F3eaKI1Sl5gJJhycAABL
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        livestreamId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        subscribeEventId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        User:
+          $ref: '#/components/schemas/getSubscriberUserData'
+    
+    getSubscriberUserData:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        fullName:
+          type: string
+          example: John Doe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: johndoe@example.com
+    CourseType:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        course_type:
+          type: string
+          example: development
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+
+    leaveTypeRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        leaveName:
+          type: string
+          example: Sick Leave
+        leaveDescription:
+          type: string
+          example: Sick Leave
+        type:
+          type: string
+          example: Sick
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    
+    leaveTypeReq:
+      type: object
+      properties:
+        leaveName:
+          type: string
+          example: Sick Leave
+        leaveDescription:
+          type: string
+          example: Sick Leave
+        type:
+          type: string
+          example: Sick
+      
+    instructorLeavesRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        leaveCount:
+          type: number
+          example: 5
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        instituteInstructorId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        LeaveType:
+          $ref: '#/components/schemas/leaveTypeRes'
+        InstituteInstructor:
+          $ref: '#/components/schemas/instituteInstructorRes'
+
+    instituteInstructorRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        Instructor:
+          $ref: '#/components/schemas/instructorRes'
+    
+    instructorRes:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+
+    instructorLeavesReq:
+      type: object
+      properties:
+        leaveCount:
+          type: number
+          example: 5
+        instituteInstructorId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    addinstructorLeavesRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        leaveCount:
+          type: number
+          example: 5
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        instituteInstructorId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+
+    adminLeaveRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        date:
+          type: string
+          example: 2022-12-09
+        leaveReason:
+          type: string
+          example: Medical CheckUp
+        isApproved:
+          type: string
+          example: Pending
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        livestreamId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        User:
+          $ref: '#/components/schemas/userRes'
+        LiveStream:
+          $ref: '#/components/schemas/liveStreamRes'
+        LeaveType:
+          $ref: '#/components/schemas/leaveTypeRes'
+    userRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        fullName:
+          type: string
+          example: John Doe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: johndoe@example.com 
+    liveStreamRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        title:
+          type: string
+          example: Live Stream 1
+    leaveReq:
+      type: object
+      properties:
+        date:
+          type: string
+          example: 2022-12-09
+        leaveReason:
+          type: string
+          example: Medical CheckUp
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        livestreamId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+          
+    addLeaveRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        isApproved:
+          type: string
+          example: Pending
+        date:
+          type: string
+          example: 2022-12-09
+        leaveReason:
+          type: string
+          example: Medical CheckUp
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+    LeaveRes:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        isApproved:
+          type: string
+          example: Pending
+        date:
+          type: string
+          example: 2022-12-09
+        leaveReason:
+          type: string
+          example: Medical CheckUp
+        leaveTypeId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        userId:
+          type: string
+          example: 57f8e71a-3d18-48cc-a9e3-b23065f5f619
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+        User:
+          $ref: '#/components/schemas/userRes'
+
+    holidayListRes:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        name:
+          type: string
+          example: Christmas
+        description:
+          type: string
+          example: Christmas Holiday
+        type:
+          type: string
+          example: Public Holiday
+    
+    holidayListFullRes:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        name:
+          type: string
+          example: Christmas
+        description:
+          type: string
+          example: Christmas Holiday
+        type:
+          type: string
+          example: Public Holiday
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+
+    holidayListReq:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Christmas
+        description:
+          type: string
+          example: Christmas Holiday
+        type:
+          type: string
+          example: Public Holiday
+
+    holidayRes:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        date:
+          type: string
+          example: 2022-12-09
+        holidayList:
+          $ref: '#/components/schemas/holidayListRes'
+    holidayReq:
+      type: object
+      properties:
+        date:
+          type: string
+          example: 2022-12-09
+        holidayListId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+
+    holidayFullRes:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        date:
+          type: string
+          example: 2022-12-09
+        holidayListId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        instituteId:
+          type: string
+          example: 8f2f0716-9347-4758-90a5-cae6dd4dae6a
+        createdAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        updatedAt:
+          type: string
+          example: 2022-12-09T04:17:17.962Z
+        deletedAt:
+          type: [string, null]
+          example: null
+
+
+
+
+        
+        
+    
+      
+
+
+        
+          

@@ -52,10 +52,18 @@ class InstituteInstructorService {
       ...instructorDetail,
       instituteId: loggedUser.id,
     });
+
+    const instituteInfo = await this.user.findByPk(loggedUser.id);
+    const instructorInfo = await this.user.findByPk(
+      instructorDetail.instructorId
+    );
+
     if (createInstituteInstructor) {
       const mailData: Mail = {
         templateData: {
           proposal: instructorDetail.proposal,
+          institute: instituteInfo,
+          instructor: instructorInfo,
         },
         mailData: {
           from: loggedUser.email,
@@ -187,7 +195,7 @@ class InstituteInstructorService {
       throw new HttpException(401, 'Unauthorized');
     }
 
-    // // sorting
+    // sorting
     const order = queryObject.order || 'DESC';
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
@@ -197,7 +205,7 @@ class InstituteInstructorService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const coursesCount = await this.instituteInstructor.findAndCountAll({
+    const dataCount = await this.instituteInstructor.findAndCountAll({
       include: {
         model: this.user,
         attributes: [
@@ -228,7 +236,7 @@ class InstituteInstructorService {
       ],
     });
 
-    return { totalCount: coursesCount.count, records: coursesCount.rows };
+    return { totalCount: dataCount.count, records: dataCount.rows };
   }
 
   public async viewRequest(user, instructor) {

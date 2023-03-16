@@ -1,11 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import { LiveStreamChatDTO } from '@/dtos/livestreamchat.dto';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
 import { LiveStreamChat } from '@/interfaces/liveStramChat.interface';
 
 class LiveStreamChatService {
@@ -19,14 +13,31 @@ class LiveStreamChatService {
     message: string,
     loggedUser
   ): Promise<LiveStreamChat> {
-    const subscribeEvent = await this.subscribeEvent.findOne({
-      where: { user_id: loggedUser.id, livestream_id: livestreamId },
+   
+    const userId=loggedUser.id;
+
+    const dbLiveStreamCheck = await this.liveStream.findOne({
+      where: { id: livestreamId },
     });
-    if (!subscribeEvent) {
-      throw new HttpException(404, 'User not subscribed to this LiveStream');
+
+    if (!dbLiveStreamCheck) {
+      throw new HttpException(404, 'Event Not Found');
+    }
+
+    if (dbLiveStreamCheck.userId !== userId) {
+      const subscribeEvent = await this.subscribeEvent.findOne({
+        where: { user_id: loggedUser.id, livestream_id: livestreamId },
+      });
+  
+      if (!subscribeEvent) {
+        throw new HttpException(
+          400,
+          'User is not subscribed to this livestream'
+        );
+      }
+      var subscribeEventId = subscribeEvent.id ?? null;
     }
     const loggedUserId = loggedUser.id;
-    const subscribeEventId = subscribeEvent.id;
 
     const sendLiveStreamChatMsg = await this.liveStreamChat.create({
       messages: message,
@@ -77,7 +88,6 @@ class LiveStreamChatService {
       include: [
         {
           model: this.user,
-          // attributes: ['id', 'firstName', 'lastName', 'email'],
         },
       ],
       attributes: ['id', 'messages', 'userId', 'createdAt'],

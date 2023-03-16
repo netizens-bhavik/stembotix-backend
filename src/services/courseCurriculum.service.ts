@@ -12,6 +12,7 @@ class CurriculumSectionService {
   public course = DB.Course;
   public trainer = DB.Trainer;
   public user = DB.User;
+  public courseTrainer = DB.CoursesTrainers;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -40,9 +41,8 @@ class CurriculumSectionService {
         },
       ],
     });
-
     if (!response) throw new HttpException(403, 'Forbidden Resource');
-    if (user.id !== response.Trainer[0].userId && user.role !== 'Admin')
+    if (user.id !== response.Trainers[0].User.id && user.role !== 'Admin')
       throw new HttpException(
         403,
         "You don't have Authority to Add CourseCurriculumn"
@@ -114,11 +114,30 @@ class CurriculumSectionService {
     if (!this.isTrainer(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const record = await this.curriculumSection.findOne({
-    //   where: {
-    //     id: curriculumId,
-    //   },
-    // });
+    const record = await this.curriculumSection.findOne({
+      where: {
+        id: curriculumId,
+      },
+      include: {
+        model: this.course,
+        include: [
+          {
+            model: this.trainer,
+            include: {
+              model: this.user,
+            },
+          },
+        ],
+      },
+    });
+    if (
+      trainer.id !== record.Course.Trainers[0].User.id &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Edit CourseCurriculumn"
+      );
     const updateSection = await this.curriculumSection.update(
       {
         ...curriculumDetails,
@@ -139,6 +158,30 @@ class CurriculumSectionService {
     curriculumId,
   }): Promise<{ count: number }> {
     if (!this.isTrainer(trainer)) throw new HttpException(401, 'Unauthorized');
+    const record = await this.curriculumSection.findOne({
+      where: {
+        id: curriculumId,
+      },
+      include: {
+        model: this.course,
+        include: [
+          {
+            model: this.trainer,
+            include: {
+              model: this.user,
+            },
+          },
+        ],
+      },
+    });
+    if (
+      trainer.id !== record.Course.Trainers[0].User.id &&
+      trainer.role !== 'Admin'
+    )
+      throw new HttpException(
+        403,
+        "You don't have Authority to Delete CourseCurriculumn"
+      );
 
     const res: number = await this.curriculumSection.destroy({
       where: {
