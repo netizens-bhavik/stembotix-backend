@@ -25,6 +25,9 @@ class CourseService {
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
   }
+  public isAdmin(user): boolean {
+    return user.role === 'Admin';
+  }
   public async viewCourses(
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
@@ -691,7 +694,7 @@ class CourseService {
     trainer,
     courseId,
   }): Promise<{ count: number }> {
-    if (!this.isTrainer(trainer))
+    if (!this.isAdmin(trainer))
       throw new HttpException(403, 'Forbidden Resource');
     const courseRecord = await this.course.findOne({
       where: {
@@ -706,7 +709,7 @@ class CourseService {
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
     const status = courseRecord.status === 'Drafted' ? 'Published' : 'Drafted';
     const res = await courseRecord.update({ status });
-    let count = courseRecord.status === 'Drafted' ? 0 : 1;
+    let count = res.status === 'Drafted' ? 0 : 1;
     return { count };
   }
 }

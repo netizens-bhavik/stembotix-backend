@@ -36,7 +36,7 @@ class LeaveTypeRoute implements Routes {
     );
 
     this.router.put(
-      `/admin${this.path}/:id`,
+      `/admin${this.path}/:leavetypeId`,
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(LeaveTypeDTO, 'body', true),
       this.leaveTypeController.updateLeaveType

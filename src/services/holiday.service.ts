@@ -1,19 +1,9 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import EmailService from './email.service';
-import { Mail } from '@/interfaces/mailPayload.interface';
-import { User } from 'aws-sdk/clients/budgets';
-import { clearConfigCache } from 'prettier';
 import {
   HolidayList,
-  Holiday,
-  HolidaywithDetails,
+  createHolidayData,
   AllHolidaywithDetails,
 } from '@/interfaces/holiday.interface';
 
@@ -31,14 +21,6 @@ class HolidayService {
 
   public isInstitute(loggedUser): boolean {
     return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
-  }
-
-  public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor';
-  }
-
-  public isStudent(loggedUser): boolean {
-    return loggedUser.role === 'Student';
   }
 
   public async getHolidays({
@@ -79,7 +61,6 @@ class HolidayService {
 
   public async getAllHolidays({ loggedUser }) {
     const findLeave = await this.holiday.findAll({
-      // attributes: ['id', 'date'],
       include: [
         {
           model: this.holidayList,
@@ -92,7 +73,10 @@ class HolidayService {
     return findLeave;
   }
 
-  public async createHoliday({ loggedUser, holidayData }): Promise<any> {
+  public async createHoliday(
+    loggedUser,
+    holidayData
+  ): Promise<createHolidayData> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -104,7 +88,7 @@ class HolidayService {
     });
     if (findHolidayList) throw new HttpException(409, `Holiday already exists`);
 
-    const createHolidayData: HolidayList = await this.holiday.create({
+    const createHolidayData = await this.holiday.create({
       ...holidayData,
       instituteId: loggedUser.id,
     });
@@ -116,11 +100,11 @@ class HolidayService {
     loggedUser,
     holidayId,
     holidayData,
-  }): Promise<any> {
+  }): Promise<createHolidayData> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const findHoliday: HolidayList = await this.holiday.findByPk(holidayId);
+    const findHoliday = await this.holiday.findByPk(holidayId);
     if (!findHoliday) throw new HttpException(409, `Holiday List not found`);
 
     const findHolidayList = await this.holiday.findOne({
@@ -133,7 +117,7 @@ class HolidayService {
     if (findHolidayList && findHolidayList.id !== holidayId)
       throw new HttpException(409, `Holiday already exists`);
     if (
-      loggedUser.id !== findHolidayList.instituteId &&
+      loggedUser.id !== findHoliday.instituteId &&
       loggedUser.role !== 'Admin'
     )
       throw new HttpException(403, "You don't have Authority to Edit Holiday");
@@ -145,13 +129,13 @@ class HolidayService {
         returning: true,
       }
     );
-    if (!updateHolidayData)
-      throw new HttpException(409, `Something went wrong`);
-
     return updateHolidayData;
   }
 
-  public async deleteHoliday({ loggedUser, holidayId }): Promise<HolidayList> {
+  public async deleteHoliday({
+    loggedUser,
+    holidayId,
+  }): Promise<{ count: number }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -170,11 +154,9 @@ class HolidayService {
     const deleteHolidayData = await this.holiday.destroy({
       where: { id: holidayId },
     });
-
-    if (!deleteHolidayData)
-      throw new HttpException(409, `Something went wrong`);
-
-    return findHoliday;
+    if (deleteHolidayData === 1)
+      throw new HttpException(200, 'Holiday deleted successfully');
+    return { count: deleteHolidayData };
   }
 }
 export default HolidayService;

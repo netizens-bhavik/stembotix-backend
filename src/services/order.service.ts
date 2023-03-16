@@ -1,18 +1,10 @@
 import DB from '@databases';
 import Razorpay from 'razorpay';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
-import { OrderItem } from '@/interfaces/order.interface';
-import sequelize, { Op, Sequelize } from 'sequelize';
 import { OrderData } from '../utils/ruleEngine/orderData.rule';
-// import { Op } from 'sequelize/types/operators';
-// import { DataTypes, Model, Optional } from "sequelize";
-// const { v4: uuidv4 } = require('uuid');
-// uuidv4();
-
 class OrderService {
   public user = DB.User;
   public order = DB.Order;

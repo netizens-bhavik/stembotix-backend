@@ -1,15 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import EmailService from './email.service';
-import { Mail } from '@/interfaces/mailPayload.interface';
-import { User } from 'aws-sdk/clients/budgets';
-import { clearConfigCache } from 'prettier';
 import {
   AllHolidayList,
   HolidayList,
@@ -24,18 +14,9 @@ class HolidayListService {
   public instructorHasLeave = DB.InstructorHasLeave;
   public holidayList = DB.HolidayList;
   public leaveType = DB.LeaveTypes;
-  public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
     return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
-  }
-
-  public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor';
-  }
-
-  public isStudent(loggedUser): boolean {
-    return loggedUser.role === 'Student';
   }
 
   public async getHolidayList({

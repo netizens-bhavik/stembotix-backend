@@ -12,18 +12,14 @@ class CompleteQuizService {
   public completeQuiz = DB.CompleteQuiz;
 
   public async createCompleteQuiz(quizid, user): Promise<CompleteQuiz> {
-    try {
-      const completeData = {
-        completeQuiz: true,
-        quiz_id: quizid,
-        user_id: user.id,
-      };
-      const response = await this.completeQuiz.create(completeData);
+    const completeData = {
+      completeQuiz: true,
+      quiz_id: quizid,
+      user_id: user.id,
+    };
+    const response = await this.completeQuiz.create(completeData);
 
-      return response;
-    } catch (error) {
-      return error;
-    }
+    return response;
   }
   public async getCompleteQuizById(quizid): Promise<CompleteQuizType> {
     let message = 'This is your Record';

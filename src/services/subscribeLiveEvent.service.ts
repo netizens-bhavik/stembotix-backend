@@ -2,9 +2,8 @@ import DB from '@databases';
 import Razorpay from 'razorpay';
 import { HttpException } from '@exceptions/HttpException';
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
-import { VerifyOrderDto } from '@/dtos/subscribeLiveEvent.dto';
 import crypto from 'crypto';
-import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
+import { MailPayloads } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 import { Op } from 'sequelize';
 import { Subscribe } from '@/interfaces/liveStream.interface';
@@ -22,6 +21,9 @@ class SubscriptionService {
     });
 
     const checkLivestream = await this.livestream.findByPk(liveStreamId);
+    const sortBy = 'updatedAt';
+    const orderBy = 'DESC';
+
     if (!checkLivestream) {
       throw new HttpException(404, 'Event Not Found');
     }
@@ -50,6 +52,7 @@ class SubscriptionService {
         },
         { livestream_id: liveStreamId }
       ),
+      order: [[`${sortBy}`, `${orderBy}`]],
     });
     if (response?.payment_id && response?.razorpay_signature)
       throw new HttpException(400, 'Your Event is Already Booked');
