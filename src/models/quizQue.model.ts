@@ -23,6 +23,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'quiz_id',
       targetKey: 'id',
     });
+    QuizQue.hasMany(models.AttemptQuizQue,{
+      foreignKey: 'quiz_que_id',
+      targetKey: 'id',
+    })
     QuizQue.hasMany(models.QuizAns);
   };
   return QuizQue;

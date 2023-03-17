@@ -2,6 +2,8 @@ import DB from '@databases';
 import { CompleteQuiz, Quiz } from '@/interfaces/quiz.interface';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
+import { Op } from 'sequelize';
+
 class QuizService {
   public trainer = DB.Trainer;
   public user = DB.User;
@@ -10,6 +12,8 @@ class QuizService {
   public quizAns = DB.QuizAns;
   public quizScore = DB.QuizScore;
   public completeQuiz = DB.CompleteQuiz;
+  public attemptQuizQue = DB.AttemptQuizQue;
+
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
   }
@@ -145,25 +149,47 @@ class QuizService {
     quizId: string,
     user
   ): Promise<{ data: Quiz[] | undefined }> {
-    const response: Quiz = await this.quiz.findAndCountAll({
+    const isAttempted = await this.attemptQuizQue.findAll({
+      where: {
+        userId: user.id,
+        deletedAt: null,
+        quiz_id: quizId,
+      },
+    });
+
+    const allAttemptedQueId = isAttempted.map((attempt) => attempt.quiz_que_id);
+    // console.log(allAttemptedQueId);
+
+    const response = await this.quiz.findAndCountAll({
       where: {
         id: quizId,
       },
-      include: {
-        model: this.quizQue,
-        attributes: ['id', 'question', 'quiz_id'],
+      include: [
+        {
+          model: this.quizQue,
+          attributes: ['id', 'question', 'quiz_id'],
+          // where:{
+          //   id: {[Op.notIn]:allAttemptedQueId}
+          // },
 
-        include: [
-          {
-            model: this.quizAns,
-            separate: true,
-            attributes: ['id', 'QuizQueId', 'option'],
-          },
-        ],
-      },
+          include: [
+            {
+              model: this.quizAns,
+              attributes: ['id', 'QuizQueId', 'option'],
+            },
+            {
+              model: this.attemptQuizQue,
+              separate: true,
+              where: {
+                userId: user.id,
+                deletedAt: null,
+              },
+            },
+          ],
+        },
+      ],
       order: [['createdAt', 'DESC']],
     });
-
     const scoreData = await this.quizScore.findOne({
       where: { quiz_id: quizId },
     });
@@ -178,6 +204,11 @@ class QuizService {
       quiz_id: quizId,
       userId: user.id,
     });
+
+    const allNewQues = response.rows[0].QuizQues.filter(
+      (ques) => !allAttemptedQueId.includes(ques.id)
+    );
+
     return { data: response.rows[0] };
   }
 
