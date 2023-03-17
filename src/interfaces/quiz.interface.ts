@@ -4,3 +4,9 @@ export interface Quiz {
   count: number;
   rows: object;
 }
+export interface CompleteQuiz {
+  completeQuiz: boolean;
+  quiz_id: string;
+  user_id: string;
+  id: string;
+}

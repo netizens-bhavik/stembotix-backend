@@ -15,6 +15,8 @@ class OrderService {
   public product = DB.Product;
   public review = DB.Review;
   public trainer = DB.Trainer;
+  public coursetype = DB.CourseType;
+
   public orderData = new OrderData();
 
   public isTrainer(user): boolean {
@@ -48,6 +50,9 @@ class OrderService {
           {
             model: this.course,
             include: [
+              {
+                model: this.coursetype,
+              },
               {
                 model: this.trainer,
                 through: { attributes: [] },
