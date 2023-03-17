@@ -1,5 +1,5 @@
 import DB from '@databases';
-import { Quiz } from '@/interfaces/quiz.interface';
+import { CompleteQuiz, Quiz } from '@/interfaces/quiz.interface';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
 class QuizService {
@@ -249,7 +249,7 @@ class QuizService {
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
-   // pagination
+    // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
@@ -287,7 +287,7 @@ class QuizService {
     return { totalCount: quizData.count, records: data };
   }
 
-  public async createQuizCompletetion(quizId, user): Promise<any> {
+  public async createQuizCompletetion(quizId, user): Promise<CompleteQuiz> {
     const record = await this.completeQuiz.findOne({
       where: { quiz_id: quizId },
     });
