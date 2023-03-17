@@ -1,10 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
-import crypto from 'crypto';
-import fs from 'fs';
-import { API_BASE } from '@/config';
-import path from 'path';
 import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import EmailService from './email.service';
 import { Mail } from '@/interfaces/mailPayload.interface';
@@ -45,6 +40,7 @@ class InstituteInstructorService {
         instructorId: instructorDetail.instructorId,
       },
     });
+
     if (findInstituteInstructor)
       throw new HttpException(409, 'Request already sent');
 
@@ -110,6 +106,13 @@ class InstituteInstructorService {
         returning: true,
       }
     );
+
+    if (isAcceptedCount.count === 1) {
+      const deleteRequest = await this.instituteInstructor.destroy({
+        where: { id: offerId },
+      });
+    }
+
     return { count: updateOffer };
   }
 

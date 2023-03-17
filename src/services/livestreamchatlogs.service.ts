@@ -15,7 +15,7 @@ class LiveStreamChatLogsService {
   public emailService = new EmailService();
 
   public async newUserJoined(data) {
-    // try {
+    
       const { livestreamId, userId, socketId } = data;
 
       if (isEmpty(livestreamId) || isEmpty(userId))
@@ -63,10 +63,7 @@ class LiveStreamChatLogsService {
           { where: { livestreamId, userId } }
         );
       }
-      // return liveStreamChatLogs;
-    // } catch (err) {
-    //   console.log(err);
-    // }
+
 
     if (created) {
       const liveStream = await this.liveStream.findByPk(livestreamId);

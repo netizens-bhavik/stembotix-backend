@@ -141,8 +141,6 @@ class CurriculumVideoService {
         },
       },
     });
-    console.log(record.CurriculumSection.Course.Trainers[0].User.id);
-
     if (
       trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
       trainer.role !== 'Admin'
@@ -155,8 +153,7 @@ class CurriculumVideoService {
       .split('/')
       .splice(-2)
       .join('/')}`;
-    if (filePath)
-      curriculumVideoDetails.video_url = `${API_BASE}/media/${filePath}`;
+    curriculumVideoDetails.video_url = filePath;
     const updateVideo = await this.curriculumVideo.update(
       {
         ...curriculumVideoDetails,
@@ -194,8 +191,7 @@ class CurriculumVideoService {
         },
       },
     });
-    if (!record)
-    throw new HttpException(404, 'No data found');
+    if (!record) throw new HttpException(404, 'No data found');
     if (
       trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
       trainer.role !== 'Admin'
