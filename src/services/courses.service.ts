@@ -22,6 +22,7 @@ class CourseService {
   public order = DB.Order;
   public coursetype = DB.CourseType;
   public instituteinstructor = DB.InstituteInstructor;
+  public quizScore = DB.QuizScore;
   public emailService = new EmailService();
 
   public isTrainer(user): boolean {
@@ -229,6 +230,9 @@ class CourseService {
             },
             {
               model: DB.Quiz,
+              include: {
+                model: this.quizScore,
+              },
             },
           ],
         },
@@ -718,9 +722,8 @@ class CourseService {
         (approval) => approval.instructorId === userId
       );
       const isAcceptedStatus = approvalStatus
-      ? approvalStatus.isAccepted
-      : 'notRequested';
-
+        ? approvalStatus.isAccepted
+        : 'notRequested';
 
       return {
         ...row.toJSON(),
