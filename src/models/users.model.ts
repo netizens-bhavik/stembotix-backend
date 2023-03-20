@@ -151,6 +151,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'instituteId',
       targetKey: 'id',
     });
+    User.hasMany(models.AttemptQuizQue, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {

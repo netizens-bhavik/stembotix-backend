@@ -15,6 +15,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      isCompleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     { paranoid: true }
   );
