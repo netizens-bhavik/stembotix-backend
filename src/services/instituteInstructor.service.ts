@@ -261,8 +261,8 @@ class InstituteInstructorService {
     );
   }
   public async viewInstituteByInstructor(user) {
-    if (!this.isInstructor(user))
-      throw new HttpException(403, 'Forbidden Resource');
+    // if (!this.isInstructor(user))
+    //   throw new HttpException(403, 'Forbidden Resource');
 
     const data = await this.instituteInstructor.findAll({
       where: {
