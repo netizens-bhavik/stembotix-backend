@@ -209,27 +209,42 @@ class InstituteInstructorService {
       : ['', DB.Sequelize.Op.ne];
 
     const dataCount = await this.instituteInstructor.findAndCountAll({
-      include: {
-        model: this.user,
-        attributes: [
-          'fullName',
-          'firstName',
-          'lastName',
-          'email',
-          'id',
-          'email',
-          'role',
-        ],
-        as: 'Institute',
-        where: DB.Sequelize.or(
-          {
-            firstName: { [searchCondition]: search },
-          },
-          {
-            lastName: { [searchCondition]: search },
-          }
-        ),
-      },
+      include: [
+        {
+          model: this.user,
+          attributes: [
+            'fullName',
+            'firstName',
+            'lastName',
+            'email',
+            'id',
+            'email',
+            'role',
+          ],
+          as: 'Institute',
+          where: DB.Sequelize.or(
+            {
+              firstName: { [searchCondition]: search },
+            },
+            {
+              lastName: { [searchCondition]: search },
+            }
+          ),
+        },
+        {
+          model: this.user,
+          attributes: [
+            'fullName',
+            'firstName',
+            'lastName',
+            'email',
+            'id',
+            'email',
+            'role',
+          ],
+          as: 'Instructor',
+        },
+      ],
 
       limit: pageSize,
       offset: pageNo,
