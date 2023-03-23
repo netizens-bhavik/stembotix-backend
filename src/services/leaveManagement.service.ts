@@ -51,10 +51,6 @@ class LeaveManagementService {
       include: [
         {
           model: this.user,
-          order: [
-            [{ model: this.user }, 'firstName', order],
-            [{ model: this.user }, 'lastName', order],
-          ],
           attributes: ['id', 'firstName', 'lastName', 'email', 'fullName'],
           where: DB.Sequelize.or(
             { firstName: { [searchCondition]: search } },
@@ -72,6 +68,10 @@ class LeaveManagementService {
       ],
       limit: pageSize,
       offset: pageNo,
+      order: [
+        [{ model: this.user }, 'firstName', order],
+        [{ model: this.user }, 'lastName', order],
+      ],
     });
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
@@ -307,7 +307,6 @@ class LeaveManagementService {
 
     if (checkHoliday)
       throw new HttpException(409, 'You cannot take leave on holiday');
-
 
     const updateLeave = await this.manageLeave.update(
       {
