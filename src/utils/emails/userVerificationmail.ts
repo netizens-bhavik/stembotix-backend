@@ -3,7 +3,8 @@ import ejs from "ejs";
 import { logger } from "../logger";
 import path from "path";
 
-const EMAIL_ADDRESS = process.env.EMAIL_FROM;
+const EMAIL_ADDRESS = process.env.EMAIL_F
+ROM;
 
 const userVerificationEmail = async (sendTo, subject, templateData) => {
   try {

@@ -20,7 +20,7 @@ class InstituteInstructorService {
   }
 
   public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor';
+    return loggedUser.role === 'Instructor'|| loggedUser.role === 'Admin';
   }
 
   // public async fetchInstructors() {
