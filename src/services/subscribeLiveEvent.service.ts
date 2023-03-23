@@ -12,6 +12,7 @@ class SubscriptionService {
   public user = DB.User;
   public livestream = DB.LiveStream;
   public subscribelivestream = DB.SubscribeEvent;
+  public instituteinstructor = DB.InstituteInstructor;
   public emailService = new EmailService();
 
   public async addSubscription(user, subscriptionPrice, liveStreamId) {
@@ -154,6 +155,42 @@ class SubscriptionService {
             razorpay_signature: {
               [Op.not]: null,
             },
+          },
+        ],
+      },
+    });
+    return response;
+  }
+  public async getAllBookedEventByUserId(
+    user,
+    queryObject
+  ): Promise<{ totalCount: number; records: string }> {
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
+    const response = await this.subscribelivestream.findAndCountAll({
+      where: DB.Sequelize.and({
+        [Op.and]: [
+          { payment_id: { [Op.ne]: null } },
+          { razorpay_order_id: { [Op.ne]: null } },
+          { razorpay_signature: { [Op.ne]: null } },
+          { user_id: user.id },
+        ],
+      }),
+      include: {
+        model: this.livestream,
+        where: {
+          title: { [searchCondition]: search },
+        },
+        include: [
+          {
+            model: this.user,
+          },
+          {
+            model: this.user,
+            as: 'Institute',
           },
         ],
       },

@@ -413,6 +413,7 @@ class LeaveManagementService {
 
   public async getEventsByDate(loggedUser, date) {
     const newDate = new Date(date);
+    console.log(newDate);
 
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     // if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
@@ -424,7 +425,6 @@ class LeaveManagementService {
       where: { date: newDate, userId: loggedUser.id },
       attributes: ['id', 'date', 'startTime', 'endTime', 'title'],
     });
-
     return findEvents.map((event) => {
       return {
         id: event.id,
