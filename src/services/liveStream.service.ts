@@ -288,8 +288,7 @@ class LiveStreamService {
     });
     if (record === 1)
       throw new HttpException(200, 'Attendence Deleted Successfully');
-      if(record === 0)
-      throw new HttpException(404, 'No Data found');
+    if (record === 0) throw new HttpException(404, 'No Data found');
 
     return { count: record };
   }

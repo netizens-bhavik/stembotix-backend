@@ -27,6 +27,11 @@ class SubscripeLiveStreamRoute implements Routes {
       ],
       this.subscribeController.addSubscription
     );
+    this.router.get(
+      `${this.path}/getbookedevent`,
+      passport.authenticate('jwt', { session: false }),
+      this.subscribeController.getAllBookedEventByUserId
+    );
     this.router.post(
       `${this.path}/verify/:subscriptionId`,
       [
