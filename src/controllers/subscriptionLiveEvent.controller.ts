@@ -61,5 +61,24 @@ class SubscriptionController {
       next(error);
     }
   };
+  public getAllBookedEventByUserId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const { search } = req.query;
+      const queryObject = { search };
+      const getAllBookedEventByUserId =
+        await this.subscriptionService.getAllBookedEventByUserId(
+          user,
+          queryObject
+        );
+      res.status(200).send(getAllBookedEventByUserId);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 export default SubscriptionController;

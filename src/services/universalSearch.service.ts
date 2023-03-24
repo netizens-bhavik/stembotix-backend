@@ -18,11 +18,17 @@ class UniversalSearchService {
       : ['', DB.Sequelize.Op.ne];
 
     const courseRes = await this.course.findAll({
-      where: DB.Sequelize.or({ title: { [searchCondition]: search } }),
+      where: DB.Sequelize.and(
+        { status: 'Published' },
+        { title: { [searchCondition]: search } }
+      ),
     });
 
     const productRes = await this.product.findAll({
-      where: DB.Sequelize.or({ title: { [searchCondition]: search } }),
+      where: DB.Sequelize.and(
+        { status: 'Published' },
+        { title: { [searchCondition]: search } }
+      ),
     });
     return { courseRes: courseRes, productRes: productRes };
   }
