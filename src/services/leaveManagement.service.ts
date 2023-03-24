@@ -413,8 +413,6 @@ class LeaveManagementService {
 
   public async getEventsByDate(loggedUser, date) {
     const newDate = new Date(date);
-    console.log(newDate);
-
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     // if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
     //   throw new HttpException(403, 'Forbidden Resource');

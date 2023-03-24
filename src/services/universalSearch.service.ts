@@ -12,12 +12,6 @@ class UniversalSearchService {
   ): Promise<{ courseRes: object; productRes: object }> {
     if (!loggedUser) throw new HttpException(403, 'Access Forbidden');
 
-    // const searchQuery = queryObject.search;
-    // const searchQueryLength = searchQuery ? searchQuery.length : 0;
-    // if (searchQueryLength < 3) {
-    //   return { courseRes: [], productRes: [] };
-    // }
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]

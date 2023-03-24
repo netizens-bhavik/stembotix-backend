@@ -77,7 +77,7 @@ class SubscriptionController {
         );
       res.status(200).send(getAllBookedEventByUserId);
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   };
 }
