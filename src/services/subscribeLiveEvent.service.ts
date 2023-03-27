@@ -34,7 +34,6 @@ class SubscriptionService {
     if (currentDay > eventDate) {
       throw new HttpException(400, 'Event is Already Expired');
     }
-
     const restrictedUser = await this.user.findOne({
       where: DB.Sequelize.and(
         {
@@ -131,7 +130,7 @@ class SubscriptionService {
         templateData: {
           Title: res.title,
           StartingTime: res.startTime,
-          StartingDate: res.Date,
+          StartingDate: res.date,
         },
         mailerData: {
           to: users,

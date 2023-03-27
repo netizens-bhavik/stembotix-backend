@@ -23,6 +23,7 @@ class CourseService {
   public coursetype = DB.CourseType;
   public instituteinstructor = DB.InstituteInstructor;
   public quizScore = DB.QuizScore;
+  public quizQue = DB.QuizQue;
   public emailService = new EmailService();
 
   public isTrainer(user): boolean {
@@ -230,9 +231,12 @@ class CourseService {
             },
             {
               model: DB.Quiz,
-              include: {
-                model: this.quizScore,
-              },
+              include: [
+                { model: this.quizQue },
+                {
+                  model: this.quizScore,
+                },
+              ],
             },
           ],
         },

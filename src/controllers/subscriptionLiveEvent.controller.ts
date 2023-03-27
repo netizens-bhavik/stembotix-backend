@@ -14,7 +14,7 @@ class SubscriptionController {
     try {
       const user = req.user;
       const { liveStreamId } = req.params;
-      const { subscriptionPrice }: AddOrderDto = req.body;
+      const { subscriptionPrice } = req.body;
       const response = await this.subscriptionService.addSubscription(
         user,
         subscriptionPrice,
