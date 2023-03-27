@@ -1,9 +1,6 @@
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import { LeaveTypeDTO } from '@/dtos/leaveType.dto';
 import LeaveTypeService from '@/services/leaveType.service';
 import { NextFunction, Request, Response } from 'express';
-import { clearConfigCache } from 'prettier';
-import { LeaveType, AddLeaveType } from '@/interfaces/leaveType.interface';
 
 class LeaveTypeController {
   public leaveTypeService = new LeaveTypeService();
@@ -107,25 +104,5 @@ class LeaveTypeController {
       next(error);
     }
   };
-
-  // public toggleLeaveType = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const loggedUser = req.user;
-  //     const leaveTypeId = req.params.id;
-
-  //     const toggleLeave = await this.leaveTypeService.toggleLeaveType({
-  //       loggedUser,
-  //       leaveTypeId,
-  //     });
-
-  //     res.status(200).send(toggleLeave);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
 }
 export default LeaveTypeController;

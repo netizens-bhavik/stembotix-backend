@@ -69,23 +69,7 @@ class QuizController {
       next(err);
     }
   };
-  // public getQuizByIds = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
-  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
-  //     const { quizId } = req.params;
-  //     const user = req.user;
-  //     const response: { totalCount: number; records: (Quiz | undefined)[] } =
-  //       await this.quizService.getQuizByIds(quizId, queryObject);
-  //     res.status(200).send(response);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
+
   public getQuizById = async (
     req: Request,
     res: Response,
@@ -100,34 +84,6 @@ class QuizController {
       next(err);
     }
   };
-  //   public getQuizByIds = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { quizId } = req.params;
-  //     const user = req.user;
-  //     const response :{ totalCount: number; records: (Quiz | undefined)[]}= await this.quizService.getQuizById(quizId, user);
-  //     res.status(200).send(response);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
-  // public getQuizBy = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { quizId } = req.params;
-  //     const user = req.user;
-  //     const response = await this.quizService.getQuizBy(quizId, user);
-  //     res.status(200).send(response);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
 
   public updateQuiz = async (
     req: Request,
@@ -220,4 +176,3 @@ class QuizController {
   };
 }
 export default QuizController;
-

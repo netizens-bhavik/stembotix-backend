@@ -709,14 +709,6 @@ class CourseService {
       allUserResponse.push(row);
     });
 
-    // const records = avgRatingResponse.map((row) => {
-    //   const isRequested = approvalCheck.some((instructor) => instructor.instructorId === row.userId);
-    //   return {
-    //     ...row,
-    //     isRequested
-    //   };
-    // });
-
     const trainerDataWithRequestStatus = trainerData.rows.map((row) => {
       const userId = row.userId;
       const hasRequest = approvalCheck.some(

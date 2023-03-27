@@ -25,24 +25,6 @@ class QuizQueAnsController {
       next(err);
     }
   };
-  // public getQuizQueAnsById = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
-  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
-  //     const { quizQueId } = req.params;
-  //     const response: QuizQue = await this.quizQueAnsService.getQuizQueAnsById(
-  //       quizQueId,
-  //       queryObject
-  //     );
-  //     res.status(200).send(response);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
   public getQuizQueAnsByIdAdmin = async (
     req: Request,
     res: Response,
@@ -78,7 +60,10 @@ class QuizQueAnsController {
       );
       res
         .status(200)
-        .send({ response: update, message: 'Question Answer Update Successfully' });
+        .send({
+          response: update,
+          message: 'Question Answer Update Successfully',
+        });
     } catch (err) {
       next(err);
     }

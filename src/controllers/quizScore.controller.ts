@@ -1,4 +1,3 @@
-import { RequestWithUser } from '@/interfaces/auth.interface';
 import QuizScoreService from '@/services/quizScore.service';
 import { NextFunction, Request, Response } from 'express';
 

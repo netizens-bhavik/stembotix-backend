@@ -26,13 +26,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    // Reply.hasMany(models.Comment,{
-    //   foreignKey:"comment_id"
-    // })
-    Reply.hasMany(models.LikeDislike,{
+    Reply.hasMany(models.LikeDislike, {
       foreignKey: 'reply_id',
       targetKey: 'id',
-    })
+    });
   };
   return Reply;
 };

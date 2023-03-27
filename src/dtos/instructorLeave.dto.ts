@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsUUID, IsNumber } from 'class-validator';
+import { IsUUID, IsNumber } from 'class-validator';
 
 export class InstructorLeaveCountDTO {
   @IsNumber()

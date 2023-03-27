@@ -22,21 +22,7 @@ class QuizCorrectController {
       next(error);
     }
   };
-  // public addScore = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const optiondetail = req.body;
-  //     const { quizId } = req.params;
-  //     const user = req.user;
-  //     const response = await this.quizcorrectService.addScore(
-  //       optiondetail,
-  //       quizId,
-  //       user
-  //     );
-  //     res.status(200).send(response);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+
   public getScorebyQuizId = async (
     req: Request,
     res: Response,

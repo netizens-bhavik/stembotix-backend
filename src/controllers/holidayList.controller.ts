@@ -1,8 +1,5 @@
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import { LeaveTypeDTO } from '@/dtos/leaveType.dto';
 import HolidayListService from '@/services/holidayList.service';
 import { NextFunction, Request, Response } from 'express';
-import { clearConfigCache } from 'prettier';
 import {
   HolidayList,
   AllHolidayList,

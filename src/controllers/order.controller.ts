@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '@/services/order.service';
 import { AddOrderDTO, VerifyOrderDTO } from '@/dtos/order.dto';
-import { OrderItem } from '@/interfaces/order.interface';
 
 class OrderController {
   public orderService = new OrderService();
