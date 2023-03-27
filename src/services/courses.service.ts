@@ -3,10 +3,10 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
 import { API_BASE } from '@config';
-// const sgMail = require('@sendgrid/mail');
 import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
+// const sgMail = require('@sendgrid/mail');
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
