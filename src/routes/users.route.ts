@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import UsersController from '@controllers/users.controller';
-import { RegisterUserDto } from '@dtos/users.dto';
 import { Routes } from '@interfaces/routes.interface';
-import validationMiddleware from '@middlewares/validation.middleware';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 class UsersRoute implements Routes {
@@ -29,18 +27,12 @@ class UsersRoute implements Routes {
 
     this.router.put(
       `${this.path}/:id`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        // validationMiddleware(RegisterUserDto, 'body', true),
-      ],
+      passport.authenticate('jwt', { session: false }),
       this.usersController.updateUser
     );
     this.router.delete(
       `${this.path}/:id`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        // validationMiddleware(RegisterUserDto, 'body', true),
-      ],
+      passport.authenticate('jwt', { session: false }),
       this.usersController.deleteUser
     );
   }

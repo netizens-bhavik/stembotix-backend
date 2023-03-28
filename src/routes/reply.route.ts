@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import { ReplyDTO, ReplyDto } from '@dtos/reply.dto';
 import uploadFiles from '@/rest/fileUpload';
 import Replycontroller from '@/controllers/reply.controller';
 

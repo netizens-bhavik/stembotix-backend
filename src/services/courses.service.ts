@@ -3,10 +3,10 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
 import { API_BASE } from '@config';
-// const sgMail = require('@sendgrid/mail');
 import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
+// const sgMail = require('@sendgrid/mail');
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -708,14 +708,6 @@ class CourseService {
       avgRatingResponse.push(row);
       allUserResponse.push(row);
     });
-
-    // const records = avgRatingResponse.map((row) => {
-    //   const isRequested = approvalCheck.some((instructor) => instructor.instructorId === row.userId);
-    //   return {
-    //     ...row,
-    //     isRequested
-    //   };
-    // });
 
     const trainerDataWithRequestStatus = trainerData.rows.map((row) => {
       const userId = row.userId;

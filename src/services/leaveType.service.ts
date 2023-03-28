@@ -127,34 +127,5 @@ class LeaveTypeService {
       throw new HttpException(200, 'Leavetype deleted successfully');
     return { count: deleteLeaveType };
   }
-
-  // public async toggleLeaveType({ loggedUser, leaveTypeId }) {
-  //   if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-  //   if (!this.isInstitute(loggedUser)) {
-  //     throw new HttpException(403, 'Forbidden Resource');
-  //   }
-
-  //   const findLeaveType = await this.leaveType.findOne({
-  //     where: {
-  //       id: leaveTypeId,
-  //     },
-  //   });
-
-  //   if (!findLeaveType) {
-  //     throw new HttpException(409, 'Leave Type not found');
-  //   }
-
-  //   const updateLeaveType = await this.leaveType.update(
-  //     {
-  //       IsEnable: !findLeaveType.IsEnable,
-  //     },
-  //     {
-  //       where: {
-  //         id: leaveTypeId,
-  //       },
-  //     }
-  //   );
-  //   return { message: 'Leave Type updated successfully' };
-  // }
 }
 export default LeaveTypeService;

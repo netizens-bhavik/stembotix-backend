@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';

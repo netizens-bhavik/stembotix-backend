@@ -68,38 +68,7 @@ class QuizService {
     });
     return { totalCount: quizData.count, records: data };
   }
-  // public async getQuizByIds(quizId: string, user): Promise<{ totalCount: number; records: (Quiz | undefined)[] }> {
-  //     const response = await this.quiz.findAndCountAll({
-  //       where: {
-  //         id: quizId,
-  //       },
-  //       include: [
-  //         {
-  //           model: this.quizQue,
-  //           attributes: ['id', 'question', 'id'],
-  //           include: [
-  //             {
-  //               model: this.quizAns,
-  //               attributes: ['id', 'QuizQueId', 'option'],
-  //               separate: true,
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //     });
-  //    const scoreData = await this.quizScore.findOne({
-  //      where: { quiz_id: quizId },
-  //    });
-  //    if (scoreData === null) {
-  //      var data = await this.quizScore.create({
-  //        score: 0,
-  //        totalQue: response.rows[0].QuizQues.length,
-  //        quiz_id: quizId,
-  //        userId: user.id,
-  //      });
-  //    }
-  //     return { totalCount: response.count, records: response.rows };
-  //   }
+
   public async getQuizByAdmin(
     quizId,
     queryObject
@@ -158,7 +127,6 @@ class QuizService {
     });
 
     const allAttemptedQueId = isAttempted.map((attempt) => attempt.quiz_que_id);
-    // console.log(allAttemptedQueId);
 
     const response = await this.quiz.findAndCountAll({
       where: {
@@ -168,10 +136,6 @@ class QuizService {
         {
           model: this.quizQue,
           attributes: ['id', 'question', 'quiz_id'],
-          // where:{
-          //   id: {[Op.notIn]:allAttemptedQueId}
-          // },
-
           include: [
             {
               model: this.quizAns,

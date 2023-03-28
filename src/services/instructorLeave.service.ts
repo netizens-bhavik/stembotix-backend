@@ -36,7 +36,6 @@ class InstructorLeaveService {
       : ['', DB.Sequelize.Op.ne];
 
     const findLeave = await this.instructorHasLeave.findAndCountAll({
-      // attributes: ['id', 'leaveCount'],
       include: [
         {
           model: this.leaveType,

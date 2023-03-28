@@ -26,12 +26,6 @@ class QuizQueRoute implements Routes {
       this.quizQueAnsController.createQuizQueAns
     );
 
-    //get a single quetion-answer by id
-
-    // this.router.get(
-    //   `${this.path}/que-ans/:quizQueId`,
-    //   this.quizQueAnsController.getQuizQueAnsById
-    // );
     this.router.get(
       `/admin${this.path}/que-ans/:quizId`,
       passport.authenticate('jwt', { session: false }),
@@ -41,11 +35,8 @@ class QuizQueRoute implements Routes {
     //update quetion-answer
     this.router.put(
       `${this.path}/que-ans/:quizQueId`,
-
       passport.authenticate('jwt', { session: false }),
-
       validationMiddleware(QuizQueDTO, 'body'),
-
       this.quizQueAnsController.updateQuizQueAns
     );
 

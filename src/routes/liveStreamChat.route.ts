@@ -22,10 +22,8 @@ class LiveStreamChatRoute implements Routes {
   private initializeRoutes() {
     this.router.post(
       `${this.path}/:livestreamId`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(LiveStreamChatDTO, 'body'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(LiveStreamChatDTO, 'body'),
       this.liveStreamchatController.sendLiveStreamChat
     );
 
@@ -37,10 +35,8 @@ class LiveStreamChatRoute implements Routes {
 
     this.router.get(
       `${this.path}/:livestreamId`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(LiveStreamChatGetDTO, 'params'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(LiveStreamChatGetDTO, 'params'),
       this.liveStreamchatController.getLiveStreamChat
     );
   }

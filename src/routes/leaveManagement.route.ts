@@ -6,7 +6,6 @@ import passportConfig from '@/config/passportConfig';
 import LeaveManagementController from '@controllers/leaveManagement.controller';
 import {
   leaveManagementRequestDTO,
-  leaveManagementApproveRequestDTO,
   leaveManagementDateRequestDTO,
 } from '@/dtos/leaveManagement.dto';
 // import 'reflect-metadata';

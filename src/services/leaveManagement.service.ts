@@ -414,9 +414,7 @@ class LeaveManagementService {
   public async getEventsByDate(loggedUser, date) {
     const newDate = new Date(date);
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
-    // if (!this.isInstructor(loggedUser) && !this.isStudent(loggedUser)) {
-    //   throw new HttpException(403, 'Forbidden Resource');
-    // }
+
     if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
 
     const findEvents = await this.livestream.findAll({

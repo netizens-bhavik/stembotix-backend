@@ -56,17 +56,6 @@ class QuizCorrectService {
       });
     }
 
-    // const isAlreadyAttempted = await this.attemptQuizQue.findOne({
-    //   quiz_que_id: optiondetail.quiz_que_id,
-    //   userId: user.id,
-    //   isAttempted: true,
-    //   quiz_id: queQuizId,
-    // })
-
-    // if(isAlreadyAttempted){
-    //   throw new HttpException(400, 'Already Attempted');
-    // }
-
     const totalAttemptQuizQue = await this.attemptQuizQue.findAndCountAll({
       where: { userId: user.id, quiz_id: queQuizId },
     });
@@ -100,7 +89,7 @@ class QuizCorrectService {
 
       await this.quizScore.update(
         {
-          ...scoreObject
+          ...scoreObject,
         },
         {
           where: { quiz_id: quizId },
@@ -131,67 +120,6 @@ class QuizCorrectService {
     };
     return response;
   }
-
-  // public async addScore(optiondetail, quizId, user): Promise<QuizCorrect> {
-  //   const selection = await this.quizAns.findOne({
-  //     where: {
-  //       id: optiondetail.option_id,
-  //     },
-  //   });
-  //   const findScore = await this.quizScore.findOne({
-  //     where: { quiz_id: quizId },
-  //   });
-  //   console.log(findScore);
-  //   // if (findScore) {
-  //   let totalQuizQues = await this.quizQue.findAndCountAll({
-  //     where: {
-  //       quiz_id: quizId,
-  //     },
-  //   });
-  //   console.log('totalQuizQues', totalQuizQues);
-
-  //   const totalAttemptQuizQue = await this.attemptQuizQue.findAndCountAll({
-  //     where: { userId: user.id, quiz_id: quizId },
-  //   });
-
-  //   console.log('totalAttemptQuizQue', totalAttemptQuizQue);
-
-  //   let isCompleted =
-  //     totalQuizQues?.count === totalAttemptQuizQue.count ? true : false;
-  //   console.log('isCompleted', isCompleted);
-  //   // }
-
-  //   if (selection.is_correct === true) {
-  //     const scoreObject = {
-  //       score: findScore?.score + 1,
-  //       option_id: optiondetail.option_id,
-  //     };
-  //     var scoreData = await this.quizScore.update(
-  //       {
-  //         ...scoreObject,
-  //       },
-  //       {
-  //         where: { quiz_id: quizId },
-  //         attributes: ['score'],
-  //         returning: true,
-  //       }
-  //     );
-  //   }
-
-  //   const scoreDataUpdate = await this.quizScore.update(
-  //     {
-  //       isCompleted: isCompleted,
-  //     },
-  //     {
-  //       where: { quiz_id: quizId, user_id: user.id },
-  //       returning: true,
-  //     }
-  //   );
-
-  //   console.log('scoreDataUpdate', scoreDataUpdate);
-
-  //   return scoreData;
-  // }
 
   public async getScoreByQuizId(quizId) {
     let response = await this.quizScore.findOne({

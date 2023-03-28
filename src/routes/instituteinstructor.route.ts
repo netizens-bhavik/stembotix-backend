@@ -6,7 +6,6 @@ import passportConfig from '@/config/passportConfig';
 import InstituteInstructorController from '@controllers/instituteInstructor.controller';
 import {
   InstituteInstructorIdDto,
-  InstituteInstructorIdDTO,
   RequestProposalDTO,
 } from '@/dtos/instituteInstructor.dto';
 // import 'reflect-metadata';
@@ -21,33 +20,12 @@ class InstituteInstroctorRoute implements Routes {
     this.initializeRoutes();
   }
   private initializeRoutes() {
-    //for admin
-    // this.router.get(
-    //   `admin/${this.path}`,
-    //   [passport.authenticate('jwt', { session: false })],
-    //   this.instituteInstuctorController.deleteInstructorRequest
-    // );
-
-    // //to view request for instructor by institute
-    // this.router.get(
-    //   `${this.path}/view-request-instructor`,
-    //   [passport.authenticate('jwt', { session: false })],
-    //   this.instituteInstuctorController.deleteInstructorRequest
-    // );
-
     //to view request for institute by instructor
     this.router.get(
       `${this.path}/institute-hire-status-list`,
       [passport.authenticate('jwt', { session: false })],
       this.instituteInstuctorController.getInstitueRequest
     );
-
-    //get all instructors
-    // this.router.get(
-    //   `${this.path}/instructors`,
-    //   [passport.authenticate('jwt', { session: false })],
-    //   this.instituteInstuctorController.fetchInstructors
-    // );
 
     //for institute
     this.router.post(
