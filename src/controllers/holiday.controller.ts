@@ -1,15 +1,5 @@
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import { LeaveTypeDTO } from '@/dtos/leaveType.dto';
 import HolidayService from '@/services/holiday.service';
 import { NextFunction, Request, Response } from 'express';
-import { clearConfigCache } from 'prettier';
-import {
-  HolidayList,
-  createHolidayData,
-  HolidaywithDetails,
-  AllHolidaywithDetails,
-} from '@/interfaces/holiday.interface';
-
 class HolidayController {
   public holidayService = new HolidayService();
 

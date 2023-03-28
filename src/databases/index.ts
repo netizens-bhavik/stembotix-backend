@@ -7,7 +7,6 @@ import {
   DB_PASSWORD,
   DB_DATABASE,
 } from '@config';
-import { logger } from '@utils/logger';
 import fs from 'fs';
 import path from 'path';
 

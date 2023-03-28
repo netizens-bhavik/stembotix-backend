@@ -29,18 +29,14 @@ class OrderRoute implements Routes {
     );
     this.router.post(
       `${this.path}`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(AddOrderDTO, 'body'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(AddOrderDTO, 'body'),
       this.orderController.addOrder
     );
     this.router.post(
       `${this.path}/verify`,
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(VerifyOrderDTO, 'body'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(VerifyOrderDTO, 'body'),
       this.orderController.verifyOrder
     );
   }

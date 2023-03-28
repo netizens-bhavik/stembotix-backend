@@ -1,9 +1,5 @@
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import { LeaveTypeDTO } from '@/dtos/leaveType.dto';
 import InstructorLeaveService from '@/services/instructorLeave.service';
 import { NextFunction, Request, Response } from 'express';
-import { clearConfigCache } from 'prettier';
-import { LeaveType, AddLeaveType } from '@/interfaces/leaveType.interface';
 
 class InstructorLeaveController {
   public instructorLeaveService = new InstructorLeaveService();

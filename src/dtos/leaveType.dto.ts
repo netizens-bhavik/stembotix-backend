@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsEnum } from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
 
 export class LeaveTypeDTO {
   @IsString()

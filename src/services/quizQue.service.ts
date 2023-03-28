@@ -36,40 +36,6 @@ class QuizQueAnsService {
     const res = await this.quizAns.bulkCreate(op);
     return res;
   }
-  // public async getQuizQueAnsById(
-  //   quizQueId: string,
-  //   queryObject
-  // ): Promise<{ totalCount: number; records: (QuizQue | undefined)[] }> {
-  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-  //   const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
-  //   // pagination
-  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-  //   // Search
-  //   const [search, searchCondition] = queryObject.search
-  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-  //     : ['', DB.Sequelize.Op.ne];
-
-  //   const response = await this.quizQue.findOne({
-  //     where: {
-  //       id: quizQueId,
-  //       question: {
-  //         [searchCondition]: search,
-  //       },
-  //     },
-  //     include: [
-  //       {
-  //         model: this.quizAns,
-  //         separate: true,
-  //         attributes: ['id', 'QuizQueId', 'option'],
-  //       },
-  //     ],
-  //     limit: pageSize,
-  //     offset: pageNo,
-  //     order: [[`${sortBy}`, `${order}`]],
-  //   });
-  //   return { totalCount: response, records: response.rows };
-  // }
 
   public async getQuizQueAnsByIdAdmin(
     quizId: string,

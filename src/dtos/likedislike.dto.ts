@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsNumber } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class LikeDislikeDTO {
   @IsNumber()

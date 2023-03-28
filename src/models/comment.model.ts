@@ -22,14 +22,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     { paranoid: true }
   );
-  // Comment.getLike = async function () {
-  //   return DB.LikeDislike;
-  // };
-  // LikeDislike.findAll({
-  //   where:{
 
-  //   }
-  // })
   Comment.associate = (models) => {
     Comment.belongsTo(models.Course, {
       foreignKey: 'course_id',

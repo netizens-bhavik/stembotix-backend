@@ -23,9 +23,6 @@ class HolidayListService {
     loggedUser,
     queryObject,
   }): Promise<AllHolidayList> {
-    // if (!this.isInstitute(loggedUser) && !this.isInstructor(loggedUser)) {
-    //   throw new HttpException(403, 'Forbidden Resource');
-    // }
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'ASC' ? 'ASC' : 'DESC';
     // pagination

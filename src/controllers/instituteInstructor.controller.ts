@@ -6,24 +6,6 @@ import { NextFunction, Request, Response } from 'express';
 class InstituteInstructorController {
   public instituteInstructionService = new InstituteInstructorService();
 
-  // public fetchInstructors = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const allInstructors =
-  //       await this.instituteInstructionService.fetchInstructors();
-
-  //     res.status(200).json({
-  //       message: 'All instructors',
-  //       data: allInstructors,
-  //     });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
-
   public createInstructorRequest = async (
     req: Request,
     res: Response,

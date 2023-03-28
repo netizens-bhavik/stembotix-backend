@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import { CurriculumSectionDto } from '@/dtos/curriculumSection.dto';
 import CurriculumSectionController from '@/controllers/courseCurriculum.controller';
 
 class CurriculumSectionRoute implements Routes {

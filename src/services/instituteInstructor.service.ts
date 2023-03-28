@@ -18,17 +18,6 @@ class InstituteInstructorService {
     return loggedUser.role === 'Instructor';
   }
 
-  // public async fetchInstructors() {
-  //   const allInstructors = await this.user.findAll({
-  //     where: {
-  //       role: 'Instructor',
-  //       deletedAt: null,
-  //     },
-  //     attributes: ['id', 'fullName', 'firstName', 'lastName'],
-  //   });
-  //   return allInstructors;
-  // }
-
   public async createInstructorRequest(loggedUser, instructorDetail) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -157,11 +146,6 @@ class InstituteInstructorService {
       include: [
         {
           model: this.user,
-          // where: DB.Sequelize.and({
-          //   firstName: {
-          //     [searchCondition]: search,
-          //   },
-          // }),
           as: 'Instructor',
         },
       ],
@@ -276,9 +260,6 @@ class InstituteInstructorService {
     );
   }
   public async viewInstituteByInstructor(user) {
-    // if (!this.isInstructor(user))
-    //   throw new HttpException(403, 'Forbidden Resource');
-
     const data = await this.instituteInstructor.findAll({
       where: {
         instructor_id: user.id,
@@ -287,7 +268,6 @@ class InstituteInstructorService {
       include: [
         {
           model: this.user,
-          // attributes:['firstName','lastName','fullName'],
           as: 'Institute',
           required: true,
         },

@@ -1,4 +1,4 @@
-import { IsArray, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 type QuizOption = {
   option: string;
@@ -21,9 +21,6 @@ export class UpdateQuizDto {
 export class QuizQueDTO {
   @IsString()
   public question: string;
-
-  // @IsUUID()
-  // public quiz_id: string;
 
   @IsArray()
   public options: QuizOption[];

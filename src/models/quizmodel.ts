@@ -11,10 +11,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      // completeQuiz: {
-      //   type: Sequelize.BOOLEAN,
-      //   allowNull: false,
-      // },
     },
     {
       paranoid: true,
@@ -29,10 +25,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'quiz_id',
       targetKey: 'id',
     });
-    Quiz.hasMany(models.CompleteQuiz,{
-      foreignKey:'quiz_id',
-      targetKey:'id'  
-  })
+    Quiz.hasMany(models.CompleteQuiz, {
+      foreignKey: 'quiz_id',
+      targetKey: 'id',
+    });
     Quiz.hasMany(models.QuizScore, {
       foreignKey: 'quiz_id',
       targetKey: 'id',

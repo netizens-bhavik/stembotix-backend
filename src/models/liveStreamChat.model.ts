@@ -7,12 +7,6 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      // messagesType: {
-      //   type: Sequelize.ENUM,
-      //   values: ['text', 'image', 'video', 'audio'],
-      //   allowNull: false,
-      //   defaultValue: 'text',
-      // },
       messages: {
         type: Sequelize.TEXT,
         allowNull: false,

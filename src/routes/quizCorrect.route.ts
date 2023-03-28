@@ -24,13 +24,6 @@ class AnswerRoute implements Routes {
 
       this.createCorrectAns.CorrectAns
     );
-    // this.router.post(
-    //   `${this.path}/score/:quizId`,
-    //   passport.authenticate('jwt', { session: false }),
-    //   validationMiddleware(QuizCorrectDto, 'body'),
-
-    //   this.createCorrectAns.addScore
-    // );
     this.router.get(
       `${this.path}/totalScore/:quizId`,
       passport.authenticate('jwt', { session: false }),

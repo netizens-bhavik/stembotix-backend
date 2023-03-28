@@ -1,12 +1,7 @@
-import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
-import {
-  leaveManagementRequestDTO,
-  leaveManagementApproveRequestDTO,
-} from '@/dtos/leaveManagement.dto';
+import { leaveManagementRequestDTO } from '@/dtos/leaveManagement.dto';
 import LeaveManagementService from '@/services/leaveManagement.service';
 import { NextFunction, Request, Response } from 'express';
-import { clearConfigCache } from 'prettier';
-import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
+import { LeaveData } from '@/interfaces/leaveData.interface';
 
 class LeaveManagementController {
   public leaveManagementService = new LeaveManagementService();
