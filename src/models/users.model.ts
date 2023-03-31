@@ -98,12 +98,18 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       sourceKey: 'id',
     });
-    User.hasMany(models.Order);
+    User.hasMany(models.Order, {
+      foreignKey: 'userId',
+      sourceKey: 'id',
+    });
     User.hasMany(models.CompleteQuiz, {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    User.hasOne(models.Trainer);
+    User.hasOne(models.Trainer, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
     User.hasOne(models.LikeDislike, {
       foreignKey: 'userId',
       targetKey: 'id',
