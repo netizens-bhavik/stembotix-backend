@@ -62,9 +62,15 @@ class LiveStreamService {
       where: {
         id: livestreamId,
       },
-      include: {
-        model: this.user,
-      },
+      include: [
+        {
+          model: this.user,
+        },
+        {
+          model: this.user,
+          as: 'Institute',
+        },
+      ],
     });
     if (!streamData) throw new HttpException(400, 'No event found');
     return streamData;
