@@ -68,6 +68,7 @@ class UserService {
     userId: string,
     userData: RegisterUserDTO
   ): Promise<User> {
+    if (!this.isAdmin(loggedUser)) throw new HttpException(401, 'Unauthorized');
     if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
       throw new HttpException(403, 'Access Forbidden');
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
