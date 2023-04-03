@@ -29,7 +29,10 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
   Order.associate = (models) => {
-    Order.belongsTo(models.User);
+    Order.belongsTo(models.User, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
     Order.hasMany(models.OrderItem);
   };
   return Order;

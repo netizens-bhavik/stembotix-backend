@@ -1,50 +1,26 @@
-version: '3.7'
-
+version: '3.8'
 services:
-  proxy:
-    image: nginx:alpine
-    container_name: proxy
+  api:
+    container_name: api
+    restart: always
+    build: .
     ports:
-      - '80:80'
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    restart: 'unless-stopped'
-    networks:
-      - backend
-  server:
-    build:
-      context: ./
-      target: development-build-stage
-      dockerfile: Dockerfile
-    container_name: server
-    ports:
-      - '3000:3000'
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    restart: 'unless-stopped'
-    networks:
-      - backend
-    links:
-      - mysql
+      - ${PORT}:${PORT}
     depends_on:
-      - mysql
-  mysql:
-    image: mysql:5.7
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: test
-    ports:
-      - '3306:3306'
-    networks:
-      - backend
+      - db
+    volumes:
+      - .:/usr/src/app
 
-networks:
-  backend:
-    driver: bridge
+  db:
+    container_name: postgres
+    image: postgres
+    ports:
+      - '5433:${DB_PORT}'
+    volumes:
+      - data:/data/db
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
 
 volumes:
-  data:
-    driver: local
+  data: {}
