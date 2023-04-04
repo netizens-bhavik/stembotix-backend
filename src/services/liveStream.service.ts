@@ -7,6 +7,7 @@ import {
   LiveStream,
   LiveStreamUserRecord,
 } from '@/interfaces/liveStream.interface';
+import { Op } from 'sequelize';
 
 class LiveStreamService {
   public user = DB.User;
@@ -45,16 +46,65 @@ class LiveStreamService {
     totalCount: number;
     records: (LiveStream | undefined)[];
   }> {
+    const currentDate = new Date().toJSON().slice(0, 10);
+    const currentTime = new Date().toLocaleTimeString();
     const streamData = await this.liveStream.findAndCountAll({
       include: {
         model: this.user,
       },
       order: [
-        ['is_active', 'DESC'],
+        ['date', 'ASC'],
         ['startTime', 'ASC'],
       ],
     });
-    return { totalCount: streamData.count, records: streamData.rows };
+    const data = [];
+    streamData.rows.map((elem) => {
+      if (currentDate > elem.date.toJSON().slice(0, 10)) {
+        if (
+          currentDate === elem.date.toJSON().slice(0, 10) &&
+          !(currentTime > elem.endTime)
+        ) {
+          data.push(elem);
+        }
+      } else {
+        data.push(elem);
+      }
+    });
+    return { totalCount: data.length, records: data };
+  }
+  public async viewTodaysEvent(
+    user
+  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    const currentDate = new Date().toJSON().slice(0, 10);
+    const todaysEvent = await this.liveStream.findAndCountAll({
+      include: {
+        model: this.user,
+      },
+    });
+    const data = [];
+    todaysEvent.rows.map((elem) => {
+      if (currentDate === elem.date.toJSON().slice(0, 10)) {
+        data.push(elem);
+      }
+    });
+    return { totalCount: data.length, records: data };
+  }
+  public async viewUpcommingEvent(
+    user
+  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    const currentDate = new Date().toJSON().slice(0, 10);
+    const todaysEvent = await this.liveStream.findAndCountAll({
+      include: {
+        model: this.user,
+      },
+    });
+    const data = [];
+    todaysEvent.rows.map((elem) => {
+      if (elem.date.toJSON().slice(0, 10) > currentDate) {
+        data.push(elem);
+      }
+    });
+    return { totalCount: data.length, records: data };
   }
 
   public async viewLiveStreambyId(livestreamId): Promise<LiveStream> {

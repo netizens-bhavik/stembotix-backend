@@ -42,6 +42,40 @@ class LiveStreamController {
       next(error);
     }
   };
+
+  public viewTodaysEvent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const todaysEvent: {
+        totalCount: number;
+        records: (LiveStream | undefined)[];
+      } = await this.liveStreamService.viewTodaysEvent(user);
+      res.status(200).send(todaysEvent);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public viewUpcommingEvent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const viewUpcommingEvent: {
+        totalCount: number;
+        records: (LiveStream | undefined)[];
+      } = await this.liveStreamService.viewUpcommingEvent(user);
+      res.status(200).send(viewUpcommingEvent);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public viewLiveStreamById = async (
     req: Request,
     res: Response,
