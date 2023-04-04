@@ -32,7 +32,14 @@ class LiveStreamRoute implements Routes {
       this.liveStreamController.createLiveStream
     );
     this.router.get(`${this.path}`, this.liveStreamController.viewLiveStream);
-
+    this.router.get(
+      `${this.path}/todayEvent`,
+      this.liveStreamController.viewTodaysEvent
+    );
+    this.router.get(
+      `${this.path}/upCommingEvent`,
+      this.liveStreamController.viewUpcommingEvent
+    );
     this.router.get(
       `${this.path}/list`,
       passport.authenticate('jwt', { session: false }),
