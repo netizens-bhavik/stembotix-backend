@@ -24,7 +24,7 @@ export class RegisterUserDto {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Instructor','Institute','Student'])
+  @IsEnum(['Instructor', 'Institute', 'Student'])
   public role: string;
 }
 export class RegisterUserDTO {
@@ -43,7 +43,7 @@ export class RegisterUserDTO {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Instructor','Institute','Student','Admin'])
+  @IsEnum(['Instructor', 'Institute', 'Student', 'Admin'])
   public role: string;
 }
 
@@ -67,8 +67,8 @@ export class ForgotPasswordDTO {
 export class ResetPasswordDTO {
   @IsString()
   public token: string;
-  @IsAlphanumeric()
+  @IsString()
   public newPassword: string;
-  @IsAlphanumeric()
+  @IsString()
   public confirmPassword: string;
 }
