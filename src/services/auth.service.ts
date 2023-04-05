@@ -202,8 +202,6 @@ class AuthService {
     });
     if (!emailRecord) throw new HttpException(400, 'Account not found');
     const token = crypto.randomBytes(20).toString('hex');
-    // const expiresAt = new Date();
-    // expiresAt.setMinutes(expiresAt.getMinutes() + 1);
     await this.passwordToken.createToken(token, emailRecord);
 
     const mailData: MailPayload = {
@@ -227,20 +225,6 @@ class AuthService {
     if (isInvalid) throw new HttpException(400, 'Token is Expired');
     return { message: 'Valid Token' };
   }
-
-  // public async verifyPasswordtoken(token: string) {
-  //   const tokenRecord = await this.passwordToken.findOne({
-  //     where: { token },
-  //     include: [{ model: this.user }],
-  //   });
-  //   if (!tokenRecord) throw new HttpException(400, 'Invalid token');
-  //   const { user, expiresAt } = tokenRecord;
-  //   if (new Date() > expiresAt)
-  //     throw new HttpException(400, 'Token has expired');
-
-  //   // Allow the user to reset their password
-  //   return { message: 'Valid token' };
-  // }
 
   public async resetPassword(
     token: string,

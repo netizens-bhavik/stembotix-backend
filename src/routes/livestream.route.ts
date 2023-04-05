@@ -40,11 +40,11 @@ class LiveStreamRoute implements Routes {
       `${this.path}/upCommingEvent`,
       this.liveStreamController.viewUpcommingEvent
     );
-    this.router.get(
-      `${this.path}/list`,
-      passport.authenticate('jwt', { session: false }),
-      this.liveStreamController.listLiveEvent
-    );
+    // this.router.get(
+    //   `${this.path}/list`,
+    //   passport.authenticate('jwt', { session: false }),
+    //   this.liveStreamController.listLiveEvent
+    // );
 
     this.router.get(
       `${this.path}/:livestreamId`,

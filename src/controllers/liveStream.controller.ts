@@ -153,24 +153,24 @@ class LiveStreamController {
       next(error);
     }
   };
-  public listLiveEvent = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const trainer = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
-      const response: {
-        totalCount: number;
-        records: (LiveStream | undefined)[];
-      } = await this.liveStreamService.listLiveEvent(trainer, queryObject);
-      res.status(200).send(response);
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public listLiveEvent = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     const trainer = req.user;
+  //     const { search, pageRecord, pageNo, sortBy, order } = req.query;
+  //     const queryObject = { search, pageRecord, pageNo, sortBy, order };
+  //     const response: {
+  //       totalCount: number;
+  //       records: (LiveStream | undefined)[];
+  //     } = await this.liveStreamService.listLiveEvent(trainer, queryObject);
+  //     res.status(200).send(response);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
   public getUserTimeLogByEventId = async (
     req: Request,
     res: Response,
