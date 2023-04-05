@@ -1,19 +1,9 @@
-# FROM node:18
-# WORKDIR /usr/src/app
-
-# COPY . ./
-
-# # building the app
-# RUN npm i
-
-# # Running the app
-# CMD [ "npm","run","dev" ]
 FROM node:18
 WORKDIR /usr/src/app
 
 COPY . ./
-# building the app
-RUN npm i
 
-# Running the app
-CMD [ "npm","run","dev" ]
+RUN npm install --global cross-env
+WORKDIR /usr/src/app
+RUN npm i
+CMD [ "npm","start"]
