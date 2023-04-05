@@ -11,8 +11,8 @@ export enum QuantityOperation {
   DEC = 'DEC',
 }
 export class AddProductDTO {
-  @IsString()
-  public productId: string;
+  // @IsString()
+  // public productId: string;
 
   @IsOptional()
   @IsNumber()
