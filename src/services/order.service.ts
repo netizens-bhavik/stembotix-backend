@@ -104,7 +104,7 @@ class OrderService {
   }
   public async verifyOrder(userId: string, orderBody: VerifyOrderDTO) {
     const orderRecord = await this.order.findOne({
-      where: { UserId: userId },
+      where: { user_id: userId },
     });
     if (!orderRecord) throw new HttpException(403, 'Resource Forbidden');
 
