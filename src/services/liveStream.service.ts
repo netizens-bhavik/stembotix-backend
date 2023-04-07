@@ -255,48 +255,48 @@ class LiveStreamService {
     });
     return { totalCount: liveStreamData.count, records: liveStreamData.rows };
   }
-  // public async listLiveEvent(
-  //   trainer,
-  //   queryObject
-  // ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
-  //   if (isEmpty(trainer) || !this.isTrainer(trainer))
-  //     throw new HttpException(401, 'Unauthorized');
-  //   // sorting
-  //   const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-  //   const order = queryObject.order || 'DESC';
-  //   // pagination
-  //   const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-  //   const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-  //   // Search
-  //   const [search, searchCondition] = queryObject.search
-  //     ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-  //     : ['', DB.Sequelize.Op.ne];
+  public async listLiveEvent(
+    trainer,
+    queryObject
+  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    if (isEmpty(trainer) || !this.isTrainer(trainer))
+      throw new HttpException(401, 'Unauthorized');
+    // sorting
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
 
-  //   const trainerRecord = await this.trainer.findOne({
-  //     where: { user_id: trainer.id },
-  //   });
-  //   if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
-  //   const liveStream = await this.liveStream.findAndCountAll({
-  //     where: DB.Sequelize.or({ title: { [searchCondition]: search } }),
+    const trainerRecord = await this.trainer.findOne({
+      where: { user_id: trainer.id },
+    });
+    if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
+    const liveStream = await this.liveStream.findAndCountAll({
+      where: DB.Sequelize.or({ title: { [searchCondition]: search } }),
 
-  //     include: [
-  //       {
-  //         model: this.user,
-  //         where: {
-  //           id: trainerRecord.user_id,
-  //         },
-  //       },
-  //       {
-  //         model: this.user,
-  //         as: 'Institute',
-  //       },
-  //     ],
-  //     limit: pageSize,
-  //     offset: pageNo,
-  //     order: [[`${sortBy}`, `${order}`]],
-  //   });
-  //   return { totalCount: liveStream.count, records: liveStream.rows };
-  // }
+      include: [
+        {
+          model: this.user,
+          where: {
+            id: trainerRecord.user_id,
+          },
+        },
+        {
+          model: this.user,
+          as: 'Institute',
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    return { totalCount: liveStream.count, records: liveStream.rows };
+  }
   public async getUserTimeLogByEventId(
     livestreamId,
     queryObject,

@@ -5,6 +5,7 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import InstituteInstructorController from '@controllers/instituteInstructor.controller';
 import {
+  AcceptProposalDTO,
   InstituteInstructorIdDto,
   RequestProposalDTO,
 } from '@/dtos/instituteInstructor.dto';
@@ -30,6 +31,7 @@ class InstituteInstroctorRoute implements Routes {
     //for institute
     this.router.post(
       `${this.path}/request-instructor`,
+
       [
         passport.authenticate('jwt', { session: false }),
         validationMiddleware(RequestProposalDTO, 'body'),
@@ -41,6 +43,7 @@ class InstituteInstroctorRoute implements Routes {
     this.router.put(
       `${this.path}/request-instructor/:offerId`,
       passport.authenticate('jwt', { session: false }),
+      validationMiddleware(AcceptProposalDTO, 'body'),
       this.instituteInstuctorController.acceptInstructorRequest
     );
 
@@ -58,7 +61,7 @@ class InstituteInstroctorRoute implements Routes {
     this.router.get(
       `${this.path}/instructor-hire-status-list`,
       passport.authenticate('jwt', { session: false }),
-      this.instituteInstuctorController.getReqByInstructorId
+      this.instituteInstuctorController.getReqByInstructor
     );
 
     // get all request by Admin

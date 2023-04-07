@@ -38,7 +38,7 @@ class InstituteInstructorController {
       const { offerId } = req.params;
       const loggedUser = req.user;
       const isAcceptedCount = req.body;
-      const liveStreamChatResponse: { count: number } =
+      const liveStreamChatResponse =
         await this.instituteInstructionService.acceptApproval(
           offerId,
           loggedUser,
@@ -90,25 +90,27 @@ class InstituteInstructorController {
           queryObject
         );
 
-      res.status(200).json({
-        message: 'Message deleted successfully',
-        data: liveStreamChatResponse,
-      });
+      res.status(200).json(liveStreamChatResponse);
     } catch (error) {
       next(error);
     }
   };
-  public getReqByInstructorId = async (
+  public getReqByInstructor = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const user = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: {
         totalCount: number;
         records: (InstructorInstitute | undefined)[];
-      } = await this.instituteInstructionService.getReqByInstructorId(user);
+      } = await this.instituteInstructionService.getReqByInstructor(
+        user,
+        queryObject
+      );
       res.status(200).send(response);
     } catch (error) {
       next(error);

@@ -262,6 +262,63 @@ class EmailService {
       return err;
     }
   }
+  public async AcceptProposalofInstitute(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/acceptProposalofInstitute.ejs'
+      );
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Proposal',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+
+  public async RejectProposalofInstitute(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(
+        __dirname,
+        '../view/rejectProposalofInstitute.ejs'
+      );
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Proposal',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
   public async sendMailunPublishproduct(payload: Mail) {
     try {
       await this.createConnection();

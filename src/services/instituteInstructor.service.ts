@@ -15,7 +15,7 @@ class InstituteInstructorService {
   }
 
   public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor';
+    return loggedUser.role === 'Instructor' || loggedUser.role === 'Admin';
   }
 
   public async createInstructorRequest(loggedUser, instructorDetail) {
@@ -29,9 +29,6 @@ class InstituteInstructorService {
         instructorId: instructorDetail.instructorId,
       },
     });
-
-    if (findInstituteInstructor)
-      throw new HttpException(409, 'Request already sent');
 
     const createInstituteInstructor = await this.instituteInstructor.create({
       ...instructorDetail,
@@ -52,7 +49,7 @@ class InstituteInstructorService {
         },
         mailData: {
           from: loggedUser.email,
-          to: instructorDetail.email,
+          to: instructorInfo.email,
         },
       };
       this.emailService.sendRequestToJoinInstitute(mailData);
@@ -60,11 +57,7 @@ class InstituteInstructorService {
     return createInstituteInstructor;
   }
 
-  public async acceptApproval(
-    offerId,
-    loggedUser,
-    isAcceptedCount
-  ): Promise<{ count: number }> {
+  public async acceptApproval(offerId, loggedUser, isAcceptedCount) {
     if (!this.isInstructor(loggedUser))
       throw new HttpException(403, 'Forbidden Resource');
 
@@ -72,7 +65,12 @@ class InstituteInstructorService {
       where: {
         id: offerId,
       },
+      include: {
+        model: this.user,
+        as: 'Institute',
+      },
     });
+
     if (!findInstituteInstructor) {
       throw new HttpException(409, 'Your Request is not found');
     }
@@ -85,7 +83,6 @@ class InstituteInstructorService {
         "You don't have Authority to Accept Proposal"
       );
     let isAccepted = isAcceptedCount.count === 0 ? 'Accepted' : 'Rejected';
-
     const updateOffer = await this.instituteInstructor.update(
       { isAccepted },
       {
@@ -95,18 +92,40 @@ class InstituteInstructorService {
         returning: true,
       }
     );
-
-    if (isAcceptedCount.count === 1) {
-      const deleteRequest = await this.instituteInstructor.destroy({
-        where: { id: offerId },
-      });
+    if (isAcceptedCount.count === 0) {
+      const mailData: Mail = {
+        templateData: {
+          isAccepted: updateOffer[1][0].isAccepted,
+          email: loggedUser.email,
+          user: findInstituteInstructor.Institute.firstName,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: findInstituteInstructor.Institute.email,
+        },
+      };
+      this.emailService.AcceptProposalofInstitute(mailData);
     }
 
-    return { count: updateOffer };
+    if (isAcceptedCount.count === 1) {
+      const mailData: Mail = {
+        templateData: {
+          isAccepted: updateOffer[1][0].isAccepted,
+          email: loggedUser.email,
+          user: findInstituteInstructor.Institute.firstName,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: findInstituteInstructor.Institute.email,
+        },
+      };
+      this.emailService.RejectProposalofInstitute(mailData);
+    }
+    return updateOffer[1][0];
   }
 
   public async deleteInstituteRequest(loggedUser, offerId) {
-    if (!this.isInstitute(loggedUser)) {
+    if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Unauthorized');
     }
     const record = await this.instituteInstructor.findOne({
@@ -114,7 +133,8 @@ class InstituteInstructorService {
         id: offerId,
       },
     });
-    if (loggedUser.id !== record.instituteId && loggedUser.role !== 'Admin')
+    if (!record) throw new HttpException(404, 'No data found');
+    if (loggedUser.id !== record.instructorId && loggedUser.role !== 'Admin')
       throw new HttpException(
         403,
         "You don't have Authority to Delete Proposal"
@@ -126,7 +146,7 @@ class InstituteInstructorService {
   }
 
   public async getInstituteRequest(loggedUser, queryObject) {
-    if (!this.isInstitute(loggedUser)) {
+    if (!this.isInstructor(loggedUser)) {
       throw new HttpException(401, 'Unauthorized');
     }
 
@@ -156,13 +176,26 @@ class InstituteInstructorService {
     return resposnse;
   }
 
-  public async getReqByInstructorId(user): Promise<{
+  public async getReqByInstructor(
+    user,
+    queryObject
+  ): Promise<{
     totalCount: number;
     records: (InstructorInstitute | undefined)[];
   }> {
     if (!this.isInstructor(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+
     const response = await this.instituteInstructor.findAndCountAll({
       where: {
         instructor_id: user.id,
@@ -170,7 +203,18 @@ class InstituteInstructorService {
       include: {
         model: this.user,
         as: 'Institute',
+        where: DB.Sequelize.or(
+          {
+            firstName: { [searchCondition]: search },
+          },
+          {
+            lastName: { [searchCondition]: search },
+          }
+        ),
       },
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: response.count, records: response.rows };
   }
