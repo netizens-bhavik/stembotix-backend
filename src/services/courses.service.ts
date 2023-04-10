@@ -6,6 +6,8 @@ import { API_BASE } from '@config';
 import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
+import { deleteFromS3 } from '@/utils/s3/s3Uploads';
+
 // const sgMail = require('@sendgrid/mail');
 class CourseService {
   public course = DB.Course;
@@ -150,23 +152,10 @@ class CourseService {
     if (!trainerRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
 
-    const { trailer, thumbnail } = file;
-    // const ab = { trailer, thumbnail };
-    const trailerPath = `${API_BASE}/media/${trailer[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    // const uploadedFile = await uploadFileS3(ab); // Upload of s3
-
-    // const uploadedFile = await uploadFileS3(ab); // Upload of s3
     const newCourse = await this.course.create({
       ...courseDetails,
-      trailer: trailerPath,
-      thumbnail: thumbnailPath,
+      trailer: file['trailer'][0].path,
+      thumbnail: file['thumbnail'][0].path,
     });
 
     newCourse.addTrainer(trainerRecord);
@@ -192,9 +181,9 @@ class CourseService {
       price: newCourse.price,
       language: newCourse.language,
       description: newCourse.description,
-      thumbnail: `${API_BASE}/media/${newCourse.thumbnail}`,
+      thumbnail: file['thumbnail'][0].path,
       // @ts-ignore
-      trailer: `${API_BASE}/media/${newCourse.trailer}`,
+      trailer: file['trailer'][0].path,
       coursetypeId: newCourse.coursetypeId,
       updatedAt: newCourse.updateAt,
       createdAt: newCourse.createdAt,
@@ -415,30 +404,40 @@ class CourseService {
         },
       },
     });
+    if (file) {
+      const thumbnailLink = record.Courses[0].thumbnail;
+      const fileName = thumbnailLink.split('/');
+      await deleteFromS3(fileName[3]);
+      const trailerlLink = record.Courses[0].trailer;
+      const trailerName = trailerlLink.split('/');
+      await deleteFromS3(trailerName[3]);
+    }
     if (!record) throw new HttpException(404, 'No Data Found');
     if (trainer.id !== record.user_id && trainer.role !== 'Admin')
       throw new HttpException(403, "You don't have Authority to Update Course");
 
-    const { trailer, thumbnail } = file;
+    // const { trailer, thumbnail } = file;
 
-    if (trailer) {
-      const trailerPath = `${API_BASE}/media/${trailer[0].path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-      courseDetails.trailer = trailerPath;
-    }
-    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-      courseDetails.thumbnail = thumbnailPath;
-    }
+    // if (trailer) {
+    //   const trailerPath = `${API_BASE}/media/${trailer[0].path
+    //     .split('/')
+    //     .splice(-2)
+    //     .join('/')}`;
+    //   courseDetails.trailer = trailerPath;
+    // }
+    // if (thumbnail) {
+    //   const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
+    //     .split('/')
+    //     .splice(-2)
+    //     .join('/')}`;
+    //   courseDetails.thumbnail = thumbnailPath;
+    // }
 
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
+        trailer: file['trailer'][0].path,
+        thumbnail: file['thumbnail'][0].path,
       },
       {
         where: {
@@ -497,7 +496,6 @@ class CourseService {
       include: [
         {
           model: this.order,
-          attributes: ['UserId'],
           include: {
             model: this.user,
             attributes: ['email'],
@@ -509,6 +507,14 @@ class CourseService {
     await responses.map((index) => {
       users.push(index.Order.User.email as string);
     });
+
+    const thumbnailLink = courseRecord.thumbnail;
+    const fileName = thumbnailLink.split('/');
+    await deleteFromS3(fileName[3]);
+    const trailerlLink = courseRecord.trailer;
+    const trailerName = trailerlLink.split('/');
+    await deleteFromS3(trailerName[3]);
+
     const res = await this.course.destroy({
       where: {
         id: courseId,

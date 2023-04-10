@@ -4,6 +4,7 @@ import { API_BASE } from '@config';
 import { Product } from '@/interfaces/product.interface';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
+import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 
 class ProductService {
   public product = DB.Product;
@@ -195,25 +196,10 @@ class ProductService {
 
     if (!userRecord)
       throw new HttpException(404, 'Requested trainer details do not exist');
-    // const uploadedFile = await uploadFileS3(file); // Upload of s3
-    // console.log('bvdhsgfh', uploadedFile);
-
-    const filePath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    // var files = file;
-    // var fileName = file.filename;
-    // var albumPhotosKey = encodeURIComponent(file.path) + '/';
-
-    // const uploadedFile = await uploadFileS3(file); // Upload of s3
-    // console.log(uploadedFile);
-
-    // const uploadedFile = await uploadFileS3(file); // Upload of s3
 
     const newProduct = await this.product.create({
       ...productDetails,
-      thumbnail: filePath,
+      thumbnail: file.path,
     });
     const addProductDimension = await this.productDimension.create({
       product_id: newProduct.id,
@@ -241,7 +227,7 @@ class ProductService {
       description: newProduct.description,
       status: newProduct.status,
       // thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
-      thumbnail: filePath,
+      thumbnail: file.path,
       sku: newProduct.sku,
       weight: addProductDimension.weight,
       dimension: addProductDimension.dimension,
@@ -288,15 +274,20 @@ class ProductService {
     )
       throw new HttpException(403, "You don't have Authority to Edit Product");
     if (file) {
-      const filePath = `${API_BASE}/media/${file.path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-      productDetails.thumbnail = filePath;
+      const thumbnailLink = record.Products[0].thumbnail;
+      const fileName = thumbnailLink.split('/');
+      await deleteFromS3(fileName[3]);
+
+      // const filePath = `${API_BASE}/media/${file.path
+      //   .split('/')
+      //   .splice(-2)
+      //   .join('/')}`;
+      // productDetails.thumbnail = filePath;
     }
     const updateProduct = await this.product.update(
       {
         ...productDetails,
+        thumbnail: file.path,
       },
       {
         where: {
@@ -364,6 +355,10 @@ class ProductService {
     await responses.map((index) => {
       users.push(index.Order.User.email as string);
     });
+    const thumbnailLink = productRecord.thumbnail;
+    const fileName = thumbnailLink.split('/');
+    await deleteFromS3(fileName[3]);
+
     const res: number = await this.product.destroy({
       where: {
         id: productId,

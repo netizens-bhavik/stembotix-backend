@@ -17,7 +17,6 @@ class UniversalSearchRoute implements Routes {
     //Universal search
     this.router.get(
       `${this.path}/search`,
-      passport.authenticate('jwt', { session: false }),
       this.universalSearchController.universalSearch
     );
   }

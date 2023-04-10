@@ -1,5 +1,3 @@
-import { HttpException } from '@/exceptions/HttpException';
-import { isEmpty } from '@/utils/util';
 import DB from '@databases';
 
 class UniversalSearchService {
@@ -7,11 +5,8 @@ class UniversalSearchService {
   public product = DB.Product;
 
   public async universalSearch(
-    loggedUser,
     queryObject
   ): Promise<{ courseRes: object; productRes: object }> {
-    if (!loggedUser) throw new HttpException(403, 'Access Forbidden');
-
     // Search
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
