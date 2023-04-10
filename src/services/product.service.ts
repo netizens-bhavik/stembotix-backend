@@ -353,7 +353,6 @@ class ProductService {
       include: [
         {
           model: this.order,
-          attributes: ['UserId'],
           include: {
             model: this.user,
             attributes: ['email'],

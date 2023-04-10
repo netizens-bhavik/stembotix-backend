@@ -228,20 +228,6 @@ class AuthService {
     return { message: 'Valid Token' };
   }
 
-  // public async verifyPasswordtoken(token: string) {
-  //   const tokenRecord = await this.passwordToken.findOne({
-  //     where: { token },
-  //     include: [{ model: this.user }],
-  //   });
-  //   if (!tokenRecord) throw new HttpException(400, 'Invalid token');
-  //   const { user, expiresAt } = tokenRecord;
-  //   if (new Date() > expiresAt)
-  //     throw new HttpException(400, 'Token has expired');
-
-  //   // Allow the user to reset their password
-  //   return { message: 'Valid token' };
-  // }
-
   public async resetPassword(
     token: string,
     newPassword: string,
