@@ -1,4 +1,11 @@
-import { IsString, IsUUID, IsEmail } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  Max,
+} from 'class-validator';
 
 export class InstituteInstructorIdDTO {
   @IsString()
@@ -15,6 +22,12 @@ export class RequestProposalDTO {
   @IsString()
   public proposal: string;
 
+  @IsOptional()
   @IsEmail()
   public email: string;
+}
+export class AcceptProposalDTO {
+  @IsNumber()
+  @Max(1)
+  public count: number;
 }

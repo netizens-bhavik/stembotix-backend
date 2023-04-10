@@ -7,7 +7,7 @@ import {
   LiveStream,
   LiveStreamUserRecord,
 } from '@/interfaces/liveStream.interface';
-import { Op } from 'sequelize';
+import convertTimeTo12Hour from '@utils/timeStamp/timestamp';
 
 class LiveStreamService {
   public user = DB.User;
@@ -48,6 +48,7 @@ class LiveStreamService {
   }> {
     const currentDate = new Date().toJSON().slice(0, 10);
     const currentTime = new Date().toLocaleTimeString();
+    // const timetest = convertTimeTo12Hour('23:23:15');
     const streamData = await this.liveStream.findAndCountAll({
       include: {
         model: this.user,
@@ -69,6 +70,8 @@ class LiveStreamService {
       } else {
         data.push(elem);
       }
+      elem.startTime = convertTimeTo12Hour(elem.startTime);
+      elem.endTime = convertTimeTo12Hour(elem.endTime);
     });
     return { totalCount: data.length, records: data };
   }
@@ -86,6 +89,8 @@ class LiveStreamService {
       if (currentDate === elem.date.toJSON().slice(0, 10)) {
         data.push(elem);
       }
+      elem.startTime = convertTimeTo12Hour(elem.startTime);
+      elem.endTime = convertTimeTo12Hour(elem.endTime);
     });
     return { totalCount: data.length, records: data };
   }
@@ -103,6 +108,8 @@ class LiveStreamService {
       if (elem.date.toJSON().slice(0, 10) > currentDate) {
         data.push(elem);
       }
+      elem.startTime = convertTimeTo12Hour(elem.startTime);
+      elem.endTime = convertTimeTo12Hour(elem.endTime);
     });
     return { totalCount: data.length, records: data };
   }
@@ -123,6 +130,8 @@ class LiveStreamService {
       ],
     });
     if (!streamData) throw new HttpException(400, 'No event found');
+    streamData.startTime = convertTimeTo12Hour(streamData.startTime);
+    streamData.endTime = convertTimeTo12Hour(streamData.endTime);
     return streamData;
   }
   public async updateLiveStream({
@@ -225,15 +234,10 @@ class LiveStreamService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
     const liveStreamData = await this.liveStream.findAndCountAll({
-      where: DB.Sequelize.and({ deletedAt: null }),
-    });
-    const data: (LiveStream | undefined)[] = await this.liveStream.findAll({
-      where: {
-        deletedAt: null,
-        title: {
-          [searchCondition]: search,
-        },
-      },
+      where: DB.Sequelize.and(
+        { deletedAt: null },
+        { title: { [searchCondition]: search } }
+      ),
       include: [
         { model: this.user },
         {
@@ -241,12 +245,15 @@ class LiveStreamService {
           as: 'Institute',
         },
       ],
-
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return { totalCount: liveStreamData.count, records: data };
+    liveStreamData.rows.map((elem) => {
+      elem.startTime = convertTimeTo12Hour(elem.startTime);
+      elem.endTime = convertTimeTo12Hour(elem.endTime);
+    });
+    return { totalCount: liveStreamData.count, records: liveStreamData.rows };
   }
   public async listLiveEvent(
     trainer,

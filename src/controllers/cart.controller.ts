@@ -62,7 +62,7 @@ class CartController {
       // @ts-ignore
 
       const { id: userId } = req.user;
-      const response: Cart = await this.cartService.viewCart( userId);
+      const response: Cart = await this.cartService.viewCart(userId);
       res.status(200).send(response);
     } catch (error) {
       next(error);

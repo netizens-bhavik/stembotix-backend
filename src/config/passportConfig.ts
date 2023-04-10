@@ -1,6 +1,6 @@
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import { SECRET_KEY } from ".";
-import DB from "@/databases";
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
+import { SECRET_KEY } from '.';
+import DB from '@/databases';
 
 const { User, Role } = DB;
 
@@ -27,7 +27,7 @@ export default (passport) => {
         }
         if (data) {
           const user = JSON.parse(JSON.stringify(data));
-          Reflect.deleteProperty(user, "password");
+          Reflect.deleteProperty(user, 'password');
           cb(null, user);
         } else {
           cb(null, false);

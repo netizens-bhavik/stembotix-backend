@@ -165,7 +165,6 @@ class CourseService {
 
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
     // console.log('bvdhsgfh', uploadedFile);
-
     const newCourse = await this.course.create({
       ...courseDetails,
       trailer: trailerPath,
