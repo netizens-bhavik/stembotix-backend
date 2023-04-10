@@ -1,0 +1,47 @@
+export const CONSTANTS = {
+  IMAGE_WIDTH: 1800,
+  DISTANCE_180DEGREES: 180,
+  MILES_CONVERSION: 60 * 1.1515,
+  ONE_DAY: 60 * 60 * 24 * 1000,
+  TWO_DAYS: 86400 * 2,
+  DIGIT_TEN: 10,
+
+  //ACCESS TOKEN EXPIRY
+  ACCESS_TOKEN_EXPIRY: 60 * 60 * 24,
+
+  //STATUS CODES
+  STATUSCODE_200: 200,
+  STATUSCODE_201: 201,
+  STATUSCODE_300: 300,
+  STATUSCODE_400: 400,
+  STATUSCODE_401: 401,
+  STATUSCODE_403: 403,
+  STATUSCODE_404: 404,
+  STATUSCODE_409: 409,
+  STATUSCODE_500: 500,
+
+  //PAGINATION
+  PAGE_SIZE: '10',
+  PAGE_NO: '0',
+
+  //AVAILABILITY
+  AVAILABILITY_DATA: [
+    'Weekdays',
+    'Weekends',
+    'Daily',
+    'Custom',
+    'Not available',
+  ],
+
+  //VIDEO EXTENSIONS
+  VIDEO_EXTENSIONS: ['mov', 'mp4', 'mkv', 'avi'],
+
+  //RELATIONSHIP GENDERS
+  GENDERS_DATA: ['Male', 'Female', 'Others'],
+};
+
+export enum BODYTYPES {
+  BODY = 'body',
+  QUERY = 'query',
+  PARAMS = 'params',
+}

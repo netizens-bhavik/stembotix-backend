@@ -6,6 +6,7 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import { ProductDto } from '@/dtos/product.dto';
 import { uploadFiles } from '@/rest/fileUpload';
+import { imageUpload } from '@/middlewares/imageUpload.middleware';
 
 class ProductRoute implements Routes {
   public path = '/product';
@@ -43,6 +44,7 @@ class ProductRoute implements Routes {
           req.body.price = Number(req.body.price);
           next();
         },
+        imageUpload,
         validationMiddleware(ProductDto, 'body'),
       ],
       this.productController.addProduct
@@ -64,6 +66,7 @@ class ProductRoute implements Routes {
           req.body.price = Number(req.body.price);
           next();
         },
+        imageUpload,
         validationMiddleware(ProductDto, 'body'),
       ],
       this.productController.updateProduct
