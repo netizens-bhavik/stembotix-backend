@@ -6,6 +6,8 @@ import passportConfig from '@/config/passportConfig';
 import { uploadFiles } from '@/rest/fileUpload';
 import LiveStreamController from '@controllers/liveStream.controller';
 import { LiveStreamDTO } from '@/dtos/liveStream.dto';
+import { imageUpload } from '@/middlewares/imageUpload.middleware';
+
 // import 'reflect-metadata';
 
 class LiveStreamRoute implements Routes {
@@ -27,6 +29,7 @@ class LiveStreamRoute implements Routes {
           req.body.subscriptionPrice = Number(req.body.subscriptionPrice);
           next();
         },
+        imageUpload,
         validationMiddleware(LiveStreamDTO, 'body'),
       ],
       this.liveStreamController.createLiveStream
@@ -60,6 +63,7 @@ class LiveStreamRoute implements Routes {
           req.body.subscriptionPrice = Number(req.body.subscriptionPrice);
           next();
         },
+        imageUpload,
         validationMiddleware(LiveStreamDTO, 'body'),
       ],
       this.liveStreamController.updateLiveStream

@@ -10,11 +10,9 @@ class UniversalSearchController {
     next: NextFunction
   ) => {
     try {
-      const loggedUser = req.user;
       const { search } = req.query;
       const queryObject = { search };
       const searchData = await this.universalSearchService.universalSearch(
-        loggedUser,
         queryObject
       );
 

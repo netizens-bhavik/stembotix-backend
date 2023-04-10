@@ -7,6 +7,7 @@ const courseData = {
   language: 'English',
   status: 'Published',
   description: 'Courses',
+  courseType:"Game Development",
   thumbnail: `${API_BASE}/media/thumbnail/thumbnail_2.svg`,
   trailer:
     'https://images.all-free-download.com/footage_preview/mp4/cute_small_bird_perching_on_tree_6892042.mp4',

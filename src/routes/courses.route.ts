@@ -6,6 +6,7 @@ import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import { AddCourseDTO } from '@/dtos/course.dto';
 import { uploadFiles } from '@/rest/fileUpload';
+import { courseUploadFile } from '@/middlewares/courseUpload.middleware';
 
 class CourseRoute implements Routes {
   public path = '/courses';
@@ -73,13 +74,14 @@ class CourseRoute implements Routes {
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.fields([
-          { name: 'trailer', maxCount: 1 },
           { name: 'thumbnail', maxCount: 1 },
+          { name: 'trailer', maxCount: 1 },
         ]),
         (req, res, next) => {
           req.body.price = Number(req.body.price);
           next();
         },
+        courseUploadFile,
         validationMiddleware(AddCourseDTO, 'body'),
       ],
       this.courseController.addCourse
@@ -94,6 +96,7 @@ class CourseRoute implements Routes {
           req.body.price = Number(req.body.price);
           next();
         },
+        courseUploadFile,
         validationMiddleware(AddCourseDTO, 'body'),
       ],
       this.courseController.updateCourse

@@ -8,6 +8,7 @@ import {
   LiveStreamUserRecord,
 } from '@/interfaces/liveStream.interface';
 import convertTimeTo12Hour from '@utils/timeStamp/timestamp';
+import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 
 class LiveStreamService {
   public user = DB.User;
@@ -30,14 +31,14 @@ class LiveStreamService {
     if (!this.isTrainer(user)) {
       throw new HttpException(404, "You don't have Authority to Create Event");
     }
-    const thumbnail = file;
-    const thumbnailPath = `${API_BASE}/media/${thumbnail.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+    // const thumbnail = file;
+    // const thumbnailPath = `${API_BASE}/media/${thumbnail.path
+    //   .split('/')
+    //   .splice(-2)
+    //   .join('/')}`;
     const liveStream = await this.liveStream.create({
       ...liveStreamDetails,
-      thumbnail: thumbnailPath,
+      thumbnail: file.path,
       userId: user.id,
     });
     return liveStream;
@@ -156,18 +157,23 @@ class LiveStreamService {
       user.role !== 'Admin'
     )
       throw new HttpException(403, "You don't have Authority to Update Event");
-
-    const thumbnail = file;
-    if (thumbnail) {
-      const thumbnailPath = `${API_BASE}/media/${thumbnail.path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-      livestreamDetails.thumbnail = thumbnailPath;
+    if (file) {
+      const thumbnailLink = record.thumbnail;
+      const fileName = thumbnailLink.split('/');
+      await deleteFromS3(fileName[3]);
     }
+    // const thumbnail = file;
+    // if (thumbnail) {
+    //   const thumbnailPath = `${API_BASE}/media/${thumbnail.path
+    //     .split('/')
+    //     .splice(-2)
+    //     .join('/')}`;
+    //   livestreamDetails.thumbnail = thumbnailPath;
+    // }
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
+        thumbnail: file.path,
       },
       {
         where: {
@@ -204,6 +210,10 @@ class LiveStreamService {
       user.role !== 'Admin'
     )
       throw new HttpException(403, "You don't have Authority to Delete Event");
+
+    const thumbnailLink = record.thumbnail;
+    const fileName = thumbnailLink.split('/');
+    await deleteFromS3(fileName[3]);
 
     const res = await this.liveStream.destroy({
       where: {
