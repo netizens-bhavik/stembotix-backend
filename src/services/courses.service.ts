@@ -161,10 +161,8 @@ class CourseService {
       .splice(-2)
       .join('/')}`;
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
-    // console.log('bvdhsgfh', uploadedFile);
 
     // const uploadedFile = await uploadFileS3(ab); // Upload of s3
-    // console.log('bvdhsgfh', uploadedFile);
     const newCourse = await this.course.create({
       ...courseDetails,
       trailer: trailerPath,

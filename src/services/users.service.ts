@@ -49,7 +49,6 @@ class UserService {
       order: [[`${sortBy}`, `${order}`]],
     });
     // const data = await redisFunction('allUsers',allUser)
-    // console.log(data)
     return { totalCount: userCount.count, records: allUser };
   }
 
