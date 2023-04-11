@@ -15,10 +15,10 @@ class InstituteInstructorController {
       const loggedUser = req.user;
       const instructorDetail = req.body;
       const createInstructorRequestResponse =
-        await this.instituteInstructionService.createInstructorRequest(
+        await this.instituteInstructionService.createInstructorRequest({
           loggedUser,
-          instructorDetail
-        );
+          instructorDetail,
+        });
 
       res.status(200).json({
         message: 'Request sent successfully',

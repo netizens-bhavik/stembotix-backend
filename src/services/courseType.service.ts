@@ -96,6 +96,19 @@ class CourseTypeService {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const data = await this.course.findAndCountAll({
+      where: {
+        coursetypeId: courseTypeId,
+      },
+    });
+    if (data.count !== 0) {
+      console.log('sec');
+      throw new HttpException(
+        422,
+        'Course Type is already in used please change course type in course and try again'
+      );
+    }
+
     const res: number = await this.coursetype.destroy({
       where: {
         id: courseTypeId,

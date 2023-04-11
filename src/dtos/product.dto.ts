@@ -1,25 +1,25 @@
-import { IsString, IsNumber, Min } from 'class-validator'
+import { IsString, IsNumber, Min } from 'class-validator';
 
 export class ProductDto {
   @IsString()
-  public title: string
+  public title: string;
 
   @IsNumber()
   @Min(0)
-  public price: number
+  public price: number;
 
   @IsString()
-  public category: string
+  public category: string;
 
   @IsString()
-  public sku: string
+  public sku: string;
 
   @IsString()
-  public description: string
+  public description: string;
 
   @IsString()
-  public weight: string
+  public weight: string;
 
   @IsString()
-  public dimension: string
+  public dimension: string;
 }

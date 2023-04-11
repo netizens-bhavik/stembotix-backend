@@ -48,8 +48,8 @@ class LiveStreamService {
     records: (LiveStream | undefined)[];
   }> {
     const currentDate = new Date().toJSON().slice(0, 10);
-    const currentTime = new Date().toLocaleTimeString();
-    // const timetest = convertTimeTo12Hour('23:23:15');
+    const options = { hour12: false };
+    const currentTime = new Date().toLocaleTimeString(undefined, options);
     const streamData = await this.liveStream.findAndCountAll({
       include: {
         model: this.user,
@@ -59,21 +59,15 @@ class LiveStreamService {
         ['startTime', 'ASC'],
       ],
     });
-    const data = [];
-    streamData.rows.map((elem) => {
-      if (currentDate > elem.date.toJSON().slice(0, 10)) {
-        if (
-          currentDate === elem.date.toJSON().slice(0, 10) &&
-          !(currentTime > elem.endTime)
-        ) {
-          data.push(elem);
-        }
-      } else {
-        data.push(elem);
-      }
-      elem.startTime = convertTimeTo12Hour(elem.startTime);
-      elem.endTime = convertTimeTo12Hour(elem.endTime);
-    });
+    const data = streamData.rows
+      .filter((elem) => {
+        return (
+          currentDate < elem.date.toJSON().slice(0, 10) ||
+          (currentDate === elem.date.toJSON().slice(0, 10) &&
+            currentTime <= elem.endTime)
+        );
+      })
+      .map((elem) => elem);
     return { totalCount: data.length, records: data };
   }
   public async viewTodaysEvent(
@@ -173,7 +167,7 @@ class LiveStreamService {
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
-        thumbnail: file.path,
+        thumbnail: file?.path,
       },
       {
         where: {
@@ -259,10 +253,10 @@ class LiveStreamService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    liveStreamData.rows.map((elem) => {
-      elem.startTime = convertTimeTo12Hour(elem.startTime);
-      elem.endTime = convertTimeTo12Hour(elem.endTime);
-    });
+    // liveStreamData.rows.map((elem) => {
+    //   elem.startTime = convertTimeTo12Hour(elem.startTime);
+    //   elem.endTime = convertTimeTo12Hour(elem.endTime);
+    // });
     return { totalCount: liveStreamData.count, records: liveStreamData.rows };
   }
   public async listLiveEvent(
