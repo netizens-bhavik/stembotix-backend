@@ -1,8 +1,6 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class CourseTypeDto {
-    @IsString()
-    public course_type: string;
-  
-
-  }
+  @IsString()
+  public course_type: string;
+}
