@@ -32,10 +32,8 @@ class InstituteInstroctorRoute implements Routes {
     this.router.post(
       `${this.path}/request-instructor`,
 
-      [
-        passport.authenticate('jwt', { session: false }),
-        validationMiddleware(RequestProposalDTO, 'body'),
-      ],
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(RequestProposalDTO, 'body'),
       this.instituteInstuctorController.createInstructorRequest
     );
 

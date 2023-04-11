@@ -18,18 +18,17 @@ class InstituteInstructorService {
     return loggedUser.role === 'Instructor' || loggedUser.role === 'Admin';
   }
 
-  public async createInstructorRequest(loggedUser, instructorDetail) {
+  public async createInstructorRequest({ loggedUser, instructorDetail }) {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
-    const findInstituteInstructor = await this.instituteInstructor.findOne({
-      where: {
-        instituteId: loggedUser.id,
-        instructorId: instructorDetail.instructorId,
-      },
-    });
-
+    // const findInstituteInstructor = await this.instituteInstructor.findOne({
+    //   where: {
+    //     instituteId: loggedUser.id,
+    //     instructorId: instructorDetail.instructorId,
+    //   },
+    // });
     const createInstituteInstructor = await this.instituteInstructor.create({
       ...instructorDetail,
       instituteId: loggedUser.id,
