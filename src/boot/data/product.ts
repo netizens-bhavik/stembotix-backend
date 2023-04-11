@@ -5,7 +5,7 @@ const productData = {
   price: 5454,
   category: 'Uncategorized',
   sku: 'vnfdj',
-  thumbnail: `${API_BASE}/media/thumbnail/thumbnail_1.jpg`,
+  thumbnail: `https://stembotix-bucket.s3.ap-south-1.amazonaws.com/media/thumbnail/media/thumbnail/thumbnail_1.jpg`,
   status: 'Published',
   description: 'Product',
   weight: '160gm',
