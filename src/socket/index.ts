@@ -98,7 +98,7 @@ const init = (server: httpServer) => {
     maxHttpBufferSize: 10e6,
     pingTimeout: 60000,
     cors: {
-      origin: 'http://13.126.135.109/ || http://localhost:5000/',
+      origin: 'http://13.126.135.109/ ' || 'http://localhost:5000/',
       credentials: true,
       methods: ['GET', 'POST'],
     },
