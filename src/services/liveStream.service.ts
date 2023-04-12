@@ -37,6 +37,43 @@ class LiveStreamService {
     //   .split('/')
     //   .splice(-2)
     //   .join('/')}`;
+    const data = await this.liveStream.findAll({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    data.map((elem) => {
+      const date = elem.date.toJSON().slice(0, 10);
+
+      const time = elem.startTime;
+      const startTime = moment(liveStreamDetails.startTime, 'HH:mm:ss').format(
+        'HH:mm:ss'
+      );
+      const newTime = elem.endTime;
+      const endTime = moment(liveStreamDetails.endTime, 'HH:mm:ss').format(
+        'HH:mm:ss'
+      );
+
+      if (
+        (date === liveStreamDetails.date &&
+          time === startTime &&
+          newTime === endTime) ||
+        (startTime < newTime && date === liveStreamDetails.date)
+      ) {
+        throw new HttpException(
+          409,
+          'Event already exist at same date & time please change date & time and try again'
+        );
+      }
+      if (startTime === endTime) {
+        throw new HttpException(
+          409,
+          'Start time and end time is same please change time and try again'
+        );
+      }
+    });
+
     const liveStream = await this.liveStream.create({
       ...liveStreamDetails,
       thumbnail: file.path,
@@ -143,13 +180,53 @@ class LiveStreamService {
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (this.isUser(user) || !user.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
-
     const record = await this.liveStream.findOne({
       where: {
         id: livestreamId,
       },
     });
     if (!record) throw new HttpException(404, 'No stream Found');
+
+    const data = await this.liveStream.findAll({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    data.map((elem) => {
+      const date = elem.date.toJSON().slice(0, 10);
+
+      const time = elem.startTime;
+      const startTime = moment(livestreamDetails.startTime, 'HH:mm:ss').format(
+        'HH:mm:ss'
+      );
+      const newTime = elem.endTime;
+      const endTime = moment(livestreamDetails.endTime, 'HH:mm:ss').format(
+        'HH:mm:ss'
+      );
+
+      if (
+        (date === livestreamDetails.date && time === startTime) ||
+        newTime === endTime
+        // ||
+        //     // (
+        // startTime < newTime
+        //  &&
+        //     date === livestreamDetails.date
+        // )
+      ) {
+        throw new HttpException(
+          409,
+          'Event already exist at same date & time please change date & time and try again'
+        );
+      }
+      if (startTime === endTime) {
+        throw new HttpException(
+          409,
+          'Start time and end time is same please change time and try again'
+        );
+      }
+    });
 
     if (
       user.id !== record.userId &&
