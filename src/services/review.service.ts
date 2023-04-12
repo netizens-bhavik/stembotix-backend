@@ -20,7 +20,7 @@ class ReviewService {
           user_id: user.id,
         },
       });
-      if (reviewData) throw new HttpException(400, 'You already Reviewed');
+      if (reviewData) throw new HttpException(409, 'You already Reviewed');
       const review = await this.review.create({
         ...reviewDetail,
         userId: user.id,
@@ -39,7 +39,7 @@ class ReviewService {
             user_id: user.id,
           },
         });
-        if (reviewData) throw new HttpException(400, 'You already Reviewed');
+        if (reviewData) throw new HttpException(409, 'You already Reviewed');
         const newreview = await this.review.create({
           ...reviewDetail,
           userId: user.id,

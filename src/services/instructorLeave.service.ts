@@ -92,7 +92,7 @@ class InstructorLeaveService {
       where: { instituteInstructorId, leaveTypeId },
     });
     if (findLeave) {
-      throw new HttpException(400, 'Leave already exists');
+      throw new HttpException(409, 'Leave already exists');
     }
 
     if (leaveCount < 0) {
@@ -142,7 +142,7 @@ class InstructorLeaveService {
       where: { instituteInstructorId, leaveTypeId, leaveCount },
     });
     if (checkfindLeave) {
-      throw new HttpException(400, 'Leave already exists');
+      throw new HttpException(409, 'Leave already exists');
     }
 
     const updateLeave = await this.instructorHasLeave.update(
