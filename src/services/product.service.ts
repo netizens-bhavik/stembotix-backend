@@ -283,11 +283,23 @@ class ProductService {
       //   .splice(-2)
       //   .join('/')}`;
       // productDetails.thumbnail = filePath;
+      const updateProduct = await this.product.update(
+        {
+          ...productDetails,
+          thumbnail: file?.path,
+        },
+        {
+          where: {
+            id: productDetails.id,
+          },
+          returning: true,
+        }
+      );
+      return { count: updateProduct[0], rows: updateProduct[1] };
     }
     const updateProduct = await this.product.update(
       {
         ...productDetails,
-        thumbnail: file.path,
       },
       {
         where: {

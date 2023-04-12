@@ -9,6 +9,7 @@ import {
 } from '@/interfaces/liveStream.interface';
 import convertTimeTo12Hour from '@utils/timeStamp/timestamp';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
+import moment from 'moment';
 
 class LiveStreamService {
   public user = DB.User;
@@ -47,10 +48,10 @@ class LiveStreamService {
     totalCount: number;
     records: (LiveStream | undefined)[];
   }> {
-    const currentDate = new Date().toJSON().slice(0, 10);
-    const options = { hour12: false };
-    const currentTime = new Date().toLocaleTimeString(undefined, options);
+    const currentDate = moment().format('YYYY-MM-DD');
+    const currentTime = moment().format('HH:mm:ss');
     const streamData = await this.liveStream.findAndCountAll({
+      where: {},
       include: {
         model: this.user,
       },
@@ -61,15 +62,20 @@ class LiveStreamService {
     });
     const data = streamData.rows
       .filter((elem) => {
+        const streamDate = moment(elem.date).format('YYYY-MM-DD');
+        const streamEndTime = moment(elem.endTime, 'HH:mm:ss').format(
+          'HH:mm:ss'
+        );
         return (
-          currentDate < elem.date.toJSON().slice(0, 10) ||
-          (currentDate === elem.date.toJSON().slice(0, 10) &&
-            currentTime <= elem.endTime)
+          currentDate <= streamDate &&
+          currentDate === streamDate &&
+          currentTime <= streamEndTime
         );
       })
       .map((elem) => elem);
     return { totalCount: data.length, records: data };
   }
+
   public async viewTodaysEvent(
     user
   ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
@@ -155,6 +161,20 @@ class LiveStreamService {
       const thumbnailLink = record.thumbnail;
       const fileName = thumbnailLink.split('/');
       await deleteFromS3(fileName[3]);
+
+      const updateLiveStream = await this.liveStream.update(
+        {
+          ...livestreamDetails,
+          thumbnail: file?.path,
+        },
+        {
+          where: {
+            id: livestreamId,
+          },
+          returning: true,
+        }
+      );
+      return { count: updateLiveStream[0], rows: updateLiveStream[1] };
     }
     // const thumbnail = file;
     // if (thumbnail) {
@@ -167,7 +187,7 @@ class LiveStreamService {
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
-        thumbnail: file?.path,
+        // thumbnail: file?.path,
       },
       {
         where: {
