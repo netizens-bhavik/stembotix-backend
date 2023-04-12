@@ -103,7 +103,7 @@ class CourseTypeService {
     });
     if (data.count !== 0) {
       throw new HttpException(
-        422,
+        409,
         'Course Type is already in used please change course type in course and try again'
       );
     }
