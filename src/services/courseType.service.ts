@@ -102,7 +102,6 @@ class CourseTypeService {
       },
     });
     if (data.count !== 0) {
-      console.log('sec');
       throw new HttpException(
         422,
         'Course Type is already in used please change course type in course and try again'
