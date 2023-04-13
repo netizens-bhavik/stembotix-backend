@@ -413,11 +413,11 @@ class CourseService {
         const thumbnailLink = record.Courses[0]?.thumbnail;
 
         const fileName = thumbnailLink.split('/');
-        // await deleteFromS3(fileName[3]);
+        await deleteFromS3(fileName[3]);
 
         const trailerlLink = record.Courses[0]?.trailer;
         const trailerName = trailerlLink.split('/');
-        // await deleteFromS3(trailerName[3]);
+        await deleteFromS3(trailerName[3]);
         const updateCourse = await this.course.update(
           {
             ...courseDetails,
@@ -436,7 +436,7 @@ class CourseService {
       if (file['trailer']) {
         const trailerlLink = record.Courses[0]?.trailer;
         const trailerName = trailerlLink.split('/');
-        // await deleteFromS3(trailerName[3]);
+        await deleteFromS3(trailerName[3]);
         const updateCourse = await this.course.update(
           {
             ...courseDetails,
@@ -455,7 +455,7 @@ class CourseService {
         const thumbnailLink = record.Courses[0]?.thumbnail;
 
         const fileName = thumbnailLink.split('/');
-        // await deleteFromS3(fileName[3]);
+        await deleteFromS3(fileName[3]);
         const updateCourse = await this.course.update(
           {
             ...courseDetails,
