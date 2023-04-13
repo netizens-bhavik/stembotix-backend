@@ -408,10 +408,11 @@ class CourseService {
     if (trainer.id !== record.user_id && trainer.role !== 'Admin')
       throw new HttpException(403, "You don't have Authority to Update Course");
     if (file) {
-      const thumbnailLink = record.Courses[0].thumbnail;
+      const thumbnailLink = record.Courses[0]?.thumbnail;
       const fileName = thumbnailLink.split('/');
       await deleteFromS3(fileName[3]);
-      const trailerlLink = record.Courses[0].trailer;
+
+      const trailerlLink = record.Courses[0]?.trailer;
       const trailerName = trailerlLink.split('/');
       await deleteFromS3(trailerName[3]);
 
@@ -459,7 +460,6 @@ class CourseService {
         returning: true,
       }
     );
-
     return { count: updateCourse[0], rows: updateCourse[1] };
   }
 
