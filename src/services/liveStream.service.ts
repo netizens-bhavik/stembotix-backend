@@ -59,7 +59,9 @@ class LiveStreamService {
         (date === liveStreamDetails.date &&
           time === startTime &&
           newTime === endTime) ||
-        (startTime < newTime && date === liveStreamDetails.date)
+        (startTime < newTime &&
+          date === liveStreamDetails.date &&
+          endTime === time)
       ) {
         throw new HttpException(
           409,
@@ -209,7 +211,7 @@ class LiveStreamService {
         (date === livestreamDetails.date && time === startTime) ||
         newTime === endTime
         // ||
-        //     // (
+        // (
         // startTime < newTime
         //  &&
         //     date === livestreamDetails.date
