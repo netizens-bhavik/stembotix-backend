@@ -208,16 +208,6 @@ class LiveStreamService {
       const endTime = moment(livestreamDetails.endTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
-      // if (
-      //   (date === liveStreamDetails.date &&
-      //     time === startTime &&
-      //     newTime === endTime) ||
-      //   (startTime < newTime &&
-      //     date === liveStreamDetails.date &&
-      //     endTime === time)
-      // )
-      console.log(date);
-      console.log(livestreamDetails.date);
       if (
         (date === livestreamDetails.date &&
           time === startTime &&

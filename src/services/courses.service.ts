@@ -452,7 +452,6 @@ class CourseService {
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
       if (file['thumbnail']) {
-        console.log('Thumbnail available');
         const thumbnailLink = record.Courses[0]?.thumbnail;
 
         const fileName = thumbnailLink.split('/');
