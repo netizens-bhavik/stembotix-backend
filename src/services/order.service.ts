@@ -5,6 +5,8 @@ import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
 import { OrderData } from '../utils/ruleEngine/orderData.rule';
+import { Mails } from '@/interfaces/mailPayload.interface';
+import EmailService from './email.service';
 class OrderService {
   public user = DB.User;
   public order = DB.Order;
@@ -16,6 +18,7 @@ class OrderService {
   public review = DB.Review;
   public trainer = DB.Trainer;
   public coursetype = DB.CourseType;
+  public emailService = new EmailService();
 
   public orderData = new OrderData();
 
@@ -104,10 +107,15 @@ class OrderService {
   }
   public async verifyOrder(userId: string, orderBody: VerifyOrderDTO) {
     const orderRecord = await this.order.findOne({
-      where: { user_id: userId },
+      where: DB.Sequelize.and({
+        user_id: userId,
+      }),
+      include: [{ model: this.user }],
     });
     if (!orderRecord) throw new HttpException(403, 'Resource Forbidden');
-
+    const adminRecord = await this.user.findAll({
+      where: { role: 'Admin' },
+    });
     const {
       orderId: order_id,
       paymentId: payment_id,
@@ -134,6 +142,7 @@ class OrderService {
     const verification = await this.order.update(paymentData, {
       where: { id: order_id },
     });
+
     if (!verification) {
       throw new HttpException(500, 'Payment failed');
     }
@@ -164,6 +173,30 @@ class OrderService {
     });
 
     const orderCartItems = await this.orderItem.bulkCreate(orderItems);
+    const orderData = await this.orderItem.findOne({
+      where: DB.Sequelize.and({ order_id: order_id }),
+      include: [{ model: this.course }, { model: this.product }],
+    });
+
+    if (verification) {
+      let isProduct = true;
+      if (orderData.CourseId) {
+        isProduct = false;
+      }
+      const title = isProduct
+        ? `(${orderData.Product.title})`
+        : `(${orderData.Course.title})`;
+      const mailData: Mails = {
+        templateData: {
+          title,
+        },
+        mailData: {
+          from: adminRecord[0].email,
+          to: orderRecord.User.email,
+        },
+      };
+      this.emailService.sendMailofOrder(mailData);
+    }
     if (orderCartItems) {
       await this.cartItem.destroy({
         where: { id: cartItems },
