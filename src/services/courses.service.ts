@@ -407,29 +407,71 @@ class CourseService {
     if (!record) throw new HttpException(404, 'No Data Found');
     if (trainer.id !== record.user_id && trainer.role !== 'Admin')
       throw new HttpException(403, "You don't have Authority to Update Course");
+
     if (file) {
-      const thumbnailLink = record.Courses[0]?.thumbnail;
-      const fileName = thumbnailLink.split('/');
-      await deleteFromS3(fileName[3]);
+      if (file['trailer'] && file['thumbnail']) {
+        const thumbnailLink = record.Courses[0]?.thumbnail;
 
-      const trailerlLink = record.Courses[0]?.trailer;
-      const trailerName = trailerlLink.split('/');
-      await deleteFromS3(trailerName[3]);
+        const fileName = thumbnailLink.split('/');
+        // await deleteFromS3(fileName[3]);
 
-      const updateCourse = await this.course.update(
-        {
-          ...courseDetails,
-          trailer: file['trailer'][0]?.path,
-          thumbnail: file['thumbnail'][0]?.path,
-        },
-        {
-          where: {
-            id: courseDetails.id,
+        const trailerlLink = record.Courses[0]?.trailer;
+        const trailerName = trailerlLink.split('/');
+        // await deleteFromS3(trailerName[3]);
+        const updateCourse = await this.course.update(
+          {
+            ...courseDetails,
+            trailer: file['trailer'][0]?.path,
+            thumbnail: file['thumbnail'][0]?.path,
           },
-          returning: true,
-        }
-      );
-      return { count: updateCourse[0], rows: updateCourse[1] };
+          {
+            where: {
+              id: courseDetails.id,
+            },
+            returning: true,
+          }
+        );
+        return { count: updateCourse[0], rows: updateCourse[1] };
+      }
+      if (file['trailer']) {
+        const trailerlLink = record.Courses[0]?.trailer;
+        const trailerName = trailerlLink.split('/');
+        // await deleteFromS3(trailerName[3]);
+        const updateCourse = await this.course.update(
+          {
+            ...courseDetails,
+            trailer: file['trailer'][0]?.path,
+          },
+          {
+            where: {
+              id: courseDetails.id,
+            },
+            returning: true,
+          }
+        );
+        return { count: updateCourse[0], rows: updateCourse[1] };
+      }
+      if (file['thumbnail']) {
+        console.log('Thumbnail available');
+        const thumbnailLink = record.Courses[0]?.thumbnail;
+
+        const fileName = thumbnailLink.split('/');
+        // await deleteFromS3(fileName[3]);
+        const updateCourse = await this.course.update(
+          {
+            ...courseDetails,
+            // trailer: file['trailer'][0]?.path,
+            thumbnail: file['thumbnail'][0]?.path,
+          },
+          {
+            where: {
+              id: courseDetails.id,
+            },
+            returning: true,
+          }
+        );
+        return { count: updateCourse[0], rows: updateCourse[1] };
+      }
     }
 
     // const { trailer, thumbnail } = file;
