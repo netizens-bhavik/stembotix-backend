@@ -44,10 +44,7 @@ class HolidayService {
           model: this.holidayList,
           attributes: ['id', 'name', 'description', 'type'],
           as: 'holidayList',
-          where: DB.Sequelize.or(
-            { name: { [searchCondition]: search } },
-            { description: { [searchCondition]: search } }
-          ),
+          where: { name: { [searchCondition]: search } },
         },
       ],
 

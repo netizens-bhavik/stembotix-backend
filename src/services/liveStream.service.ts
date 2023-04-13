@@ -40,6 +40,7 @@ class LiveStreamService {
     const data = await this.liveStream.findAll({
       where: {
         userId: user.id,
+        deletedAt: null,
       },
     });
 
@@ -192,6 +193,7 @@ class LiveStreamService {
     const data = await this.liveStream.findAll({
       where: {
         userId: user.id,
+        deletedAt: null,
       },
     });
 
@@ -206,16 +208,13 @@ class LiveStreamService {
       const endTime = moment(livestreamDetails.endTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
-
       if (
-        (date === livestreamDetails.date && time === startTime) ||
-        newTime === endTime
-        // ||
-        // (
-        // startTime < newTime
+        (date === livestreamDetails.date &&
+          time === startTime &&
+          newTime === endTime) ||
+        (startTime < newTime && date === livestreamDetails.date)
         //  &&
-        //     date === livestreamDetails.date
-        // )
+        // endTime === time)
       ) {
         throw new HttpException(
           409,
@@ -266,7 +265,6 @@ class LiveStreamService {
     const updateLiveStream = await this.liveStream.update(
       {
         ...livestreamDetails,
-        // thumbnail: file?.path,
       },
       {
         where: {
