@@ -2,6 +2,7 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
 import { API_BASE } from '@/config';
+import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 
 class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
@@ -55,20 +56,20 @@ class CurriculumVideoService {
         403,
         "You don't have Authority to Add CurriculumnVideo"
       );
-    const filePath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+    // const filePath = `${API_BASE}/media/${file.path
+    //   .split('/')
+    //   .splice(-2)
+    //   .join('/')}`;
     const newVideo = await this.curriculumVideo.create({
       ...curriculumVideoDetails,
-      video_url: filePath,
+      video_url: file.path,
       curriculum_id: fetchSection.id,
     });
 
     return {
       id: newVideo.id,
       title: newVideo.title,
-      video_url: `${API_BASE}/media/${newVideo.video_url}`,
+      video_url: file.path,
     };
   }
 
@@ -149,11 +150,25 @@ class CurriculumVideoService {
         403,
         "You don't have Authority to Edit CurriculumnVideo"
       );
-    const filePath = `${API_BASE}/media/${file?.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-    curriculumVideoDetails.video_url = filePath;
+
+    if (file) {
+      const videoLink = record.video_url;
+      const fileName = videoLink.split('/');
+      await deleteFromS3(fileName[3]);
+      const updateVideo = await this.curriculumVideo.update(
+        {
+          ...curriculumVideoDetails,
+          video_url: file.path,
+        },
+        {
+          where: {
+            id: videoId,
+          },
+          returning: true,
+        }
+      );
+      return { count: updateVideo[0], rows: updateVideo[1] };
+    }
     const updateVideo = await this.curriculumVideo.update(
       {
         ...curriculumVideoDetails,
@@ -200,6 +215,9 @@ class CurriculumVideoService {
         403,
         "You don't have Authority to Delete CurriculumnVideo"
       );
+    const videoLink = record.video_url;
+    const fileName = videoLink.split('/');
+    await deleteFromS3(fileName[3]);
     const res: number = await this.curriculumVideo.destroy({
       where: {
         id: videoId,

@@ -37,6 +37,7 @@ export const courseUploadFile = async (
         }
       });
     }
+
     next();
   } catch (error) {
     logger.error(error);

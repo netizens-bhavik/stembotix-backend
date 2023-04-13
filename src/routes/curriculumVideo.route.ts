@@ -6,6 +6,7 @@ import passportConfig from '@/config/passportConfig';
 import CurriculumVideoController from '@/controllers/curriculumVideo.controller';
 import { uploadFiles } from '@/rest/fileUpload';
 import { CurriCulumVideoDto } from '@/dtos/curriculumVideo.dto';
+import { imageUpload } from '@/middlewares/imageUpload.middleware';
 
 class CurriculumVideoRoute implements Routes {
   public path = '/courses/section';
@@ -27,6 +28,7 @@ class CurriculumVideoRoute implements Routes {
           req.body.video_url = String(req.body.video_url);
           next();
         },
+        imageUpload,
       ],
       this.curriculumVideoController.addVideo
     );
@@ -41,11 +43,8 @@ class CurriculumVideoRoute implements Routes {
       [
         passport.authenticate('jwt', { session: false }),
         uploadFiles.single('tutorial'),
-        (req, res, next) => {
-          req.body.video_url = String(req.body.video_url);
-          next();
-        },
-        validationMiddleware(CurriCulumVideoDto, 'body'),
+        imageUpload,
+        validationMiddleware(CurriCulumVideoDto, 'body', true),
       ],
       this.curriculumVideoController.updateVideo
     );
