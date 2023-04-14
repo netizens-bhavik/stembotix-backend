@@ -138,13 +138,6 @@ class InstructorLeaveService {
       throw new HttpException(401, 'Leave count must not be less than 0');
     }
 
-    const checkfindLeave = await this.instructorHasLeave.findOne({
-      where: { instituteInstructorId, leaveTypeId, leaveCount },
-    });
-    if (checkfindLeave) {
-      throw new HttpException(409, 'Leave already exists');
-    }
-
     const updateLeave = await this.instructorHasLeave.update(
       { ...leaveData },
       { where: { id: intructorLeaveId } }
@@ -159,17 +152,6 @@ class InstructorLeaveService {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const findLeave = await this.instructorHasLeave.findOne({
-      where: { id: intructorLeaveId },
-    });
-    if (!findLeave) {
-      throw new HttpException(404, 'Leave not found');
-    }
-    if (
-      loggedUser.id !== findLeave.instituteInstructorId &&
-      loggedUser.role !== 'Admin'
-    )
-      throw new HttpException(403, "You don't have Authority to Delete Leave");
     const deleteLeave = await this.instructorHasLeave.destroy({
       where: { id: intructorLeaveId },
     });

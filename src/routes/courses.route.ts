@@ -35,6 +35,11 @@ class CourseRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.courseController.listCourses
     );
+    this.router.get(
+      `${this.path}/get-all-order`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseController.getAllDataOfOrder
+    );
     // view single course details
     this.router.get(
       `${this.path}/:courseId`,

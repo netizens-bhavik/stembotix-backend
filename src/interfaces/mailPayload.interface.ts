@@ -17,4 +17,10 @@ export interface Mail {
     to: string[];
   };
 }
-
+export interface Mails {
+  templateData: object;
+  mailData: {
+    from?: string;
+    to: string[];
+  };
+}

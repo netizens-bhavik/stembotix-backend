@@ -7,6 +7,7 @@ import {
   Mail,
   MailPayload,
   MailPayloads,
+  Mails,
 } from '@/interfaces/mailPayload.interface';
 
 const transporterOptions: Options = {
@@ -222,6 +223,32 @@ class EmailService {
             from: `${mailData.from}`,
             to: mailData.to,
             subject: 'Unpublished Course',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (error) {
+          return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async sendMailofOrder(payload: Mails) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      // Mailing Data assignment
+      const pathToView = path.resolve(__dirname, '../view/orderMail.ejs');
+      const { templateData, mailData } = payload;
+
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `StemBotix: ${SMTP_EMAIL_FROM}`,
+            to: mailData.to,
+            subject: 'Order',
             html: data,
           });
           this.terminateConnection();
