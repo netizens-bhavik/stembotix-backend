@@ -21,7 +21,7 @@ class UsersRoute implements Routes {
     );
 
     this.router.get(
-      `${this.path}/allUser`,
+      `${this.path}/monthWiseUsers`,
       passport.authenticate('jwt', { session: false }),
       this.usersController.getAllUserMonthWise
     );

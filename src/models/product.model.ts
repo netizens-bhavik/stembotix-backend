@@ -1,3 +1,5 @@
+import { HasMany } from 'sequelize/types';
+
 module.exports = (sequelize, Sequelize) => {
   const Product = sequelize.define(
     'Product',
@@ -13,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       price: {
-        type: Sequelize.DECIMAL(10,2),
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
       category: {
@@ -61,6 +63,7 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Product.hasOne(models.CartItem);
+    Product.hasMany(models.OrderItem);
   };
   return Product;
 };

@@ -58,12 +58,10 @@ class QuizQueAnsController {
         trainer,
         quizQueId
       );
-      res
-        .status(200)
-        .send({
-          response: update,
-          message: 'Question Answer Update Successfully',
-        });
+      res.status(200).send({
+        response: update,
+        message: 'Question answer updated successfully',
+      });
     } catch (err) {
       next(err);
     }
@@ -84,7 +82,7 @@ class QuizQueAnsController {
         });
       res
         .status(200)
-        .send({ response: response, message: 'Question deleted Successfully' });
+        .send({ response: response, message: 'Question deleted successfully' });
     } catch (error) {
       next(error);
     }

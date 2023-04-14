@@ -88,7 +88,7 @@ class CommentController {
       });
       res
         .status(200)
-        .send({ response: response, message: 'Comment update successfully' });
+        .send({ response: response, message: 'Comment updated successfully' });
     } catch (err) {
       next(err);
     }

@@ -97,30 +97,28 @@ class UserService {
   }
   public async getAllUserMonthWise(user) {
     if (!this.isAdmin(user)) throw new HttpException(401, 'Unauthorized');
-    const month = 3;
-    const recordsPerMonth = await this.users.findAll({
-      attributes: [
-        [
-          sequelize.fn('date_trunc', 'month', sequelize.col('created_at')),
-          'month',
-        ],
-        [sequelize.fn('count', sequelize.col('id')), 'count'],
-      ],
-      group: [
-        sequelize.fn('date_trunc', 'day', sequelize.col('created_at')),
-        sequelize.col('User.created_at'),
-      ],
-      where: {
-        createdAt: {
-          // [Op.gte]: new Date(new Date().getFullYear(), 0, 1),
-          [Op.gte]: moment('0101', 'MMDD')
-            .add(month - 1, 'months')
-            .toDate(),
-          [Op.lt]: moment('0101', 'MMDD').add(month, 'months').toDate(),
+    const months = [];
+    for (let i = 1; i <= 12; i++) {
+      const recordsPerMonth = await this.users.findAndCountAll({
+        where: {
+          createdAt: {
+            [Op.gte]: moment()
+              .month(i - 1)
+              .startOf('month')
+              .year(moment().year())
+              .toDate(),
+
+            [Op.lt]: moment()
+              .month(i - 1)
+              .endOf('month')
+              .year(moment().year())
+              .toDate(),
+          },
         },
-      },
-    });
-    return recordsPerMonth;
+      });
+      months.push(recordsPerMonth);
+    }
+    return months;
   }
 }
 
