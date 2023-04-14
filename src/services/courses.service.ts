@@ -863,6 +863,14 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    const orderItems = data.rows[0].OrderItems;
+    const orderItemsObj = orderItems.reduce((obj, item) => {
+      obj[item.id] = item;
+      return obj;
+    }, {});
+
+    // Replace orderitems array with the object
+    data.rows[0].orderitems = orderItemsObj;
     return data;
   }
 }
