@@ -3,6 +3,8 @@ import { RegisterUserDTO } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
+import moment from 'moment';
+import sequelize, { Op } from 'sequelize';
 class UserService {
   public users = DB.User;
   public course = DB.Course;
@@ -92,6 +94,33 @@ class UserService {
     await this.users.destroy({ where: { id: userId } });
 
     return findUser;
+  }
+  public async getAllUserMonthWise(user) {
+    if (!this.isAdmin(user)) throw new HttpException(401, 'Unauthorized');
+    const month = 3;
+    const recordsPerMonth = await this.users.findAll({
+      attributes: [
+        [
+          sequelize.fn('date_trunc', 'month', sequelize.col('created_at')),
+          'month',
+        ],
+        [sequelize.fn('count', sequelize.col('id')), 'count'],
+      ],
+      group: [
+        sequelize.fn('date_trunc', 'day', sequelize.col('created_at')),
+        sequelize.col('User.created_at'),
+      ],
+      where: {
+        createdAt: {
+          // [Op.gte]: new Date(new Date().getFullYear(), 0, 1),
+          [Op.gte]: moment('0101', 'MMDD')
+            .add(month - 1, 'months')
+            .toDate(),
+          [Op.lt]: moment('0101', 'MMDD').add(month, 'months').toDate(),
+        },
+      },
+    });
+    return recordsPerMonth;
   }
 }
 

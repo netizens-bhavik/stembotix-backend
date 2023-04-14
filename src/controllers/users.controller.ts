@@ -76,6 +76,20 @@ class UsersController {
       next(error);
     }
   };
+
+  public getAllUserMonthWise = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const response = await this.userService.getAllUserMonthWise(user);
+      res.status(200).send(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 }
 
 export default UsersController;

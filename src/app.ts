@@ -89,7 +89,10 @@ class App {
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
       this.app.use('/api', route.router);
-      this.app.use('/media', express.static(path.join(__dirname, '/public')));
+      this.app.use(
+        '/media',
+        express.static(path.join(__dirname, '/public' || '/public/assets'))
+      );
     });
   }
 

@@ -107,9 +107,8 @@ class LiveStreamService {
           'HH:mm:ss'
         );
         return (
-          currentDate <= streamDate &&
-          currentDate === streamDate &&
-          currentTime <= streamEndTime
+          currentDate <= streamDate ||
+          (currentDate === streamDate && currentTime <= streamEndTime)
         );
       })
       .map((elem) => elem);
