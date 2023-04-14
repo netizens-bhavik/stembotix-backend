@@ -248,5 +248,21 @@ class CourseController {
       next(error);
     }
   };
+  public getAllDataOfOrder = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const response: { totalCount: number; records: (Course | undefined)[] } =
+        await this.courseService.getAllDataOfOrder(user, queryObject);
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 export default CourseController;
