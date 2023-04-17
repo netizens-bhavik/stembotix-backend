@@ -12,7 +12,7 @@ const initEvents = (io: Server) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     socket.on('get-data', (data) => console.log('data', data));
     socket.on('join', async (data) => {
-      // console.log('🔥: A user joined', data);
+      console.log('🔥: A user joined', data);
       try {
         if (data.roomId && data.userId) {
           // console.log('🔥: A user joined', data);

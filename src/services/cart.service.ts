@@ -26,7 +26,7 @@ class CartService {
     const productData = await this.product.findOne({
       where: { id: productId },
     });
-    if (!productData) throw new HttpException(404, 'Product not found');
+    if (!productData) throw new HttpException(409, 'Product not found');
 
     const cartItem = await this.cartItem.findOrCreate({
       where: {
@@ -56,7 +56,7 @@ class CartService {
       where: DB.Sequelize.and({ id: courseId }, { status: 'Published' }),
     });
     if (!courseData) {
-      throw new HttpException(404, 'Course not found');
+      throw new HttpException(409, 'Course not found');
     }
 
     const cartItem = await this.cartItem.findOrCreate({
@@ -71,7 +71,7 @@ class CartService {
       message: '',
       data: {},
     };
-    if (!cartItem[1]) throw new HttpException(400, 'Already addes to cart');
+    if (!cartItem[1]) throw new HttpException(400, 'Already added to cart');
     res.data = cartItem[0];
     res.message = `${ItemTypes.Product} added to cart successfully`;
     return res;
@@ -113,9 +113,10 @@ class CartService {
   }
   public async viewCart(userId) {
     const cart = await this.cart.findOne({
-      where: { user_id: userId },
+      where: DB.Sequelize.and({ user_id: userId }),
       include: {
         model: this.cartItem,
+
         include: [
           {
             model: this.course,
@@ -152,6 +153,31 @@ class CartService {
     if (!cartItemRecord) throw new HttpException(404, 'Record not found');
     await cartItemRecord.destroy();
     return { message: 'Item removed successfully' };
+  }
+
+  public async confirmToCheckout(user) {
+    const record = await this.cart.findAll({
+      where: { userId: user.id },
+    });
+    const cartId = record[0].id;
+    const response = await this.cart.findAll({
+      where: { userId: user.id },
+      include: {
+        model: this.cartItem,
+        where: {
+          cart_id: cartId,
+        },
+        include: [
+          {
+            model: this.course,
+          },
+          {
+            model: this.product,
+          },
+        ],
+      },
+    });
+    return response;
   }
 }
 export default CartService;

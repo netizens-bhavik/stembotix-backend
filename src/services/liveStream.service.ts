@@ -129,8 +129,6 @@ class LiveStreamService {
       if (currentDate === elem.date.toJSON().slice(0, 10)) {
         data.push(elem);
       }
-      elem.startTime = convertTimeTo12Hour(elem.startTime);
-      elem.endTime = convertTimeTo12Hour(elem.endTime);
     });
     return { totalCount: data.length, records: data };
   }
@@ -148,8 +146,6 @@ class LiveStreamService {
       if (elem.date.toJSON().slice(0, 10) > currentDate) {
         data.push(elem);
       }
-      elem.startTime = convertTimeTo12Hour(elem.startTime);
-      elem.endTime = convertTimeTo12Hour(elem.endTime);
     });
     return { totalCount: data.length, records: data };
   }
