@@ -98,15 +98,15 @@ class CartService {
       message = 'Upper limit reached';
       if (itemRecord.quantity < 10) {
         await itemRecord.update({ quantity: itemRecord.quantity + 1 });
-        message = 'Cart Item quantity increased successfully';
+        message = 'Cart item quantity increased successfully';
       }
     } else {
       if (itemRecord.quantity === 1) {
         await itemRecord.destroy();
-        message = 'Cart Item removed successfully';
+        message = 'Cart item removed successfully';
       } else {
         await itemRecord.update({ quantity: itemRecord.quantity - 1 });
-        message = 'Cart Item quantity decreased successfully';
+        message = 'Cart item quantity decreased successfully';
       }
     }
     return { message };
