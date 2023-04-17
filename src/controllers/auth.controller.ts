@@ -13,14 +13,14 @@ class AuthController {
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: RegisterUserDto = req.body;
-      const { accessToken, refreshToken, user}  = await this.authService.signup(
+      const { accessToken, refreshToken, user } = await this.authService.signup(
         userData
       );
       res.status(200).send({
         accessToken,
         refreshToken,
         user,
-        message: 'Signed Up successfully.',
+        message: 'Signed up successfully',
       });
     } catch (error) {
       next(error);
