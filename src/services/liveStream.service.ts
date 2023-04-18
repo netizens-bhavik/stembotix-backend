@@ -36,7 +36,11 @@ class LiveStreamService {
     // const thumbnailPath = `${API_BASE}/media/${thumbnail.path
     //   .split('/')
     //   .splice(-2)
-    //   .join('/')}`;
+    //   .join('/')}
+
+    const currentTime = moment().format('HH:mm:ss');
+    const currentDate = moment().format('YYYY-MM-DD');
+
     const data = await this.liveStream.findAll({
       where: {
         userId: user.id,
@@ -55,14 +59,14 @@ class LiveStreamService {
       const endTime = moment(liveStreamDetails.endTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
-
+      console.log(startTime);
+      console.log(newTime);
       if (
         (date === liveStreamDetails.date &&
-          time === startTime &&
-          newTime === endTime) ||
-        (startTime < newTime &&
-          date === liveStreamDetails.date &&
-          endTime === time)
+          startTime === time &&
+          newTime === endTime &&
+          time <= endTime) ||
+        (newTime >= startTime && date === liveStreamDetails.date)
       ) {
         throw new HttpException(
           409,
@@ -74,6 +78,16 @@ class LiveStreamService {
           409,
           'Start time and end time is same please change time and try again'
         );
+      }
+
+      if (startTime === endTime) {
+        throw new HttpException(
+          409,
+          'Start time and end time is same please change time and try again'
+        );
+      }
+      if (startTime <= currentTime && date === currentDate) {
+        throw new HttpException(409, 'Past time is not allowed');
       }
     });
 
@@ -100,18 +114,18 @@ class LiveStreamService {
         ['startTime', 'ASC'],
       ],
     });
-    const data = streamData.rows
-      .filter((elem) => {
-        const streamDate = moment(elem.date).format('YYYY-MM-DD');
-        const streamEndTime = moment(elem.endTime, 'HH:mm:ss').format(
-          'HH:mm:ss'
-        );
-        return (
-          currentDate <= streamDate ||
-          (currentDate === streamDate && currentTime <= streamEndTime)
-        );
-      })
-      .map((elem) => elem);
+    const data = [];
+    streamData.rows.map((elem) => {
+      const streamDate = moment(elem.date).format('YYYY-MM-DD');
+      const streamEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm:ss');
+
+      if (
+        streamDate > currentDate ||
+        (streamDate === currentDate && streamEndTime >= currentTime)
+      ) {
+        data.push(elem);
+      }
+    });
     return { totalCount: data.length, records: data };
   }
 
@@ -119,14 +133,24 @@ class LiveStreamService {
     user
   ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
     const currentDate = new Date().toJSON().slice(0, 10);
+    const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
       include: {
         model: this.user,
       },
+      order: [
+        ['date', 'ASC'],
+        ['startTime', 'ASC'],
+      ],
     });
     const data = [];
     todaysEvent.rows.map((elem) => {
-      if (currentDate === elem.date.toJSON().slice(0, 10)) {
+      const streamEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm:ss');
+
+      if (
+        currentDate === elem.date.toJSON().slice(0, 10) &&
+        streamEndTime >= currentTime
+      ) {
         data.push(elem);
       }
     });
@@ -136,14 +160,21 @@ class LiveStreamService {
     user
   ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
     const currentDate = new Date().toJSON().slice(0, 10);
+    // const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
       include: {
         model: this.user,
       },
+      order: [
+        ['date', 'ASC'],
+        ['startTime', 'ASC'],
+      ],
     });
     const data = [];
     todaysEvent.rows.map((elem) => {
-      if (elem.date.toJSON().slice(0, 10) > currentDate) {
+      // const streamEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm:ss');
+      const date = elem.date.toJSON().slice(0, 10);
+      if (currentDate < date) {
         data.push(elem);
       }
     });
@@ -194,22 +225,27 @@ class LiveStreamService {
 
     data.map((elem) => {
       const date = elem.date.toJSON().slice(0, 10);
-
+      //Come
       const time = elem.startTime;
+
+      // put
       const startTime = moment(livestreamDetails.startTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
+
+      //Come
       const newTime = elem.endTime;
+
+      // put
       const endTime = moment(livestreamDetails.endTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
       if (
         (date === livestreamDetails.date &&
-          time === startTime &&
-          newTime === endTime) ||
-        (startTime < newTime && date === livestreamDetails.date)
-        //  &&
-        // endTime === time)
+          startTime === time &&
+          newTime === endTime &&
+          time <= endTime) ||
+        (newTime >= startTime && date === livestreamDetails.date)
       ) {
         throw new HttpException(
           409,

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Course } from '@/interfaces/course.interface';
 import { CurriculumSection } from '@/interfaces/curriculumSection.interface';
 import CurriculumSectionService from '@/services/courseCurriculum.service';
 

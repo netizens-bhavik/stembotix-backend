@@ -32,10 +32,7 @@ class LeaveTypeService {
       : ['', DB.Sequelize.Op.ne];
 
     const findLeave = await this.leaveType.findAndCountAll({
-      where: DB.Sequelize.or(
-        { leaveName: { [searchCondition]: search } },
-        { leaveDescription: { [searchCondition]: search } }
-      ),
+      where: DB.Sequelize.or({ leaveName: { [searchCondition]: search } }),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],

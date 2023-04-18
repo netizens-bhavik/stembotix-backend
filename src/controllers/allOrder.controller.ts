@@ -56,7 +56,7 @@ class AllOrderController {
       next(err);
     }
   };
-  public getOrderDataofCourseByInstructor = async (
+  public getOrderDataByInstructor = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -66,16 +66,13 @@ class AllOrderController {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Course | undefined)[] } =
-        await this.allOrderService.getOrderDataofCourseByInstructor(
-          user,
-          queryObject
-        );
+        await this.allOrderService.getOrderDataByInstructor(user, queryObject);
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
-  public getOrderDataofProductByInstructor = async (
+  public getOrderDataofProductByInstitute = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -85,7 +82,7 @@ class AllOrderController {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const response: { totalCount: number; records: (Course | undefined)[] } =
-        await this.allOrderService.getOrderDataofProductByInstructor(
+        await this.allOrderService.getOrderDataofProductByInstitute(
           user,
           queryObject
         );

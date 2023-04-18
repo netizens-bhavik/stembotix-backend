@@ -5,7 +5,7 @@ import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import { VerifyOrderDTO } from '@/dtos/order.dto';
 import crypto from 'crypto';
 import { OrderData } from '../utils/ruleEngine/orderData.rule';
-import { Mails } from '@/interfaces/mailPayload.interface';
+import { Mail } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 class OrderService {
   public user = DB.User;
@@ -186,7 +186,7 @@ class OrderService {
       const title = isProduct
         ? `(${orderData.Product.title})`
         : `(${orderData.Course.title})`;
-      const mailData: Mails = {
+      const mailData: Mail = {
         templateData: {
           title,
         },

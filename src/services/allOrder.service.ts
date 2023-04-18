@@ -1,6 +1,5 @@
 import DB from '@databases';
 import { HttpException } from '@/exceptions/HttpException';
-import EmailService from './email.service';
 import { Product } from '@/interfaces/product.interface';
 import { Op } from 'sequelize';
 import { Course } from '@/interfaces/course.interface';
@@ -36,6 +35,7 @@ class AllOrderService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
     const response = await this.orderitem.findAndCountAll({
       where: {
         ProductId: { [Op.ne]: null },
@@ -78,13 +78,29 @@ class AllOrderService {
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
+
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    // const startDate = queryObject.startDate
+    //   ? new Date(queryObject.startDate)
+    //   : new Date(0);
+    // const endDate = queryObject.endDate
+    //   ? new Date(queryObject.endDate)
+    //   : new Date();
+
     const response = await this.orderitem.findAndCountAll({
-      where: {
-        CourseId: { [Op.ne]: null },
-      },
+      where: DB.Sequelize.or(
+        {
+          CourseId: { [Op.ne]: null },
+        }
+        // {
+        //   createdAt: {
+        //     [Op.between]: [startDate, endDate],
+        //   },
+        // }
+      ),
       include: [
         {
           model: this.course,
@@ -140,7 +156,7 @@ class AllOrderService {
     return { orderRes: resp };
   }
 
-  public async getOrderDataofCourseByInstructor(
+  public async getOrderDataByInstructor(
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
@@ -153,44 +169,54 @@ class AllOrderService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
-    const userId = user.id;
+    const data = [];
     const response = await this.orderitem.findAndCountAll({
-      include: [
-        {
-          model: this.course,
-          include: [
-            {
-              model: this.trainer,
-              include: {
-                model: this.user,
-                where: {
-                  id: userId,
-                },
-              },
-            },
-          ],
+      include: {
+        model: this.product,
+        where: {
+          title: { [searchCondition]: search },
         },
-        {
-          model: this.product,
-          include: {
-            model: this.user,
-            // where: {
-            //   id: userId,
-            // },
-            through: { attributes: [] },
-          },
+        include: {
+          model: this.user,
+          where: DB.Sequelize.or({
+            id: user.id,
+          }),
+          through: {},
         },
-      ],
-
+      },
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    data.push(...response.rows);
 
-    return { totalCount: response.count, records: response.rows };
+    const res = await this.orderitem.findAndCountAll({
+      include: {
+        model: this.course,
+        where: {
+          title: { [searchCondition]: search },
+        },
+        include: [
+          {
+            model: this.trainer,
+            where: DB.Sequelize.or({
+              userId: user.id,
+            }),
+            include: {
+              model: this.user,
+            },
+          },
+        ],
+      },
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    data.push(...res.rows);
+    return { totalCount: data.length, records: data };
   }
-  public async getOrderDataofProductByInstructor(
+
+  public async getOrderDataofProductByInstitute(
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
@@ -204,35 +230,19 @@ class AllOrderService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.user.findAndCountAll({
-      where: {
-        id: user.id,
-      },
-
+    const response = await this.orderitem.findAndCountAll({
       include: [
         {
           model: this.product,
           where: {
-            title: {
-              [searchCondition]: search,
-            },
+            title: { [searchCondition]: search },
           },
           include: {
-            model: this.orderitem,
-            include: {
-              model: this.order,
-              where: DB.Sequelize.and({
-                [Op.and]: [
-                  { payment_id: { [Op.ne]: null } },
-                  { razorpay_order_id: { [Op.ne]: null } },
-                  { razorpay_signature: { [Op.ne]: null } },
-                  { user_id: user.id },
-                ],
-              }),
-              include: {
-                model: this.user,
-              },
-            },
+            model: this.user,
+            where: DB.Sequelize.or({
+              id: user.id,
+            }),
+            through: {},
           },
         },
       ],
