@@ -12,6 +12,7 @@ class AllOrderService {
   public order = DB.Order;
   public course = DB.Course;
   public trainer = DB.Trainer;
+  public productuser = DB.ProductUser;
 
   public isAdmin(user): boolean {
     return user.role === 'Admin';
@@ -111,6 +112,34 @@ class AllOrderService {
     return response;
   }
 
+  public async deleteOrderDatabyAdmin(
+    user,
+    orderId
+  ): Promise<{ orderRes: number }> {
+    if (!this.isAdmin(user)) throw new HttpException(401, 'Unauthorized');
+    const orderRecord = await this.orderitem.findOne({
+      where: {
+        id: orderId,
+      },
+      include: [
+        {
+          model: this.order,
+        },
+      ],
+    });
+    if (!orderRecord) throw new HttpException(404, 'No data found');
+
+    const resp = await this.orderitem.destroy({
+      where: {
+        id: orderId,
+      },
+    });
+    if (resp === 1) {
+      throw new HttpException(200, 'Order deleted successfully');
+    }
+    return { orderRes: resp };
+  }
+
   public async getOrderDataofCourseByInstructor(
     user,
     queryObject
@@ -125,32 +154,32 @@ class AllOrderService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.user.findAndCountAll({
-      where: {
-        id: user.id,
-      },
+    const userId = user.id;
+    const response = await this.orderitem.findAndCountAll({
       include: [
         {
-          model: this.trainer,
+          model: this.course,
           include: [
             {
-              model: this.course,
-              where: {
-                title: {
-                  [searchCondition]: search,
-                },
-              },
+              model: this.trainer,
               include: {
-                model: this.orderitem,
-                include: {
-                  model: this.order,
-                  include: {
-                    model: this.user,
-                  },
+                model: this.user,
+                where: {
+                  id: userId,
                 },
               },
             },
           ],
+        },
+        {
+          model: this.product,
+          include: {
+            model: this.user,
+            // where: {
+            //   id: userId,
+            // },
+            through: { attributes: [] },
+          },
         },
       ],
 
@@ -158,7 +187,8 @@ class AllOrderService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return response;
+
+    return { totalCount: response.count, records: response.rows };
   }
   public async getOrderDataofProductByInstructor(
     user,

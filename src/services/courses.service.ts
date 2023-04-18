@@ -809,69 +809,21 @@ class CourseService {
       ],
     });
     if (!courseRecord) throw new HttpException(403, 'Forbidden Resource');
+
     const status = courseRecord.status === 'Drafted' ? 'Published' : 'Drafted';
     const res = await courseRecord.update({ status });
     let count = res.status === 'Drafted' ? 0 : 1;
+    // const record = await this.cartitem.findAll({
+    //   where: { course_id: courseId },
+    // });
+    // if (!record) throw new HttpException(409, 'No data found');
+    // const data = record[0];
+    // if (count === 0) {
+    //   await this.cartitem.destroy({
+    //     where: { course_id: courseId },
+    //   });
+    // }
     return { count };
-  }
-
-  public async getAllDataOfOrder(
-    user,
-    queryObject
-  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
-    if (!this.isAdmin(user)) throw new HttpException(403, 'Forbidden Resource');
-
-    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
-    const order = queryObject.order || 'DESC';
-    // pagination
-    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
-    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-    // Search
-    const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
-      : ['', DB.Sequelize.Op.ne];
-
-    const data = await this.order.findAndCountAll({
-      where: DB.Sequelize.and({
-        [Op.and]: [
-          { payment_id: { [Op.ne]: null } },
-          { razorpay_order_id: { [Op.ne]: null } },
-          { razorpay_signature: { [Op.ne]: null } },
-        ],
-      }),
-      include: [
-        {
-          model: this.user,
-        },
-        {
-          model: this.orderitem,
-          where: {
-            CourseId: { [Op.ne]: null },
-          },
-          include: [
-            {
-              model: this.course,
-              where: {
-                title: { [searchCondition]: search },
-              },
-            },
-          ],
-          duplicating: false,
-        },
-      ],
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
-    });
-    const orderItems = data.rows[0].OrderItems;
-    const orderItemsObj = orderItems.reduce((obj, item) => {
-      obj[item.id] = item;
-      return obj;
-    }, {});
-
-    // Replace orderitems array with the object
-    data.rows[0].orderitems = orderItemsObj;
-    return data;
   }
 }
 export default CourseService;

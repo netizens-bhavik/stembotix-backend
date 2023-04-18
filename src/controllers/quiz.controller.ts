@@ -24,7 +24,7 @@ class QuizController {
       const response = await this.quizService.createQuiz(quizData2, trainer);
       res
         .status(200)
-        .send({ response: response, message: 'Quiz Added Successfully' });
+        .send({ response: response, message: 'Quiz added successfully' });
     } catch (err) {
       next(err);
     }
@@ -98,7 +98,9 @@ class QuizController {
       quizDetail['id'] = quizId;
 
       const update = await this.quizService.updateQuiz(quizDetail, trainer);
-      res.status(200).send(update);
+      res
+        .status(200)
+        .send({ response: update, message: 'Quiz update successfully' });
     } catch (err) {
       next(err);
     }
