@@ -20,7 +20,7 @@ class QuizQueAnsController {
       );
       res
         .status(200)
-        .send({ response: response, message: 'Question created Successfully' });
+        .send({ response: response, message: 'Question created successfully' });
     } catch (err) {
       next(err);
     }
@@ -60,7 +60,7 @@ class QuizQueAnsController {
       );
       res.status(200).send({
         response: update,
-        message: 'Question answer updated successfully',
+        message: 'Question updated successfully',
       });
     } catch (err) {
       next(err);

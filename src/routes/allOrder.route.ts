@@ -27,8 +27,13 @@ class AllOrderRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.allOrderController.getAllDataOfCourseOrder
     );
+    this.router.delete(
+      `/admin${this.path}/deleteorder/:orderId`,
+      passport.authenticate('jwt', { session: false }),
+      this.allOrderController.deleteOrderDatabyAdmin
+    );
     this.router.get(
-      `/instructor${this.path}/course/get-all-order`,
+      `/instructor${this.path}/get-all-order`,
       passport.authenticate('jwt', { session: false }),
       this.allOrderController.getOrderDataofCourseByInstructor
     );

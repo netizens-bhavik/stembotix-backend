@@ -60,7 +60,6 @@ class CartController {
   public viewCart = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // @ts-ignore
-
       const { id: userId } = req.user;
       const response: Cart = await this.cartService.viewCart(userId);
       res.status(200).send(response);
@@ -92,6 +91,20 @@ class CartController {
       const { id: userId } = req.user;
       const { cartItemId } = req.params;
       const response = await this.cartService.removeItem(userId, cartItemId);
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public confirmToCheckout = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      // @ts-ignore
+      const user = req.user;
+      const response = await this.cartService.confirmToCheckout(user);
       res.status(200).send(response);
     } catch (error) {
       next(error);

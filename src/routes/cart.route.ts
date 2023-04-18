@@ -59,6 +59,12 @@ class CartRoute implements Routes {
       [passport.authenticate('jwt', { session: false })],
       this.cartController.removeItem
     );
+
+    this.router.get(
+      `/confirmToCheckout`,
+      passport.authenticate('jwt', { session: false }),
+      this.cartController.confirmToCheckout
+    );
   }
 }
 export default CartRoute;

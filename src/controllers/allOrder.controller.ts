@@ -39,6 +39,23 @@ class AllOrderController {
       next(err);
     }
   };
+  public deleteOrderDatabyAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { orderId } = req.params;
+      const user = req.user;
+      const response = await this.allOrderService.deleteOrderDatabyAdmin(
+        user,
+        orderId
+      );
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
   public getOrderDataofCourseByInstructor = async (
     req: Request,
     res: Response,

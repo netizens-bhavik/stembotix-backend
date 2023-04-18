@@ -27,11 +27,7 @@ class ProductRoute implements Routes {
       `${this.path}/admin`,
       this.productController.viewProductAdmin
     );
-    this.router.get(
-      `${this.path}/get-all-order`,
-      passport.authenticate('jwt', { session: false }),
-      this.productController.getAllDataOfOrder
-    );
+
     // view own courses
     this.router.get(
       `${this.path}/list`,
