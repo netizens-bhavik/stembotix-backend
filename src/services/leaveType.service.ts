@@ -58,7 +58,7 @@ class LeaveTypeService {
     });
 
     if (findLeaveType) {
-      throw new HttpException(409, 'Leave Type already exists');
+      throw new HttpException(409, 'Leave type already exists');
     }
 
     const createLeaveType = await this.leaveType.create({
@@ -80,7 +80,7 @@ class LeaveTypeService {
     });
 
     if (!findLeaveType) {
-      throw new HttpException(409, 'Leave Type not found');
+      throw new HttpException(409, 'Leave type not found');
     }
 
     const updateLeaveType = await this.leaveType.update(
@@ -112,7 +112,7 @@ class LeaveTypeService {
     });
 
     if (!findLeaveType) {
-      throw new HttpException(409, 'Leave Type not found');
+      throw new HttpException(409, 'Leave type not found');
     }
 
     const deleteLeaveType = await this.leaveType.destroy({
