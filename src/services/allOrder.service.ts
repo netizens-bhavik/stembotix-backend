@@ -3,6 +3,7 @@ import { HttpException } from '@/exceptions/HttpException';
 import { Product } from '@/interfaces/product.interface';
 import { Op } from 'sequelize';
 import { Course } from '@/interfaces/course.interface';
+import sequelize from 'sequelize';
 
 class AllOrderService {
   public product = DB.Product;
@@ -89,18 +90,18 @@ class AllOrderService {
     // const endDate = queryObject.endDate
     //   ? new Date(queryObject.endDate)
     //   : new Date();
-
+    // const startDate = queryObject.startDate
+    //   ? new Date(queryObject.startDate)
+    //   : null;
+    // // const endDate = queryObject.endDate ? new Date(queryObject.endDate) : null;
+    // console.log(startDate);
     const response = await this.orderitem.findAndCountAll({
-      where: DB.Sequelize.or(
-        {
-          CourseId: { [Op.ne]: null },
-        }
-        // {
-        //   createdAt: {
-        //     [Op.between]: [startDate, endDate],
-        //   },
-        // }
-      ),
+      where: {
+        [DB.Sequelize.Op.and]: [
+          { CourseId: { [DB.Sequelize.Op.ne]: null } },
+          // startDate ? { createdAt: { [DB.Sequelize.Op.gte]: startDate } } : {},
+        ],
+      },
       include: [
         {
           model: this.course,

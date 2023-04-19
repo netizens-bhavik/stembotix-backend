@@ -30,8 +30,16 @@ class AllOrderController {
   ) => {
     try {
       const user = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { search, pageRecord, pageNo, sortBy, order, startDate } =
+        req.query;
+      const queryObject = {
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+        startDate,
+      };
       const response: { totalCount: number; records: (Course | undefined)[] } =
         await this.allOrderService.getAllDataOfCourseOrder(user, queryObject);
       res.status(200).send(response);

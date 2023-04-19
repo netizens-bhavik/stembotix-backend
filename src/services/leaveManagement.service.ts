@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import EmailService from './email.service';
 import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
+import { Op } from 'sequelize';
 class LeaveManagementService {
   public user = DB.User;
   public instructor = DB.Instructor;
@@ -123,7 +124,11 @@ class LeaveManagementService {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
-    const findLivestream = await this.livestream.findByPk(livestreamId);
+    const findLivestream = await this.livestream.findOne({
+      where: {
+        id: livestreamId,
+      },
+    });
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
     const findInstitute = await this.instituteInstructor.findOne({
@@ -159,13 +164,12 @@ class LeaveManagementService {
       throw new HttpException(403, 'Forbidden Resource');
     }
     if (isEmpty(leaveData)) throw new HttpException(400, 'Leave data is empty');
-
     const findLivestream = await this.livestream.findOne({
-      id: leaveData.livestreamId,
+      where: { id: leaveData.liveStreamId },
     });
 
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
-
+    // console.log('third', findLivestream);
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
         instructorId: loggedUser.id,
@@ -280,7 +284,7 @@ class LeaveManagementService {
     if (!findLeave) throw new HttpException(409, 'Leave not found');
 
     const findLivestream = await this.livestream.findOne({
-      id: leaveData.liveStreamId,
+      where: { id: leaveData.liveStreamId },
     });
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
 
@@ -418,18 +422,30 @@ class LeaveManagementService {
     if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
 
     const findEvents = await this.livestream.findAll({
-      where: { date: newDate, userId: loggedUser.id },
-      attributes: ['id', 'date', 'startTime', 'endTime', 'title'],
+      where: DB.Sequelize.and(
+        { date: newDate },
+        {
+          userId: loggedUser.id,
+        },
+        {
+          instituteId: { [Op.ne]: null },
+        }
+      ),
     });
-    return findEvents.map((event) => {
-      return {
-        id: event.id,
-        date: event.date,
-        startTime: event.startTime,
-        endTime: event.endTime,
-        title: event.title,
-      };
-    });
+    console.log(findEvents);
+    return findEvents;
+    // console.log('jvfokljfwpfjwpo', findEvents);
+    // return findEvents.map((event) => {
+    //   console.log('event', event);
+    //   return
+    //   {
+    //     id: event.id,
+    //     date: event.date,
+    //     startTime: event.startTime,
+    //     endTime: event.endTime,
+    //     title: event.title,
+    //   };
+    // });
   }
 
   public async getLeaveByInstitute({ loggedUser, queryObject }) {

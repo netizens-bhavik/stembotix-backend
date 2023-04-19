@@ -79,7 +79,6 @@ class HolidayService {
     }
     const findHolidayList: HolidayList = await this.holiday.findOne({
       where: {
-        date: holidayData.date,
         holidayListId: holidayData.holidayListId,
       },
     });
@@ -106,7 +105,6 @@ class HolidayService {
 
     const findHolidayList = await this.holiday.findOne({
       where: {
-        date: holidayData.date,
         holidayListId: holidayData.holidayListId,
       },
     });
