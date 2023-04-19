@@ -30,6 +30,8 @@ class EmailService {
    * Sends verification email for account activation
    * @param payload
    */
+
+  //Done
   public async accountVerification(payload: MailPayload) {
     try {
       await this.createConnection();
@@ -49,6 +51,13 @@ class EmailService {
             to: mailerData.to,
             subject: 'Account verification',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -59,7 +68,7 @@ class EmailService {
       return err;
     }
   }
-
+  //DONE
   public async sendMailDeleteCourse(payload: MailPayloads) {
     try {
       await this.createConnection();
@@ -78,6 +87,13 @@ class EmailService {
             to: mailerData.to,
             subject: 'Delete Course',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -88,6 +104,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async sendEventstartMail(payload: MailPayloads) {
     try {
       await this.createConnection();
@@ -96,7 +114,7 @@ class EmailService {
       // Mailing Data assignment
       const pathToView = path.resolve(
         __dirname,
-        '../view/subscribeLiveCourseEmail.ejs'
+        '../view/subscribeLiveEventEmail.ejs'
       );
       const { templateData, mailerData } = payload;
 
@@ -107,6 +125,13 @@ class EmailService {
             to: mailerData.to,
             subject: 'Live Event Schedule',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -117,6 +142,7 @@ class EmailService {
       return err;
     }
   }
+  //Done
   public async sendMailDeleteProduct(payload: MailPayloads) {
     try {
       await this.createConnection();
@@ -136,6 +162,13 @@ class EmailService {
             to: mailerData.to,
             subject: 'Delete Product',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -146,6 +179,7 @@ class EmailService {
       return err;
     }
   }
+  //Done
   public async sendMailPublishCourse(payload: Mail) {
     try {
       await this.createConnection();
@@ -165,6 +199,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Published Added Course',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -175,6 +216,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async sendMailPublishProduct(payload: Mail) {
     try {
       await this.createConnection();
@@ -194,6 +237,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Published Added product',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -204,6 +254,7 @@ class EmailService {
       return err;
     }
   }
+  //Done
   public async sendMailunPublishcourse(payload: Mail) {
     try {
       await this.createConnection();
@@ -223,6 +274,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Unpublished Course',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -233,6 +291,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async sendMailofOrder(payload: Mail) {
     try {
       await this.createConnection();
@@ -249,6 +309,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Order',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -259,6 +326,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async sendRequestToJoinInstitute(payload: Mail) {
     try {
       await this.createConnection();
@@ -278,6 +347,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Proposal request',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -288,6 +364,7 @@ class EmailService {
       return err;
     }
   }
+  //Done
   public async AcceptProposalofInstitute(payload: Mail) {
     try {
       await this.createConnection();
@@ -306,6 +383,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Proposal',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -316,7 +400,7 @@ class EmailService {
       return err;
     }
   }
-
+  //Done
   public async RejectProposalofInstitute(payload: Mail) {
     try {
       await this.createConnection();
@@ -335,6 +419,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Proposal',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -345,6 +436,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async sendMailunPublishproduct(payload: Mail) {
     try {
       await this.createConnection();
@@ -364,6 +457,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Unpublished Product',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -374,6 +474,8 @@ class EmailService {
       return err;
     }
   }
+
+  //Done
   public async forgotPassword(payload: MailPayload) {
     try {
       await this.createConnection();
@@ -389,6 +491,13 @@ class EmailService {
             to: mailerData.to,
             subject: 'Passwrod Reset',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -399,7 +508,7 @@ class EmailService {
       return err;
     }
   }
-
+  //Done
   public async sendEventStartNotification(payload) {
     try {
       await this.createConnection();
@@ -419,6 +528,13 @@ class EmailService {
             to: mailData.to,
             subject: 'Event Start Notification',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (error) {
@@ -429,6 +545,7 @@ class EmailService {
       return err;
     }
   }
+  //DONE
   public async sendMailtoUserforAccountDeletion(payload: Mail) {
     try {
       await this.createConnection();
@@ -443,10 +560,17 @@ class EmailService {
             to: mailData.to,
             subject: 'Account Deleted',
             html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
           });
           this.terminateConnection();
         } catch (err) {
-          return err;
+          console.log(err);
         }
       });
     } catch (err) {
