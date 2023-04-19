@@ -87,7 +87,7 @@ class UsersController {
       const response = await this.userService.getAllUserMonthWise(user);
       res.status(200).send(response);
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   };
 }

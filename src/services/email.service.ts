@@ -446,11 +446,11 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (err) {
-          console.log('first', err);
+          return err;
         }
       });
     } catch (err) {
-      console.log(err);
+      return err;
     }
   }
 }

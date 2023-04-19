@@ -59,8 +59,7 @@ class LiveStreamService {
       const endTime = moment(liveStreamDetails.endTime, 'HH:mm:ss').format(
         'HH:mm:ss'
       );
-      console.log(startTime);
-      console.log(newTime);
+
       if (
         (date === liveStreamDetails.date &&
           startTime === time &&
