@@ -169,7 +169,6 @@ class LeaveManagementService {
     });
 
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
-    // console.log('third', findLivestream);
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
         instructorId: loggedUser.id,
@@ -432,11 +431,8 @@ class LeaveManagementService {
         }
       ),
     });
-    console.log(findEvents);
     return findEvents;
-    // console.log('jvfokljfwpfjwpo', findEvents);
     // return findEvents.map((event) => {
-    //   console.log('event', event);
     //   return
     //   {
     //     id: event.id,
