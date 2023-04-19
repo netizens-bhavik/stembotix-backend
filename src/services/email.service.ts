@@ -7,7 +7,6 @@ import {
   Mail,
   MailPayload,
   MailPayloads,
-  Mails,
 } from '@/interfaces/mailPayload.interface';
 
 const transporterOptions: Options = {
@@ -234,7 +233,7 @@ class EmailService {
       return err;
     }
   }
-  public async sendMailofOrder(payload: Mails) {
+  public async sendMailofOrder(payload: Mail) {
     try {
       await this.createConnection();
       await this.transporter.verify();
@@ -424,6 +423,30 @@ class EmailService {
           this.terminateConnection();
         } catch (error) {
           return error;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async sendMailtoUserforAccountDeletion(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/deleteAccount.ejs');
+      const { templateData, mailData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Account Deleted',
+            html: data,
+          });
+          this.terminateConnection();
+        } catch (err) {
+          return err;
         }
       });
     } catch (err) {

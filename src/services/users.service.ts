@@ -1,14 +1,17 @@
+import { Mail } from '@/interfaces/mailPayload.interface';
 import DB from '@databases';
 import { RegisterUserDTO } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { isEmpty } from '@utils/util';
+import { Op } from 'sequelize';
+import EmailService from './email.service';
 import moment from 'moment';
-import sequelize, { Op } from 'sequelize';
 class UserService {
   public users = DB.User;
   public course = DB.Course;
   public product = DB.Product;
+  public emailService = new EmailService();
 
   public isAdmin(userData): boolean {
     return userData.role === 'Admin';
@@ -83,15 +86,34 @@ class UserService {
     return updateUser;
   }
 
-  public async deleteUser(loggedUser, userId: string): Promise<User> {
+  public async deleteUser(loggedUser, userId): Promise<User> {
     if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
       throw new HttpException(403, 'Access Forbidden');
     if (isEmpty(userId)) throw new HttpException(400, "User doesn't existId");
 
-    const findUser: User = await this.users.findByPk(userId);
-    if (!findUser) throw new HttpException(409, "User doesn't exist");
+    const findUser = await this.users.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!findUser) {
+      throw new HttpException(409, "User doesn't exist");
+    } else {
+      await this.users.destroy({ where: { id: userId } });
 
-    await this.users.destroy({ where: { id: userId } });
+      const mailerData: Mail = {
+        templateData: {
+          email: loggedUser.email,
+          user: findUser.firstName,
+          name: findUser.lastName,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: findUser.email,
+        },
+      };
+      this.emailService.sendMailtoUserforAccountDeletion(mailerData);
+    }
 
     return findUser;
   }

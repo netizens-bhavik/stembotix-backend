@@ -1,10 +1,7 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
-import { isEmpty } from '@utils/util';
 import { CurriculumSection } from '@/interfaces/curriculumSection.interface';
 import { Course } from '@/interfaces/course.interface';
-import { CurriculumSectionDto } from '@/dtos/curriculumSection.dto';
-import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
 
 class CurriculumSectionService {
   public curriculumSection = DB.CurriculumSection;
