@@ -35,12 +35,12 @@ class AllOrderRoute implements Routes {
     this.router.get(
       `/instructor${this.path}/get-all-order`,
       passport.authenticate('jwt', { session: false }),
-      this.allOrderController.getOrderDataofCourseByInstructor
+      this.allOrderController.getOrderDataByInstructor
     );
     this.router.get(
-      `/instructor${this.path}/product/get-all-order`,
+      `/institute${this.path}/product/get-all-order`,
       passport.authenticate('jwt', { session: false }),
-      this.allOrderController.getOrderDataofProductByInstructor
+      this.allOrderController.getOrderDataofProductByInstitute
     );
   }
 }

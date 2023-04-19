@@ -23,7 +23,7 @@ class CourseTypeService {
         course_type: coursetype.course_type,
       },
     });
-    if (response) throw new HttpException(402, 'Type Already Exist');
+    if (response) throw new HttpException(409, 'Type already exist');
     const courseType = await this.coursetype.create({
       ...coursetype,
       userId: user.id,
