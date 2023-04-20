@@ -31,6 +31,7 @@ import CourseTypeRoute from './routes/courseType.route';
 import HolidayListRoute from './routes/holidayList.route';
 import HolidayRoute from './routes/holiday.route';
 import AllOrderRoute from './routes/allOrder.route';
+import CourseProductStatsRoute from './routes/courseproductStats.route';
 
 validateEnv();
 
@@ -66,5 +67,6 @@ const app = new App([
   new HolidayListRoute(),
   new HolidayRoute(),
   new AllOrderRoute(),
+  new CourseProductStatsRoute(),
 ]);
 app.listen();

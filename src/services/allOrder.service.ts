@@ -4,6 +4,7 @@ import { Product } from '@/interfaces/product.interface';
 import { Op } from 'sequelize';
 import { Course } from '@/interfaces/course.interface';
 import sequelize from 'sequelize';
+import moment from 'moment';
 
 class AllOrderService {
   public product = DB.Product;
@@ -19,6 +20,9 @@ class AllOrderService {
   }
   public isInstructor(user): boolean {
     return user.role === 'Instructor';
+  }
+  public isInstitute(user): boolean {
+    return user.role === 'Institute';
   }
 
   public async getAllDataOfProductOrder(
@@ -37,13 +41,23 @@ class AllOrderService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const orderDate = queryObject.orderDate
+      ? moment(queryObject.orderDate, 'DD-MM-YYYY')
+      : null;
+
     const response = await this.orderitem.findAndCountAll({
       where: {
-        ProductId: { [Op.ne]: null },
+        [DB.Sequelize.Op.and]: [
+          { ProductId: { [DB.Sequelize.Op.ne]: null } },
+          orderDate
+            ? {
+                createdAt: {
+                  [DB.Sequelize.Op.gte]: orderDate,
+                },
+              }
+            : {},
+        ],
       },
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
       include: [
         {
           model: this.product,
@@ -63,8 +77,23 @@ class AllOrderService {
           include: { model: this.user },
         },
       ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
     });
-    return { totalCount: response.count, records: response.rows };
+    let data = [];
+    data = response.rows.filter((record) => {
+      if (orderDate) {
+        const date = new Date(record.createdAt);
+        if (moment(date).format('L') === moment(orderDate).format('L')) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    });
+
+    return { totalCount: data.length, records: data };
   }
 
   public async getAllDataOfCourseOrder(
@@ -84,22 +113,15 @@ class AllOrderService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    // const startDate = queryObject.startDate
-    //   ? new Date(queryObject.startDate)
-    //   : new Date(0);
-    // const endDate = queryObject.endDate
-    //   ? new Date(queryObject.endDate)
-    //   : new Date();
-    // const startDate = queryObject.startDate
-    //   ? new Date(queryObject.startDate)
-    //   : null;
-    // // const endDate = queryObject.endDate ? new Date(queryObject.endDate) : null;
-    // console.log(startDate);
+    const orderDate = queryObject.orderDate
+      ? moment(queryObject.orderDate, 'DD-MM-YYYY')
+      : null;
+
     const response = await this.orderitem.findAndCountAll({
       where: {
         [DB.Sequelize.Op.and]: [
           { CourseId: { [DB.Sequelize.Op.ne]: null } },
-          // startDate ? { createdAt: { [DB.Sequelize.Op.gte]: startDate } } : {},
+          orderDate ? { createdAt: { [DB.Sequelize.Op.gte]: orderDate } } : {},
         ],
       },
       include: [
@@ -126,7 +148,20 @@ class AllOrderService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return response;
+
+    let data = [];
+    data = response.rows.filter((record) => {
+      if (orderDate) {
+        const date = new Date(record.createdAt);
+        if (moment(date).format('L') === moment(orderDate).format('L')) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    });
+
+    return { totalCount: data.length, records: data };
   }
 
   public async deleteOrderDatabyAdmin(
@@ -157,10 +192,13 @@ class AllOrderService {
     return { orderRes: resp };
   }
 
-  public async getOrderDataByInstructor(
+  public async getOrderCourseDataByInstructor(
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    if (!this.isInstructor(user))
+      throw new HttpException(403, 'Forbidden Resource');
+
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -170,50 +208,132 @@ class AllOrderService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const data = [];
-    const response = await this.orderitem.findAndCountAll({
-      include: {
-        model: this.product,
-        where: {
-          title: { [searchCondition]: search },
-        },
-        include: {
-          model: this.user,
-          where: DB.Sequelize.or({
-            id: user.id,
-          }),
-          through: {},
-        },
-      },
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
-    });
-    data.push(...response.rows);
+    const orderDate = queryObject.orderDate
+      ? moment(queryObject.orderDate, 'DD-MM-YYYY')
+      : null;
 
-    const res = await this.orderitem.findAndCountAll({
-      include: {
-        model: this.course,
-        where: {
-          title: { [searchCondition]: search },
-        },
-        include: [
-          {
-            model: this.trainer,
-            where: DB.Sequelize.or({
-              userId: user.id,
-            }),
-            include: {
-              model: this.user,
-            },
-          },
+    const response = await this.orderitem.findAndCountAll({
+      where: {
+        [DB.Sequelize.Op.and]: [
+          { CourseId: { [DB.Sequelize.Op.ne]: null } },
+          orderDate ? { createdAt: { [DB.Sequelize.Op.gte]: orderDate } } : {},
         ],
       },
+      include: [
+        {
+          model: this.order,
+          where: DB.Sequelize.and({
+            [Op.and]: [
+              { payment_id: { [Op.ne]: null } },
+              { razorpay_order_id: { [Op.ne]: null } },
+              { razorpay_signature: { [Op.ne]: null } },
+            ],
+          }),
+          include: { model: this.user },
+        },
+        {
+          model: this.course,
+          where: {
+            title: { [searchCondition]: search },
+          },
+          include: [
+            {
+              model: this.trainer,
+              where: DB.Sequelize.or({
+                userId: user.id,
+              }),
+              include: {
+                model: this.user,
+              },
+            },
+          ],
+        },
+      ],
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    data.push(...res.rows);
+    let data = [];
+    data = response.rows.filter((record) => {
+      if (orderDate) {
+        const date = new Date(record.createdAt);
+        if (moment(date).format('L') === moment(orderDate).format('L')) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    });
+    if (!data) throw new HttpException(409, 'No data found');
+    return { totalCount: data.length, records: data };
+  }
+  public async getOrderProductDataByInstructor(
+    user,
+    queryObject
+  ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    if (!this.isInstructor(user))
+      throw new HttpException(403, 'Forbidden Resource');
+
+    const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
+    const order = queryObject.order || 'DESC';
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+    // Search
+    const [search, searchCondition] = queryObject.search
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
+      : ['', DB.Sequelize.Op.ne];
+    const orderDate = queryObject.orderDate
+      ? moment(queryObject.orderDate, 'DD-MM-YYYY')
+      : null;
+
+    const response = await this.orderitem.findAndCountAll({
+      where: {
+        [DB.Sequelize.Op.and]: [
+          orderDate ? { createdAt: { [DB.Sequelize.Op.gte]: orderDate } } : {},
+        ],
+      },
+      include: [
+        {
+          model: this.order,
+          where: DB.Sequelize.and({
+            [Op.and]: [
+              { payment_id: { [Op.ne]: null } },
+              { razorpay_order_id: { [Op.ne]: null } },
+              { razorpay_signature: { [Op.ne]: null } },
+            ],
+          }),
+          include: { model: this.user },
+        },
+        {
+          model: this.product,
+          where: {
+            title: { [searchCondition]: search },
+          },
+          include: {
+            model: this.user,
+            where: DB.Sequelize.or({
+              id: user.id,
+            }),
+            through: {},
+          },
+        },
+      ],
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
+    let data = [];
+    data = response.rows.filter((record) => {
+      if (orderDate) {
+        const date = new Date(record.createdAt);
+        if (moment(date).format('L') === moment(orderDate).format('L')) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    });
     return { totalCount: data.length, records: data };
   }
 
@@ -221,6 +341,9 @@ class AllOrderService {
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    if (!this.isInstitute(user))
+      throw new HttpException(403, 'Forbidden Resource');
+
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -231,8 +354,28 @@ class AllOrderService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const orderDate = queryObject.orderDate
+      ? moment(queryObject.orderDate, 'DD-MM-YYYY')
+      : null;
+
     const response = await this.orderitem.findAndCountAll({
+      where: {
+        [DB.Sequelize.Op.and]: [
+          orderDate ? { createdAt: { [DB.Sequelize.Op.gte]: orderDate } } : {},
+        ],
+      },
       include: [
+        {
+          model: this.order,
+          where: DB.Sequelize.and({
+            [Op.and]: [
+              { payment_id: { [Op.ne]: null } },
+              { razorpay_order_id: { [Op.ne]: null } },
+              { razorpay_signature: { [Op.ne]: null } },
+            ],
+          }),
+          include: { model: this.user },
+        },
         {
           model: this.product,
           where: {
@@ -252,7 +395,20 @@ class AllOrderService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return response;
+
+    let data = [];
+    data = response.rows.filter((record) => {
+      if (orderDate) {
+        const date = new Date(record.createdAt);
+        if (moment(date).format('L') === moment(orderDate).format('L')) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    });
+
+    return { totalCount: data.length, records: data };
   }
 }
 export default AllOrderService;

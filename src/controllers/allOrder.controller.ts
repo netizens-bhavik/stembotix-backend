@@ -13,8 +13,16 @@ class AllOrderController {
   ) => {
     try {
       const user = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { search, pageRecord, pageNo, sortBy, order, orderDate } =
+        req.query;
+      const queryObject = {
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+        orderDate,
+      };
       const response: { totalCount: number; records: (Product | undefined)[] } =
         await this.allOrderService.getAllDataOfProductOrder(user, queryObject);
       res.status(200).send(response);
@@ -30,7 +38,7 @@ class AllOrderController {
   ) => {
     try {
       const user = req.user;
-      const { search, pageRecord, pageNo, sortBy, order, startDate } =
+      const { search, pageRecord, pageNo, sortBy, order, orderDate } =
         req.query;
       const queryObject = {
         search,
@@ -38,7 +46,7 @@ class AllOrderController {
         pageNo,
         sortBy,
         order,
-        startDate,
+        orderDate,
       };
       const response: { totalCount: number; records: (Course | undefined)[] } =
         await this.allOrderService.getAllDataOfCourseOrder(user, queryObject);
@@ -64,22 +72,61 @@ class AllOrderController {
       next(err);
     }
   };
-  public getOrderDataByInstructor = async (
+  public getOrderCourseDataByInstructor = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const user = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { search, pageRecord, pageNo, sortBy, order, orderDate } =
+        req.query;
+      const queryObject = {
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+        orderDate,
+      };
       const response: { totalCount: number; records: (Course | undefined)[] } =
-        await this.allOrderService.getOrderDataByInstructor(user, queryObject);
+        await this.allOrderService.getOrderCourseDataByInstructor(
+          user,
+          queryObject
+        );
       res.status(200).send(response);
     } catch (err) {
       next(err);
     }
   };
+  public getOrderProductDataByInstructor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const { search, pageRecord, pageNo, sortBy, order, orderDate } =
+        req.query;
+      const queryObject = {
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+        orderDate,
+      };
+      const response: { totalCount: number; records: (Course | undefined)[] } =
+        await this.allOrderService.getOrderProductDataByInstructor(
+          user,
+          queryObject
+        );
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   public getOrderDataofProductByInstitute = async (
     req: Request,
     res: Response,
@@ -87,8 +134,16 @@ class AllOrderController {
   ) => {
     try {
       const user = req.user;
-      const { search, pageRecord, pageNo, sortBy, order } = req.query;
-      const queryObject = { search, pageRecord, pageNo, sortBy, order };
+      const { search, pageRecord, pageNo, sortBy, order, orderDate } =
+        req.query;
+      const queryObject = {
+        search,
+        pageRecord,
+        pageNo,
+        sortBy,
+        order,
+        orderDate,
+      };
       const response: { totalCount: number; records: (Course | undefined)[] } =
         await this.allOrderService.getOrderDataofProductByInstitute(
           user,

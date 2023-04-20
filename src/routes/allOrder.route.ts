@@ -33,9 +33,14 @@ class AllOrderRoute implements Routes {
       this.allOrderController.deleteOrderDatabyAdmin
     );
     this.router.get(
-      `/instructor${this.path}/get-all-order`,
+      `/instructor${this.path}/course/get-all-order`,
       passport.authenticate('jwt', { session: false }),
-      this.allOrderController.getOrderDataByInstructor
+      this.allOrderController.getOrderCourseDataByInstructor
+    );
+    this.router.get(
+      `/instructor${this.path}/product/get-all-order`,
+      passport.authenticate('jwt', { session: false }),
+      this.allOrderController.getOrderProductDataByInstructor
     );
     this.router.get(
       `/institute${this.path}/product/get-all-order`,
