@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '@interfaces/users.interface';
-import userService from '@services/users.service';
+import UserService from '@services/users.service';
 
 class UsersController {
-  public userService = new userService();
+  public userService = new UserService();
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
