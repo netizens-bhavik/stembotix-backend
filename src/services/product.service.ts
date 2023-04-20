@@ -326,8 +326,9 @@ class ProductService {
     const adminRecord = await this.user.findAll({
       where: { role: 'Admin' },
     });
+
     if (!productRecord) throw new HttpException(403, 'Forbidden Resource');
-    if (user.id !== productRecord.userId && user.role !== 'Admin')
+    if (user.id !== productRecord.Users[0].id && user.role !== 'Admin')
       throw new HttpException(
         403,
         "You don't have Authority to Delete Product"

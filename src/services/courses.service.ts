@@ -539,7 +539,7 @@ class CourseService {
       );
     }
     if (
-      trainer.id !== courseRecord.Trainers[0].UserId &&
+      trainer.id !== courseRecord.Trainers[0].userId &&
       trainer.role !== 'Admin'
     )
       throw new HttpException(403, "You don't have Authority to Delete Course");
@@ -788,7 +788,7 @@ class CourseService {
 
     return {
       totalCount: trainerData.rows.length,
-      records: trainerDataWithRequestStatus,
+      records: trainerData.rows,
     };
   }
 

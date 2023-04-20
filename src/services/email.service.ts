@@ -577,5 +577,99 @@ class EmailService {
       return err;
     }
   }
+  public async sendLeaveaMail(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/applyLeaveMail.ejs');
+      const { templateData, mailData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Leave',
+            html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
+          });
+          this.terminateConnection();
+        } catch (err) {
+          return err;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+
+  public async AcceptLeave(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/acceptLeaveMail.ejs');
+      const { templateData, mailData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Accept Leave',
+            html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
+          });
+          this.terminateConnection();
+        } catch (err) {
+          return err;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  public async RejectLeave(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/rejectLeaveMail.ejs');
+      const { templateData, mailData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Reject Leave',
+            html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
+          });
+          this.terminateConnection();
+        } catch (err) {
+          return err;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
 }
 export default EmailService;
