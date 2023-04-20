@@ -73,7 +73,7 @@ class CartService {
     };
     if (!cartItem[1]) throw new HttpException(400, 'Already added to cart');
     res.data = cartItem[0];
-    res.message = `${ItemTypes.Product} added to cart successfully`;
+    res.message = `${ItemTypes.Course} added to cart successfully`;
     return res;
   }
   public async itemHandler(

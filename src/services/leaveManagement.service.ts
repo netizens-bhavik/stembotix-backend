@@ -4,6 +4,7 @@ import { isEmpty } from '@utils/util';
 import EmailService from './email.service';
 import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 import { Op } from 'sequelize';
+import { Mail } from '@/interfaces/mailPayload.interface';
 class LeaveManagementService {
   public user = DB.User;
   public instructor = DB.Instructor;
@@ -167,7 +168,11 @@ class LeaveManagementService {
     const findLivestream = await this.livestream.findOne({
       where: { id: leaveData.liveStreamId },
     });
-
+    const admin = await this.user.findOne({
+      where: {
+        role: 'Admin',
+      },
+    });
     if (!findLivestream) throw new HttpException(409, 'Livestream not found');
     const findInstitute = await this.instituteInstructor.findOne({
       where: {
@@ -210,6 +215,7 @@ class LeaveManagementService {
         livestreamId: leaveData.liveStreamId,
         userId: loggedUser.id,
         leaveTypeId: leaveData.leaveTypeId,
+        isApproved: 'Approved',
       },
     });
 
@@ -224,12 +230,27 @@ class LeaveManagementService {
 
     if (checkHoliday)
       throw new HttpException(409, 'You cannot take leave on holiday');
-
     const createLeave = await this.manageLeave.create({
       ...leaveData,
       livestreamId: leaveData.liveStreamId,
       userId: loggedUser.id,
     });
+    var mailList = [admin.email, findInstitute.email];
+    if (createLeave) {
+      const mailData: Mail = {
+        templateData: {
+          date: leaveData.date,
+          user: loggedUser.firstName,
+          users: loggedUser.lastName,
+          email: admin.email,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: mailList,
+        },
+      };
+      this.emailService.sendLeaveaMail(mailData);
+    }
 
     if (!createLeave) throw new HttpException(409, 'Leave not created');
 
@@ -350,9 +371,17 @@ class LeaveManagementService {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const admin = await this.user.findOne({
+      where: {
+        role: 'Admin',
+      },
+    });
     const findLeave = await this.manageLeave.findOne({
       where: {
         id: leaveId,
+      },
+      include: {
+        model: this.user,
       },
     });
     if (!findLeave) throw new HttpException(409, 'Leave not found');
@@ -362,31 +391,21 @@ class LeaveManagementService {
       { isApproved },
       {
         where: { id: leaveId },
+        returning: true,
       }
     );
-
+    // App (0) Rej (1)
     if (!updateLeave) throw new HttpException(409, 'Leave not updated');
-
     if (isApproved === 'Rejected') {
       const findInstitute = await this.instituteInstructor.findOne({
         where: {
-          instructorId: findLeave.UserId,
-          instituteId: loggedUser.id,
+          instructorId: findLeave.userId,
           isAccepted: 'Accepted',
         },
       });
-
-      if (!findInstitute)
-        throw new HttpException(
-          409,
-          'You are not associated with this institute for this Event'
-        );
-
-      const instituteInstructorId = findInstitute.id;
-
+      // \      const instituteInstructorId = findInstitute.id;
       const checkLeaveBalance = await this.instrucorHasLeave.findOne({
         where: {
-          instituteInstructorId: instituteInstructorId,
           leaveTypeId: findLeave.leaveTypeId,
         },
       });
@@ -401,7 +420,7 @@ class LeaveManagementService {
         },
         {
           where: {
-            instituteInstructorId: instituteInstructorId,
+            instituteInstructorId: checkLeaveBalance.instituteInstructorId,
             leaveTypeId: findLeave.leaveTypeId,
           },
         }
@@ -410,6 +429,37 @@ class LeaveManagementService {
       if (!updateLeaveBalance)
         throw new HttpException(409, 'Leave balance not updated');
     }
+    if (isApprovedCount.count === 0) {
+      const mailData: Mail = {
+        templateData: {
+          isAccepted: isApproved,
+          user: findLeave.User.firstName,
+          users: findLeave.User.lastName,
+          email: admin.email,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: findLeave.User.email,
+        },
+      };
+      this.emailService.AcceptLeave(mailData);
+    } else {
+      const mailData: Mail = {
+        templateData: {
+          isAccepted: isApproved,
+          user: findLeave.User.firstName,
+          users: findLeave.User.lastName,
+          email: admin.email,
+        },
+        mailData: {
+          from: loggedUser.email,
+          to: findLeave.User.email,
+        },
+      };
+      this.emailService.RejectLeave(mailData);
+    }
+    // if (isApprovedCount.count === 1) {
+    // }
 
     return { count: isApprovedCount.count };
   }
