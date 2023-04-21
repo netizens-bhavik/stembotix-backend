@@ -1,5 +1,3 @@
-import { API_BASE } from '@/config';
-
 const courseData = {
   title: 'Testing Boot ',
   price: 455,
