@@ -54,6 +54,7 @@ class App {
     );
     return this.credentials;
   }
+
   public listen() {
     this.httpServer = this.app.listen(this.port, () => {
       logger.info(`=================================`);
