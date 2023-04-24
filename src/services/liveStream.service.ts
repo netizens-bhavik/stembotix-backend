@@ -32,6 +32,11 @@ class LiveStreamService {
     if (!this.isTrainer(user)) {
       throw new HttpException(404, "You don't have Authority to Create Event");
     }
+<<<<<<< HEAD
+=======
+
+    const { startTime, endTime, date } = liveStreamDetails;
+>>>>>>> 3e5c60b166eef652745d9d5ff43d0eebf8a860f2
 
     const { startTime, endTime, date } = liveStreamDetails;
 
@@ -217,7 +222,11 @@ class LiveStreamService {
       throw new HttpException(403, "You don't have Authority to Update Event");
     const { startTime, endTime, date } = livestreamDetails;
 
+<<<<<<< HEAD
     const currentTime = moment().format('HH:mm');
+=======
+    const currentTime = moment().format('HH:mm:ss');
+>>>>>>> 3e5c60b166eef652745d9d5ff43d0eebf8a860f2
     const currentDate = moment().format('YYYY-MM-DD');
 
     if (startTime === endTime) {
