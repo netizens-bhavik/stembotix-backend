@@ -35,7 +35,7 @@ class LiveStreamService {
 
     const { startTime, endTime, date } = liveStreamDetails;
 
-    const currentTime = moment().format('HH:mm:ss');
+    const currentTime = moment().format('HH:mm');
     const currentDate = moment().format('YYYY-MM-DD');
 
     if (startTime === endTime) {
@@ -217,7 +217,7 @@ class LiveStreamService {
       throw new HttpException(403, "You don't have Authority to Update Event");
     const { startTime, endTime, date } = livestreamDetails;
 
-    const currentTime = moment().format('HH:mm:ss');
+    const currentTime = moment().format('HH:mm');
     const currentDate = moment().format('YYYY-MM-DD');
 
     if (startTime === endTime) {

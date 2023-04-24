@@ -75,6 +75,7 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'coursetypeId',
       targetKey: 'id',
     });
+    Course.hasOne(models.CouponCode);
   };
 
   return Course;

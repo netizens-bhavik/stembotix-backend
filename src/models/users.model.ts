@@ -161,6 +161,20 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.CouponCode, {
+      foreignKey: 'instructorId',
+      targetKey: 'id',
+      as: 'InstructorCoupon',
+    });
+    User.hasMany(models.CouponCode, {
+      foreignKey: 'instituteId',
+      targetKey: 'id',
+      as: 'InstituteCoupon',
+    });
+    User.hasMany(models.CouponCode, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {
