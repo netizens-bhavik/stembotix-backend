@@ -46,6 +46,7 @@ class EmailService {
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
         try {
+          console.log('mbcvdjhgjh');
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
             to: mailerData.to,
@@ -61,6 +62,7 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (error) {
+          console.log(error);
           return error;
         }
       });
@@ -653,6 +655,39 @@ class EmailService {
             from: `${mailData.from}`,
             to: mailData.to,
             subject: 'Reject Leave',
+            html: data,
+            attachments: [
+              {
+                filename: 'Stembotix_logo.png',
+                path: __dirname + '/../public/assets/Stembotix_logo.png',
+                cid: 'logo@cid',
+              },
+            ],
+          });
+          this.terminateConnection();
+        } catch (err) {
+          return err;
+        }
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+
+  public async sendContact(payload: Mail) {
+    try {
+      await this.createConnection();
+      await this.transporter.verify();
+
+      const pathToView = path.resolve(__dirname, '../view/contact.ejs');
+      const { templateData, mailData } = payload;
+      ejs.renderFile(pathToView, templateData, async (err, data) => {
+        try {
+          console.log('dhsgahg');
+          await this.transporter.sendMail({
+            from: `${mailData.from}`,
+            to: mailData.to,
+            subject: 'Contact Mail',
             html: data,
             attachments: [
               {
