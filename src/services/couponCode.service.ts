@@ -90,8 +90,6 @@ class CouponCodeService {
       const responseFromFetchAPI = await instance.orders.fetch(
         order.razorpay_order_id
       );
-      console.log(responseFromFetchAPI);
-      console.log(order.amount);
 
       if (
         responseFromFetchAPI.status === 'created' &&

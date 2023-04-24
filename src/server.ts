@@ -32,13 +32,10 @@ import HolidayListRoute from './routes/holidayList.route';
 import HolidayRoute from './routes/holiday.route';
 import AllOrderRoute from './routes/allOrder.route';
 import CourseProductStatsRoute from './routes/courseproductStats.route';
-<<<<<<< HEAD
 import CouponCodeRoute from './routes/couponCode.route';
 import AllCourseForInstituteRoute from './routes/instructorinstituteCourse.route';
-=======
 import ContactRoute from './routes/contact.route';
 import BlogTagRoute from './routes/blogTag.route';
->>>>>>> 3e5c60b166eef652745d9d5ff43d0eebf8a860f2
 
 validateEnv();
 
@@ -75,12 +72,9 @@ const app = new App([
   new HolidayRoute(),
   new AllOrderRoute(),
   new CourseProductStatsRoute(),
-<<<<<<< HEAD
   new CouponCodeRoute(),
   new AllCourseForInstituteRoute(),
-=======
   new ContactRoute(),
   new BlogTagRoute(),
->>>>>>> 3e5c60b166eef652745d9d5ff43d0eebf8a860f2
 ]);
 app.listen();

@@ -74,7 +74,6 @@ class BlogTagController {
     try {
       const tags = req.body;
       const { tagId } = req.params;
-      console.log(req.query);
       const user = req.user;
       const response = await this.blogTagService.updateBlogTags({
         tagId,
