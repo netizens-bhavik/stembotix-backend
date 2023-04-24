@@ -14,6 +14,8 @@ class QuizQueAnsService {
   public quizQue = DB.QuizQue;
   public quizAns = DB.QuizAns;
   public curriculum = DB.CurriculumSection;
+  public quizScore = DB.QuizScore;
+  public attemptquizque = DB.AttemptQuizQue;
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Admin';
@@ -119,11 +121,34 @@ class QuizQueAnsService {
     if (!this.isTrainer(trainer))
       throw new HttpException(401, 'Forbidden Resource');
 
+    const response = await this.quizQue.findAll({
+      where: {
+        id: quizQueId,
+      },
+      include: {
+        model: this.quiz,
+        include: {
+          model: this.quizScore,
+        },
+      },
+    });
     const res: number = await this.quizQue.destroy({
       where: {
         id: quizQueId,
       },
     });
+    if (res === 1) {
+      await this.quizScore.destroy({
+        where: {
+          quiz_id: response[0].Quiz.id,
+        },
+      });
+      // await this.attemptquizque.destroy({
+      //   where: {
+      //     quiz_id: response[0].Quiz.id,
+      //   },
+      // });
+    }
     return { count: res };
   }
 }
