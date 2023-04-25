@@ -24,7 +24,7 @@ class AllCourseForInstituteRoute implements Routes {
       this.allcourseforInstituteController.getAllCourseForInstitute
     );
     this.router.get(
-      `/admin${this.path}`,
+      `/institute${this.path}`,
       [passport.authenticate('jwt', { session: false })],
       this.allcourseforInstituteController.getAllCourseForInstitutebyAdmin
     );

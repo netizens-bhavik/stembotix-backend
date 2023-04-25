@@ -75,18 +75,18 @@ class CouponCodeService {
       key_secret: RAZORPAY_KEY_SECRET,
     });
     const price = course.price;
-    const priceInt = parseInt(price);
-    if (course) {
+    const priceInPaise = Math.round(parseFloat(price) * 100);
+    if (course.dataValues) {
       const responseFromOrderAPI = await instance.orders.create({
-        amount: priceInt,
+        amount: priceInPaise,
         currency: 'INR',
       });
       const orderData = {
-        amount: priceInt,
+        amount: responseFromOrderAPI.amount,
         razorpay_order_id: responseFromOrderAPI.id,
       };
       const order = await this.order.create(orderData);
-
+      console.log(order);
       const responseFromFetchAPI = await instance.orders.fetch(
         order.razorpay_order_id
       );
@@ -99,6 +99,20 @@ class CouponCodeService {
         const hmac = crypto.createHmac('sha256', keySecret);
         hmac.update(order.razorpay_order_id + '|' + order.payment_id);
 
+        const paymentData = {
+          payment_id: order.payment_id,
+          razorpay_order_id: order.razorpay_order_id,
+          razorpay_signature: order.razorpay_signature,
+        };
+        console.log(paymentData);
+        const verification = await this.order.update(paymentData, {
+          where: { id: order.id },
+        });
+        console.log(verification);
+        if (!verification) {
+          throw new HttpException(500, 'Payment failed');
+        }
+
         return order;
       } else {
         throw new HttpException(400, 'Payment verification failed');
@@ -106,6 +120,14 @@ class CouponCodeService {
     } else {
       throw new HttpException(404, 'Course not found');
     }
+  }
+  public async getCouponCodebyCourseId({ courseId }) {
+    const response = await this.couponCode.findAll({
+      where: {
+        course_id: courseId,
+      },
+    });
+    return response;
   }
 }
 export default CouponCodeService;
