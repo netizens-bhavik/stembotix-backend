@@ -191,6 +191,22 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasMany(models.Contact, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    User.hasMany(models.Blog, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    User.hasMany(models.BlogTags, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
+    User.hasMany(models.BlogCategory, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {
