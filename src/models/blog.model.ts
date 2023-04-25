@@ -33,11 +33,11 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Blog.belongsTo(models.BlogTags, {
-      foreignKey: 'blogId',
+      foreignKey: 'blogTagId',
       targetKey: 'id',
     });
     Blog.belongsTo(models.BlogCategory, {
-      foreignKey: 'blogId',
+      foreignKey: 'blogCatId',
       targetKey: 'id',
     });
     Blog.hasMany(models.BlogReview, {

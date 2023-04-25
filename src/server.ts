@@ -36,6 +36,8 @@ import CouponCodeRoute from './routes/couponCode.route';
 import AllCourseForInstituteRoute from './routes/instructorinstituteCourse.route';
 import ContactRoute from './routes/contact.route';
 import BlogTagRoute from './routes/blogTag.route';
+import BlogCatRoute from './routes/blogCategory.route';
+import BlogRoute from './routes/blog.route';
 
 validateEnv();
 
@@ -76,5 +78,7 @@ const app = new App([
   new AllCourseForInstituteRoute(),
   new ContactRoute(),
   new BlogTagRoute(),
+  new BlogCatRoute(),
+  new BlogRoute(),
 ]);
 app.listen();
