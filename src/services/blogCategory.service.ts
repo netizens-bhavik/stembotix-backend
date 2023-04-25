@@ -1,36 +1,37 @@
 import { HttpException } from '@/exceptions/HttpException';
 import DB from '@databases';
-import { BlogTag } from '@interfaces/blogTag.interface';
+import { BlogCategory } from '@interfaces/blogCategory.interface';
 
-class BlogTagService {
-  public blogTag = DB.BlogTags;
+class BlogCategoryService {
+  public blogCategory = DB.BlogCategory;
 
   public isAdmin(user): boolean {
     return user.role === 'Admin';
   }
 
-  public async addBlogTags({ tag, user }): Promise<BlogTag> {
+  public async addBlogCat({ categoryDetails, user }): Promise<BlogCategory> {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const tagData = await this.blogTag.findOrCreate({
+
+    const categoryData = await this.blogCategory.findOrCreate({
       where: {
-        tag_name: tag.tag_name,
+        cat_name: categoryDetails.cat_name,
       },
       defaults: {
-        ...tag,
+        ...categoryDetails,
         userId: user.id,
       },
     });
-    return tagData;
+    return categoryData;
   }
 
-  public async getBlogTagsAdmin(
+  public async getBlogCatAdmin(
     queryObject,
     user
   ): Promise<{
     totalCount: number;
-    records: (BlogTag[] | undefined)[];
+    records: (BlogCategory[] | undefined)[];
   }> {
     if (!this.isAdmin(user.user)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -44,30 +45,28 @@ class BlogTagService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const tagData = await this.blogTag.findAndCountAll({
-      where: DB.Sequelize.and({ deletedAt: null }),
-    });
 
-    const data: (BlogTag | undefined)[] = await this.blogTag.findAndCountAll({
-      where: DB.Sequelize.and({
-        deletedAt: null,
-        tag_name: {
-          [searchCondition]: search,
-        },
-      }),
-      limit: pageSize,
-      offset: pageNo,
-      order: [[`${sortBy}`, `${order}`]],
-    });
+    const data: (BlogCategory | undefined)[] =
+      await this.blogCategory.findAndCountAll({
+        where: DB.Sequelize.and({
+          deletedAt: null,
+          cat_name: {
+            [searchCondition]: search,
+          },
+        }),
+        limit: pageSize,
+        offset: pageNo,
+        order: [[`${sortBy}`, `${order}`]],
+      });
     return { totalCount: data.count, records: data.rows };
   }
 
-  public async getBlogTags({ user }): Promise<BlogTag[]> {
+  public async getBlogCat({ user }): Promise<BlogCategory[]> {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
 
-    const data: (BlogTag | undefined)[] = await this.blogTag.findAll({
+    const data: (BlogCategory | undefined)[] = await this.blogCategory.findAll({
       where: DB.Sequelize.and({
         deletedAt: null,
       }),
@@ -75,28 +74,28 @@ class BlogTagService {
     return data;
   }
 
-  public async updateBlogTags({
-    tagId,
-    tags,
+  public async updateBlogCat({
+    catId,
+    categoryDetails,
     user,
-  }): Promise<{ count: number; rows: BlogTag[] }> {
+  }): Promise<{ count: number; rows: BlogCategory[] }> {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const blogData = await this.blogTag.findOne({
+    const blogData = await this.blogCategory.findOne({
       where: {
-        id: tagId,
+        id: catId,
       },
     });
-    if (!blogData) throw new HttpException(404, 'No Tags are found');
+    if (!blogData) throw new HttpException(404, 'No Categories found');
 
-    const updateData = await this.blogTag.update(
+    const updateData = await this.blogCategory.update(
       {
-        ...tags,
+        ...categoryDetails,
       },
       {
         where: {
-          id: tagId,
+          id: catId,
         },
         returning: true,
       }
@@ -104,32 +103,32 @@ class BlogTagService {
     return { count: updateData[0], rows: updateData[1] };
   }
 
-  public async deleteBlogTag(tagId, user): Promise<{ count: number }> {
+  public async deleteBlogCat(catId, user): Promise<{ count: number }> {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const data = await this.blogTag.findAndCountAll({
+    const data = await this.blogCategory.findAndCountAll({
       where: {
-        tag_id: tagId,
+        tag_id: catId,
       },
     });
     if (data.count !== 0) {
       throw new HttpException(
         409,
-        'Tags is already in used please change tag and try again'
+        'Category is already in used please change category and try again'
       );
     }
 
-    const res: number = await this.blogTag.destroy({
+    const res: number = await this.blogCategory.destroy({
       where: {
-        id: tagId,
+        id: catId,
       },
     });
     if (res === 1)
-      throw new HttpException(200, 'Blog Tag Deleted Successfully');
+      throw new HttpException(200, 'Blog Category Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');
 
     return { count: res };
   }
 }
-export default BlogTagService;
+export default BlogCategoryService;

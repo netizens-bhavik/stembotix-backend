@@ -1,4 +1,4 @@
-import { IsString, IsObject } from 'class-validator';
+import { IsString, IsObject, IsArray } from 'class-validator';
 
 export class BlogDto {
   @IsString()
@@ -9,4 +9,10 @@ export class BlogDto {
 
   @IsObject()
   public meta: object;
+
+  // @IsArray()
+  // public blog_tag_id: object[];
+
+  // @IsString()
+  // public blog_cat_id: string;
 }
