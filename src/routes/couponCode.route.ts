@@ -20,10 +20,10 @@ class CouponCodeRoute implements Routes {
       [passport.authenticate('jwt', { session: false })],
       this.couponcodeController.createCouponCode
     );
-    // this.router.get(
-    //   `${this.path}/:courseId`,
-    //   this.couponcodeController.getCoupon
-    // );
+    this.router.get(
+      `${this.path}/:courseId`,
+      this.couponcodeController.getCouponCodebyCourseId
+    );
   }
 }
 export default CouponCodeRoute;

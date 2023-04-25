@@ -62,7 +62,7 @@ class AllCourseForInstituteService {
   public async getAllCoursebyInstitute(
     loggedUser,
     queryObject
-  ): Promise<{ totalCount: number; record: object }> {
+  ): Promise<{ totalCount: number; records: object }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -114,9 +114,21 @@ class AllCourseForInstituteService {
         offset: pageNo,
         order: [[`${sortBy}`, `${order}`]],
       });
-      return { totalCount: data.count, record: data.rows };
+
+      const res = [];
+      data.rows.map(function (trainers) {
+        trainers.Trainer.Courses.map(function (coursedetails) {
+          let customData = {
+            trainerName: trainers.fullName,
+            Courses: coursedetails,
+          };
+          res.push(customData);
+        });
+      });
+
+      return { totalCount: data.count, records: res };
     } else {
-      return response;
+      return { totalCount: response.count, records: response.rows };
     }
   }
 }
