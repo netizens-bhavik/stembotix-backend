@@ -21,8 +21,49 @@ class CouponCodeRoute implements Routes {
       this.couponcodeController.createCouponCode
     );
     this.router.get(
-      `${this.path}/:courseId`,
-      this.couponcodeController.getCouponCodebyCourseId
+      `/institute${this.path}/:courseId`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.getCouponCodebyCourseIdbyInstitute
+    );
+    this.router.get(
+      `/instructor${this.path}/:courseId`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.getCouponCodebyCourseIdbyInstructor
+    );
+    this.router.post(
+      `/coupon`,
+      [passport.authenticate('jwt', { session: false })],
+      this.couponcodeController.createCouponByAdmin
+    );
+    this.router.get(
+      `/coupon`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.getDiscountCoupon
+    );
+    this.router.put(
+      `/coupon/:id`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.updateDiscountCoupon
+    );
+    this.router.delete(
+      `/coupon/:id`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.deleteDiscountCoupon
+    );
+    this.router.post(
+      `/applyCoupon`,
+      [passport.authenticate('jwt', { session: false })],
+      this.couponcodeController.getCoupon
+    );
+    this.router.post(
+      `/applyCouponCode`,
+      [passport.authenticate('jwt', { session: false })],
+      this.couponcodeController.getCouponcode
     );
   }
 }
