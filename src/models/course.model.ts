@@ -75,7 +75,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'coursetypeId',
       targetKey: 'id',
     });
-    Course.hasOne(models.CouponCode);
+    Course.hasMany(models.CouponCode, {
+      foreignKey: 'course_id',
+      targetKey: 'id',
+    });
   };
 
   return Course;

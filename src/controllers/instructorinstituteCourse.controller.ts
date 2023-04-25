@@ -2,7 +2,7 @@ import AllCourseForInstituteService from '@/services/instructorinstituteCourse.s
 import { NextFunction, Request, Response } from 'express';
 
 class AllCourseForInstituteController {
-  public instruinstitu = new AllCourseForInstituteService();
+  public instituteInstructor = new AllCourseForInstituteService();
 
   public getAllCourseForInstitute = async (
     req: Request,
@@ -11,7 +11,7 @@ class AllCourseForInstituteController {
   ) => {
     try {
       const loggedUser = req.user;
-      const response = await this.instruinstitu.getAllCourseForInstitute(
+      const response = await this.instituteInstructor.getAllCourseForInstitute(
         loggedUser
       );
       res.status(200).send(response);
@@ -29,7 +29,7 @@ class AllCourseForInstituteController {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
       const queryObject = { search, pageRecord, pageNo, sortBy, order };
 
-      const response = await this.instruinstitu.getAllCoursebyInstitute(
+      const response = await this.instituteInstructor.getAllCoursebyInstitute(
         loggedUser,
         queryObject
       );
