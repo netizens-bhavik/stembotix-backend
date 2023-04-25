@@ -1,4 +1,4 @@
-export interface BlogDto {
+export interface Blog {
   id: string;
   title: string;
   thumbnail: string;
