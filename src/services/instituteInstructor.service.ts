@@ -7,7 +7,6 @@ import { Mail } from '@/interfaces/mailPayload.interface';
 class InstituteInstructorService {
   public user = DB.User;
   public instituteInstructor = DB.InstituteInstructor;
-  public instructor = DB.Instructor;
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {

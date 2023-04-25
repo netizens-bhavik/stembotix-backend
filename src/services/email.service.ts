@@ -683,7 +683,6 @@ class EmailService {
       const { templateData, mailData } = payload;
       ejs.renderFile(pathToView, templateData, async (err, data) => {
         try {
-          console.log('dhsgahg');
           await this.transporter.sendMail({
             from: `${mailData.from}`,
             to: mailData.to,
