@@ -32,6 +32,8 @@ import HolidayListRoute from './routes/holidayList.route';
 import HolidayRoute from './routes/holiday.route';
 import AllOrderRoute from './routes/allOrder.route';
 import CourseProductStatsRoute from './routes/courseproductStats.route';
+import CouponCodeRoute from './routes/couponCode.route';
+import AllCourseForInstituteRoute from './routes/instructorinstituteCourse.route';
 import ContactRoute from './routes/contact.route';
 import BlogTagRoute from './routes/blogTag.route';
 
@@ -70,6 +72,8 @@ const app = new App([
   new HolidayRoute(),
   new AllOrderRoute(),
   new CourseProductStatsRoute(),
+  new CouponCodeRoute(),
+  new AllCourseForInstituteRoute(),
   new ContactRoute(),
   new BlogTagRoute(),
 ]);

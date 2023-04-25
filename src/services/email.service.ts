@@ -46,7 +46,6 @@ class EmailService {
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
         try {
-          console.log('mbcvdjhgjh');
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
             to: mailerData.to,
@@ -62,7 +61,6 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (error) {
-          console.log(error);
           return error;
         }
       });
@@ -683,7 +681,6 @@ class EmailService {
       const { templateData, mailData } = payload;
       ejs.renderFile(pathToView, templateData, async (err, data) => {
         try {
-          console.log('dhsgahg');
           await this.transporter.sendMail({
             from: `${mailData.from}`,
             to: mailData.to,

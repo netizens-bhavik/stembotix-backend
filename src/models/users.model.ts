@@ -161,19 +161,17 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
-    User.hasMany(models.Contact, {
-      foreignKey: 'userId',
+    User.hasMany(models.CouponCode, {
+      foreignKey: 'instructorId',
       targetKey: 'id',
+      as: 'InstructorCoupon',
     });
-    User.hasMany(models.Blog, {
-      foreignKey: 'userId',
+    User.hasMany(models.CouponCode, {
+      foreignKey: 'instituteId',
       targetKey: 'id',
+      as: 'InstituteCoupon',
     });
-    User.hasMany(models.BlogTags, {
-      foreignKey: 'userId',
-      targetKey: 'id',
-    });
-    User.hasMany(models.BlogCategory, {
+    User.hasMany(models.CouponCode, {
       foreignKey: 'userId',
       targetKey: 'id',
     });
