@@ -21,18 +21,20 @@ class CouponCodeController {
       next(err);
     }
   };
-  //   public getCoupon = async (
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ) => {
-  //     try {
-  //       const { courseId } = req.params;
-  //       const createCoupon = await this.couponCodeService.getCoupon({ courseId });
-  //       res.status(200).send(createCoupon);
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+  public getCouponCodebyCourseId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { courseId } = req.params;
+      const createCoupon = await this.couponCodeService.getCouponCodebyCourseId(
+        { courseId }
+      );
+      res.status(200).send(createCoupon);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 export default CouponCodeController;
