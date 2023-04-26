@@ -1,10 +1,9 @@
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('InstituteInstructor', 'email');
-  },
-
-  async down(queryInterface, Sequelize) {
-    queryInterface.addColumn('InstituteInstructor', 'email', {
+    queryInterface.addColumn('Order', 'email', {
       type: Sequelize.STRING,
       allowNull: true,
       validate: {
@@ -13,5 +12,9 @@ module.exports = {
         },
       },
     });
+  },
+
+  async down(queryInterface, Sequelize) {
+    queryInterface.removeColumn('Order', 'email', {});
   },
 };
