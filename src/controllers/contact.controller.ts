@@ -53,7 +53,6 @@ class ContactController {
   ) => {
     try {
       const { contactId } = req.body;
-      console.log(req.body);
       const coursesData: Contact = await this.contactService.getContactById(
         contactId
       );
