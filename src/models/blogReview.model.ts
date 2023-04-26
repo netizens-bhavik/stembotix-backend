@@ -34,6 +34,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'blogId',
       targetKey: 'id',
     });
+    BlogReview.belongsTo(models.User, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
   };
   return BlogReview;
 };

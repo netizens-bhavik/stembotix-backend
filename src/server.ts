@@ -38,6 +38,7 @@ import ContactRoute from './routes/contact.route';
 import BlogTagRoute from './routes/blogTag.route';
 import BlogCatRoute from './routes/blogCategory.route';
 import BlogRoute from './routes/blog.route';
+import BlogReviewRoute from './routes/blogReview.route';
 
 validateEnv();
 
@@ -80,5 +81,6 @@ const app = new App([
   new BlogTagRoute(),
   new BlogCatRoute(),
   new BlogRoute(),
+  new BlogReviewRoute(),
 ]);
 app.listen();
