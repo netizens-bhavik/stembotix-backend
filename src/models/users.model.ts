@@ -207,6 +207,10 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'userId',
       targetKey: 'id',
     });
+    User.hasOne(models.BlogReview, {
+      foreignKey: 'userId',
+      targetKey: 'id',
+    });
   };
 
   User.prototype.validPassword = (password) => {

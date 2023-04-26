@@ -4,6 +4,7 @@ import { BlogTag } from '@interfaces/blogTag.interface';
 
 class BlogTagService {
   public blogTag = DB.BlogTags;
+  public blog = DB.Blogs;
 
   public isAdmin(user): boolean {
     return user.role === 'Admin';
@@ -71,6 +72,9 @@ class BlogTagService {
       where: DB.Sequelize.and({
         deletedAt: null,
       }),
+      include: {
+        model: this.blog,
+      },
     });
     return data;
   }

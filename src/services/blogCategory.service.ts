@@ -4,6 +4,7 @@ import { BlogCategory } from '@interfaces/blogCategory.interface';
 
 class BlogCategoryService {
   public blogCategory = DB.BlogCategory;
+  public blog = DB.Blog;
 
   public isAdmin(user): boolean {
     return user.role === 'Admin';
@@ -70,6 +71,9 @@ class BlogCategoryService {
       where: DB.Sequelize.and({
         deletedAt: null,
       }),
+      include: {
+        model: this.blog,
+      },
     });
     return data;
   }
