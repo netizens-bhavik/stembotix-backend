@@ -24,10 +24,9 @@ module.exports = (sequelize, Sequelize) => {
     { paranoid: true }
   );
   DiscountCode.associate = (models) => {
-    DiscountCode.belongsToMany(models.User, {
-      through: 'Discount',
-      foreignKey: 'discountCoupon_id',
-      otherKey: 'userId',
+    DiscountCode.hasMany(models.DiscountCouponMap, {
+      foreignKey: 'discountCouponId',
+      sourceKey: 'id',
     });
   };
   return DiscountCode;

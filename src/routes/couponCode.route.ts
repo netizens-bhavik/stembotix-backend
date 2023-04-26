@@ -43,6 +43,12 @@ class CouponCodeRoute implements Routes {
 
       this.couponcodeController.getDiscountCoupon
     );
+
+    this.router.post(
+      `/applyFlatCouponCode`,
+      passport.authenticate('jwt', { session: false }),
+      this.couponcodeController.applyFlatCode
+    );
     this.router.put(
       `/coupon/:id`,
       passport.authenticate('jwt', { session: false }),
@@ -55,15 +61,31 @@ class CouponCodeRoute implements Routes {
 
       this.couponcodeController.deleteDiscountCoupon
     );
-    this.router.post(
-      `/applyCoupon`,
-      [passport.authenticate('jwt', { session: false })],
-      this.couponcodeController.getCoupon
+
+    this.router.delete(
+      `/couponCode/:cartId`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.deleteDiscountCouponUser
     );
+
     this.router.post(
-      `/applyCouponCode`,
+      `/applyCoupon/:cartId`,
       [passport.authenticate('jwt', { session: false })],
       this.couponcodeController.getCouponcode
+    );
+    this.router.put(
+      `/couponCode`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.updateCouponOnApply
+    );
+
+    this.router.get(
+      `/allUserAppliedCoupon`,
+      passport.authenticate('jwt', { session: false }),
+
+      this.couponcodeController.getAllUserAppliedCoupon
     );
   }
 }

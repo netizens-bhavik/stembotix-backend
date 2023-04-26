@@ -12,6 +12,8 @@ class CartService {
   public product = DB.Product;
   public cart = DB.Cart;
   public cartItem = DB.CartItem;
+  public discountCouponMap = DB.DiscountCouponMap;
+  public discountCoupon = DB.DiscountCode;
   public itemType = {};
   public async addProductToCart(
     userId: string,
@@ -114,18 +116,28 @@ class CartService {
   public async viewCart(userId) {
     const cart = await this.cart.findOne({
       where: DB.Sequelize.and({ user_id: userId }),
-      include: {
-        model: this.cartItem,
+      include: [
+        {
+          model: this.cartItem,
 
-        include: [
-          {
-            model: this.course,
+          include: [
+            {
+              model: this.course,
+            },
+            {
+              model: this.product,
+            },
+          ],
+        },
+        {
+          model: this.discountCouponMap,
+          attributes: ['id', 'cart_id', 'discountCouponId'],
+          include: {
+            model: this.discountCoupon,
+            attributes: ['id', 'couponCode', 'discount'],
           },
-          {
-            model: this.product,
-          },
-        ],
-      },
+        },
+      ],
       order: [[{ model: this.cartItem, as: 'CartItems' }, 'created_at', 'ASC']],
     });
     if (!cart) return { message: 'Empty Cart' };

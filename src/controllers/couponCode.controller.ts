@@ -21,6 +21,24 @@ class CouponCodeController {
       next(err);
     }
   };
+
+  public updateCouponOnApply = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const couponDetail = req.body;
+      const createCoupon = await this.couponCodeService.updateCouponOnApply({
+        couponDetail,
+        user,
+      });
+      res.status(200).send(createCoupon);
+    } catch (err) {
+      next(err);
+    }
+  };
   public getCouponCodebyCourseIdbyInstitute = async (
     req: Request,
     res: Response,
@@ -93,6 +111,24 @@ class CouponCodeController {
       next(err);
     }
   };
+
+  public applyFlatCode = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const couponDetail = req.body;
+      const user = req.user;
+      const createCoupon = await this.couponCodeService.applyFlatCode({
+        user,
+        couponDetail,
+      });
+      res.status(200).send(createCoupon);
+    } catch (err) {
+      next(err);
+    }
+  };
   public updateDiscountCoupon = async (
     req: Request,
     res: Response,
@@ -129,23 +165,25 @@ class CouponCodeController {
       next(err);
     }
   };
-  public getCoupon = async (
+  public deleteDiscountCouponUser = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const couponDetail = req.body;
+      const { cartId } = req.params;
       const user = req.user;
-      const createCoupon = await this.couponCodeService.getCoupon({
-        user,
-        couponDetail,
-      });
+      const createCoupon =
+        await this.couponCodeService.deleteDiscountCouponUser({
+          user,
+          cartId,
+        });
       res.status(200).send(createCoupon);
     } catch (err) {
       next(err);
     }
   };
+
   public getCouponcode = async (
     req: Request,
     res: Response,
@@ -153,11 +191,29 @@ class CouponCodeController {
   ) => {
     try {
       const couponDetail = req.body;
+      const { cartId } = req.params;
       const user = req.user;
       const createCoupon = await this.couponCodeService.getCouponcode({
-        user,
         couponDetail,
+        cartId,
       });
+      res.status(200).send(createCoupon);
+    } catch (err) {
+      next(err);
+    }
+  };
+  public getAllUserAppliedCoupon = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const createCoupon = await this.couponCodeService.getAllUserAppliedCoupon(
+        {
+          user,
+        }
+      );
       res.status(200).send(createCoupon);
     } catch (err) {
       next(err);

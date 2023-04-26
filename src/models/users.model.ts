@@ -187,11 +187,6 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
       as: 'InstituteCoupon',
     });
-    User.belongsToMany(models.DiscountCode, {
-      through: 'Discount',
-      foreignKey: 'userId',
-      otherKey: 'discountCoupon_id',
-    });
     User.hasMany(models.Contact, {
       foreignKey: 'userId',
       targetKey: 'id',
@@ -207,6 +202,11 @@ module.exports = (sequelize, Sequelize) => {
     User.hasMany(models.BlogCategory, {
       foreignKey: 'userId',
       targetKey: 'id',
+    });
+    User.belongsToMany(models.CouponCode, {
+      through: 'CouponUser',
+      foreignKey: 'userId',
+      otherKey: 'couponCodeId',
     });
   };
 

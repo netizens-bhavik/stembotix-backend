@@ -10,7 +10,6 @@ class BlogService {
   }
 
   public async addBlog({ blogDetails, file, user }): Promise<Blog> {
-    console.log(blogDetails);
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -23,9 +22,9 @@ class BlogService {
     });
     const blogData = await this.blog.create({
       ...blogDetails,
-      meta:{
-        quote:blogDetails.quote,
-        author:blogDetails.author
+      meta: {
+        quote: blogDetails.quote,
+        author: blogDetails.author,
       },
       thumbnail: file.path,
     });

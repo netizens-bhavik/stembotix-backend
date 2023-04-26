@@ -36,6 +36,13 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
+    CouponCode.belongsToMany(models.User, {
+      through: 'CouponUser',
+      foreignKey: 'couponCodeId',
+      otherKey: 'userId',
+    });
+
+    CouponCode.hasOne(models.Order);
   };
   return CouponCode;
 };

@@ -34,6 +34,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
     Order.hasMany(models.OrderItem);
+    Order.belongsTo(models.CouponCode, {
+      foreignKey: 'couponCodeId',
+      targetKey: 'id',
+    });
   };
   return Order;
 };
