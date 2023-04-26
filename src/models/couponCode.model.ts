@@ -1,27 +1,26 @@
 module.exports = (sequelize, Sequelize) => {
-  const CouponCode = sequelize.define('CouponCode', {
-    id: {
-      type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false,
-      primaryKey: true,
-    },
-    couponCode: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    flat: {
-      type: Sequelize.STRING,
-      defaultValue: '100%',
-    },
-    discount: {
-      type: Sequelize.STRING,
-      value: {
-        type: Sequelize.DECIMAL(10, 2),
+  const CouponCode = sequelize.define(
+    'CouponCode',
+    {
+      id: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+      },
+      couponCode: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      flat: {
+        type: Sequelize.STRING,
+        defaultValue: '100%',
+        allowNull: true,
       },
     },
-  });
+    { paranoid: true }
+  );
   CouponCode.associate = (models) => {
     CouponCode.belongsTo(models.User, {
       foreignKey: 'instructorId',
@@ -37,10 +36,13 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'course_id',
       targetKey: 'id',
     });
-    CouponCode.belongsTo(models.User, {
-      foreignKey: 'userId',
-      targetKey: 'id',
+    CouponCode.belongsToMany(models.User, {
+      through: 'CouponUser',
+      foreignKey: 'couponCodeId',
+      otherKey: 'userId',
     });
+
+    CouponCode.hasOne(models.Order);
   };
   return CouponCode;
 };

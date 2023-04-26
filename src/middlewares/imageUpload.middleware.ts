@@ -21,7 +21,6 @@ export const imageUpload = async (
           let result;
           try {
             // result = await uploadFileS3(file);
-            console.log(file);
           } catch (error) {
             logger.error(error);
           }

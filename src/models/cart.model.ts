@@ -19,6 +19,10 @@ module.exports = (sequelize, Sequelize) => {
       targetKey: 'id',
     });
 
+    Cart.hasOne(models.DiscountCouponMap, {
+      foreignKey: 'cart_id',
+      targetKey: 'id',
+    });
     Cart.hasMany(models.CartItem);
   };
   return Cart;

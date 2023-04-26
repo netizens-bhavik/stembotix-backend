@@ -48,13 +48,18 @@ class AllCourseForInstituteService {
           },
         ],
       });
-      // const res = [];
-      // data.map(function (trainers) {
-      //   trainers.Trainer.Courses.map(function (coursedetails) {
-      //     res.push(coursedetails);
-      //   });
-      // });
-      return data;
+      const res = [];
+      data.map(function (trainers) {
+        trainers.Trainer.Courses.map(function (coursedetails) {
+          let customData = {
+            trainerName: trainers.fullName,
+            role: trainers.role,
+            Courses: coursedetails,
+          };
+          res.push(customData);
+        });
+      });
+      return res;
     } else {
       return response;
     }
