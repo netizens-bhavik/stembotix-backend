@@ -16,9 +16,10 @@ module.exports = (sequelize, Sequelize) => {
   );
 
   BlogTags.associate = (models) => {
-    BlogTags.hasMany(models.Blog, {
+    BlogTags.belongsToMany(models.Blog, {
+      through: 'BlogBlogTag',
       foreignKey: 'blogTagId',
-      targetKey: 'id',
+      otherKey: 'blogId',
     });
     BlogTags.belongsTo(models.User, {
       foreignKey: 'userId',
