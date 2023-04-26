@@ -33,6 +33,22 @@ class BlogRoute implements Routes {
       ],
       this.blogController.addBlog
     );
+    this.router.get(
+      `${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.blogController.getBlog
+    );
+    this.router.get(
+      `${this.path}/admin`,
+      passport.authenticate('jwt', { session: false }),
+      this.blogController.getBlogAdmin
+    );
+
+    this.router.delete(
+      `${this.path}/:blogId`,
+      passport.authenticate('jwt', { session: false }),
+      this.blogController.deleteCourse
+    );
   }
 }
 export default BlogRoute;
