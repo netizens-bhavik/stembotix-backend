@@ -111,17 +111,17 @@ class BlogCategoryService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const data = await this.blogCategory.findAndCountAll({
-      where: {
-        tag_id: catId,
-      },
-    });
-    if (data.count !== 0) {
-      throw new HttpException(
-        409,
-        'Category is already in used please change category and try again'
-      );
-    }
+    // const data = await this.blogCategory.findAndCountAll({
+    //   where: {
+    //     tag_id: catId,
+    //   },
+    // });
+    // if (data.count !== 0) {
+    //   throw new HttpException(
+    //     409,
+    //     'Category is already in used please change category and try again'
+    //   );
+    // }
 
     const res: number = await this.blogCategory.destroy({
       where: {
