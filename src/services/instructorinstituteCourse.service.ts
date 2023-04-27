@@ -14,16 +14,22 @@ class AllCourseForInstituteService {
   }
 
   public async getAllCourseForInstitute(loggedUser) {
-    const response = await this.instituteInstructor.findAll({
+    const instituteRecord = await this.instituteInstructor.findAll({
       where: {
         institute_id: loggedUser.id,
         isAccepted: 'Accepted',
       },
+      include: {
+        model: this.user,
+        as: 'Institute',
+        attributes: ['id', 'firstName', 'lastName', 'fullName'],
+      },
+      attributes: ['instructorId', 'instituteId'],
     });
-    if (response.length > 0) {
+    if (instituteRecord.length > 0) {
       const data = await this.user.findAll({
         where: {
-          id: response[0].instructorId,
+          id: instituteRecord[0].instructorId,
         },
         include: [
           {
@@ -59,15 +65,15 @@ class AllCourseForInstituteService {
           res.push(customData);
         });
       });
-      return res;
+      return { res, instituteRecord: instituteRecord[0] };
     } else {
-      return response;
+      return instituteRecord;
     }
   }
   public async getAllCoursebyInstitute(
     loggedUser,
     queryObject
-  ): Promise<{ totalCount: number; records: object }> {
+  ): Promise<{ totalCount: number; records: object; instituteRecord: object }> {
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
@@ -88,6 +94,12 @@ class AllCourseForInstituteService {
         institute_id: loggedUser.id,
         isAccepted: 'Accepted',
       },
+      include: {
+        model: this.user,
+        as: 'Institute',
+        attributes: ['id', 'firstName', 'lastName', 'fullName'],
+      },
+      attributes: ['instructorId', 'instituteId'],
     });
     if (response.count > 0) {
       const data = await this.user.findAndCountAll({
@@ -131,9 +143,17 @@ class AllCourseForInstituteService {
         });
       });
 
-      return { totalCount: data.count, records: res };
+      return {
+        totalCount: data.count,
+        records: res,
+        instituteRecord: response.rows,
+      };
     } else {
-      return { totalCount: response.count, records: response.rows };
+      return {
+        totalCount: response.count,
+        records: response.rows,
+        instituteRecord: response.count,
+      };
     }
   }
 }

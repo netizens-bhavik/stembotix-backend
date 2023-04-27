@@ -110,15 +110,12 @@ class CouponCodeService {
         },
       });
     }
-    const expirationTime = new Date();
-    expirationTime.setHours(expirationTime.getHours() + 12);
 
     const createCoupon = await this.couponCode.create({
       ...couponDetail,
       couponCode: couponCode,
       instructorId: res?.id,
       instituteId: response?.id,
-      expirationTime: expirationTime,
     });
     const course = await this.course.findOne({
       where: { id: couponDetail.course_id },
@@ -203,6 +200,7 @@ class CouponCodeService {
     if (record.userId === user.id) {
       throw new HttpException(409, 'You already used this coupon');
     }
+    const now = new Date();
     const update = await this.order.update(
       { userId: user.id },
       {
@@ -212,6 +210,13 @@ class CouponCodeService {
         returning: true,
       }
     );
+    const expirationTime = new Date(
+      update[1][0].updatedAt.getTime() + 2 * 60000
+    ); // 2 minutes from updatedAt
+
+    if (update[1][0].updatedAt > expirationTime) {
+      throw new HttpException(400, 'Coupon has already expired');
+    }
     return update[1][0];
   }
   public async getCouponCodebyCourseIdbyInstitute({ courseId, user }) {

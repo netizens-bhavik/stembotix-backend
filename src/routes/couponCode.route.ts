@@ -17,30 +17,27 @@ class CouponCodeRoute implements Routes {
   private initializeRoutes() {
     this.router.post(
       `${this.path}`,
-      [passport.authenticate('jwt', { session: false })],
+      passport.authenticate('jwt', { session: false }),
       this.couponcodeController.createCouponCode
     );
     this.router.get(
       `/institute${this.path}/:courseId`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.getCouponCodebyCourseIdbyInstitute
     );
     this.router.get(
       `/instructor${this.path}/:courseId`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.getCouponCodebyCourseIdbyInstructor
     );
     this.router.post(
       `/coupon`,
-      [passport.authenticate('jwt', { session: false })],
+      passport.authenticate('jwt', { session: false }),
       this.couponcodeController.createCouponByAdmin
     );
     this.router.get(
       `/coupon`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.getDiscountCoupon
     );
 
@@ -52,39 +49,34 @@ class CouponCodeRoute implements Routes {
     this.router.put(
       `/coupon/:id`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.updateDiscountCoupon
     );
     this.router.delete(
       `/coupon/:id`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.deleteDiscountCoupon
     );
 
     this.router.delete(
       `/couponCode/:cartId`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.deleteDiscountCouponUser
     );
 
     this.router.post(
       `/applyCoupon/:cartId`,
-      [passport.authenticate('jwt', { session: false })],
+      passport.authenticate('jwt', { session: false }),
       this.couponcodeController.getCouponcode
     );
     this.router.put(
       `/couponCode`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.updateCouponOnApply
     );
 
     this.router.get(
       `/allUserAppliedCoupon`,
       passport.authenticate('jwt', { session: false }),
-
       this.couponcodeController.getAllUserAppliedCoupon
     );
   }
