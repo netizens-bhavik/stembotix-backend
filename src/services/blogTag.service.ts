@@ -72,9 +72,9 @@ class BlogTagService {
       where: DB.Sequelize.and({
         deletedAt: null,
       }),
-      include: {
-        model: this.blog,
-      },
+      // include: {
+      //   model: this.blog,
+      // },
     });
     return data;
   }
@@ -112,17 +112,17 @@ class BlogTagService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const data = await this.blogTag.findAndCountAll({
-      where: {
-        tag_id: tagId,
-      },
-    });
-    if (data.count !== 0) {
-      throw new HttpException(
-        409,
-        'Tags is already in used please change tag and try again'
-      );
-    }
+    // const data = await this.blogTag.findAndCountAll({
+    //   where: {
+    //     tag_id: tagId,
+    //   },
+    // });
+    // if (data.count !== 0) {
+    //   throw new HttpException(
+    //     409,
+    //     'Tags is already in used please change tag and try again'
+    //   );
+    // }
 
     const res: number = await this.blogTag.destroy({
       where: {
