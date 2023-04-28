@@ -55,6 +55,23 @@ class BlogController {
       next(error);
     }
   };
+  public getBlogbyId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { blogId } = req.params;
+      const user = req.user;
+      const response: Blog = await this.blogService.getBlogbyId({
+        user,
+        blogId,
+      });
+      res.status(200).send(response);
+    } catch (error) {
+      next(error);
+    }
+  };
   public updateBlog = async (
     req: Request,
     res: Response,
@@ -73,11 +90,12 @@ class BlogController {
       });
       res
         .status(200)
-        .send({ response: response, message: 'Blog Added Successfully' });
+        .send({ response: response, message: 'Blog update successfully' });
     } catch (error) {
       next(error);
     }
   };
+
   public deleteCourse = async (
     req: Request,
     res: Response,

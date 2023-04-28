@@ -14,7 +14,7 @@ class AllCourseForInstituteService {
   }
 
   public async getAllCourseForInstitute(loggedUser) {
-    const instituteRecord = await this.instituteInstructor.findAll({
+    const instituteRecord = await this.instituteInstructor.findAndCountAll({
       where: {
         institute_id: loggedUser.id,
         isAccepted: 'Accepted',
@@ -26,36 +26,32 @@ class AllCourseForInstituteService {
       },
       attributes: ['instructorId', 'instituteId'],
     });
-    if (instituteRecord.length > 0) {
-      const data = await this.user.findAll({
+    if (instituteRecord.count > 0) {
+      const data = await this.user.findAndCountAll({
         where: {
-          id: instituteRecord[0].instructorId,
+          id: instituteRecord.rows[0].instructorId,
         },
-        include: [
-          {
-            model: this.trainer,
+        include: {
+          model: this.trainer,
+          include: {
+            model: this.course,
+            where: {
+              status: 'Published',
+            },
+            through: { attributes: [] },
             include: [
               {
-                model: this.course,
-                where: {
-                  status: 'Published',
-                },
-                through: { attributes: [] },
-                include: [
-                  {
-                    model: this.courseType,
-                  },
-                  {
-                    model: this.review,
-                  },
-                ],
+                model: this.courseType,
+              },
+              {
+                model: this.review,
               },
             ],
           },
-        ],
+        },
       });
       const res = [];
-      data.map(function (trainers) {
+      data.rows.map(function (trainers) {
         trainers.Trainer.Courses.map(function (coursedetails) {
           let customData = {
             trainerName: trainers.fullName,
@@ -65,9 +61,17 @@ class AllCourseForInstituteService {
           res.push(customData);
         });
       });
-      return { res, instituteRecord: instituteRecord[0] };
+      return {
+        totalCount: data.count,
+        records: res,
+        instituteRecord: instituteRecord.rows[0],
+      };
     } else {
-      return instituteRecord;
+      return {
+        totalCount: instituteRecord.count,
+        records: instituteRecord.rows,
+        instituteRecord: instituteRecord.count,
+      };
     }
   }
   public async getAllCoursebyInstitute(
