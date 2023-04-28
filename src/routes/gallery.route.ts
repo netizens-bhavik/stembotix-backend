@@ -1,18 +1,17 @@
 import { Router } from 'express';
-import BlogController from '@/controllers/blog.controller';
 import validationMiddleware from '@middlewares/validation.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
-import { BlogDto } from '@/dtos/blog.dto';
 import { uploadFiles } from '@/rest/fileUpload';
 import { imageUpload } from '@/middlewares/imageUpload.middleware';
+import GalleryController from '@/controllers/gallery.controller';
 
-class BlogRoute implements Routes {
-  public path = '/blog';
+class GalleryRoute implements Routes {
+  public path = '/gallery';
   public router = Router();
-  public blogController = new BlogController();
   public passport = passportConfig(passport);
+  public galleryController = new GalleryController();
 
   constructor() {
     this.initializeRoutes();
@@ -23,46 +22,46 @@ class BlogRoute implements Routes {
       `${this.path}`,
       passport.authenticate('jwt', { session: false }),
       [
-        uploadFiles.single('thumbnail'),
+        uploadFiles.single('galleryImage'),
         (req, res, next) => {
-          req.body.meta = Object(req.body.price);
+          req.body.price = Number(req.body.price);
           next();
         },
         imageUpload,
-        // validationMiddleware(BlogDto, 'body'),
       ],
-      this.blogController.addBlog
-    );
-    this.router.get(
-      `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
-      this.blogController.getBlog
-    );
-    this.router.get(
-      `${this.path}/admin`,
-      passport.authenticate('jwt', { session: false }),
-      this.blogController.getBlogAdmin
-    );
-    this.router.put(
-      `${this.path}/:blogId`,
-      passport.authenticate('jwt', { session: false }),
-      [
-        uploadFiles.single('thumbnail'),
-        (req, res, next) => {
-          req.body.meta = Object(req.body.price);
-          next();
-        },
-        imageUpload,
-        // validationMiddleware(BlogDto, 'body'),
-      ],
-      this.blogController.updateBlog
+      this.galleryController.createGallery
     );
 
-    this.router.delete(
-      `${this.path}/:blogId`,
+    this.router.get(`${this.path}`, this.galleryController.getGallerybyUser);
+    this.router.get(
+      `${this.path}/:galleryId`,
       passport.authenticate('jwt', { session: false }),
-      this.blogController.deleteCourse
+      this.galleryController.getGallerybyId
+    );
+    this.router.get(
+      `/admin${this.path}`,
+      passport.authenticate('jwt', { session: false }),
+      this.galleryController.getGallerybyAdmin
+    );
+
+    this.router.put(
+      `${this.path}/:galleryId`,
+      [
+        passport.authenticate('jwt', { session: false }),
+        uploadFiles.single('galleryImage'),
+        (req, res, next) => {
+          req.body.price = Number(req.body.price);
+          next();
+        },
+        imageUpload,
+      ],
+      this.galleryController.updateGallery
+    );
+    this.router.delete(
+      `${this.path}/:galleryId`,
+      passport.authenticate('jwt', { session: false }),
+      this.galleryController.deleteGalleryImage
     );
   }
 }
-export default BlogRoute;
+export default GalleryRoute;

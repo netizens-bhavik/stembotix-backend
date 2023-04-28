@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, Min, IsUUID } from "class-validator";
+import { IsString, IsNumber, IsOptional, Min, IsUUID } from 'class-validator';
 
 export class AddCourseDTO {
   @IsString()
@@ -19,5 +19,13 @@ export class AddCourseDTO {
   public description: string;
 
   @IsUUID()
-   public coursetypeId:string
+  public coursetypeId: string;
+
+  @IsString()
+  @IsOptional()
+  public trailer: string;
+
+  @IsString()
+  @IsOptional()
+  public thumbnail: string;
 }
