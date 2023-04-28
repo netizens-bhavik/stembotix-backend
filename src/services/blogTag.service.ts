@@ -31,7 +31,7 @@ class BlogTagService {
     user
   ): Promise<{
     totalCount: number;
-    records: (BlogTag[] | undefined)[];
+    records: (BlogTag | undefined)[];
   }> {
     if (!this.isAdmin(user.user)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -49,7 +49,7 @@ class BlogTagService {
       where: DB.Sequelize.and({ deletedAt: null }),
     });
 
-    const data: (BlogTag | undefined)[] = await this.blogTag.findAndCountAll({
+    const data = await this.blogTag.findAndCountAll({
       where: DB.Sequelize.and({
         deletedAt: null,
         tag_name: {
