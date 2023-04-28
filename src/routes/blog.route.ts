@@ -43,6 +43,20 @@ class BlogRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.blogController.getBlogAdmin
     );
+    this.router.put(
+      `${this.path}/:blogId`,
+      passport.authenticate('jwt', { session: false }),
+      [
+        uploadFiles.single('thumbnail'),
+        (req, res, next) => {
+          req.body.meta = Object(req.body.price);
+          next();
+        },
+        imageUpload,
+        // validationMiddleware(BlogDto, 'body'),
+      ],
+      this.blogController.updateBlog
+    );
 
     this.router.delete(
       `${this.path}/:blogId`,

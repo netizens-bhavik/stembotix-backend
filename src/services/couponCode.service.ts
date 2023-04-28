@@ -76,6 +76,12 @@ class CouponCodeService {
   public isAdmin(user): boolean {
     return user.role === 'Admin';
   }
+  public isInstructor(user): boolean {
+    return user.role === 'Instructor';
+  }
+  public isInstitute(user): boolean {
+    return user.role === 'Institute';
+  }
   public async createCouponCode({ couponDetail, loggedUser }) {
     if (!this.isTrainer(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -220,6 +226,10 @@ class CouponCodeService {
     return update[1][0];
   }
   public async getCouponCodebyCourseIdbyInstitute({ courseId, user }) {
+    if (!this.isInstitute(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
+
     const response = await this.couponCode.findAll({
       where: {
         course_id: courseId,
@@ -229,6 +239,9 @@ class CouponCodeService {
     return response;
   }
   public async getCouponCodebyCourseIdbyInstructor({ courseId, user }) {
+    if (!this.isInstructor(user)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
     const response = await this.couponCode.findAll({
       where: {
         course_id: courseId,
