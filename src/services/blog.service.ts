@@ -59,11 +59,11 @@ class BlogService {
     });
     return response;
   }
-  public async getBlogAdmin(
+  public async getBlogAdmin({
     queryObject,
-    user
-  ): Promise<{ totalCount: number; records: (Blog | undefined)[] }> {
-    if (!this.isAdmin(user.user)) {
+    user,
+  }): Promise<{ totalCount: number; records: (Blog | undefined)[] }> {
+    if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     // sorting
@@ -77,6 +77,7 @@ class BlogService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
     const response = await this.blog.findAndCountAll({
       where: {
         deletedAt: null,
@@ -143,7 +144,7 @@ class BlogService {
         returning: true,
       }
     );
-    blogData.addBlogTag(tag);
+    blogData.addBlogUser(tag);
     return blogData;
   }
 

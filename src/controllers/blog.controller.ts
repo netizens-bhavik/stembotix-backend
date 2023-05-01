@@ -41,21 +41,39 @@ class BlogController {
   ) => {
     try {
       const { search, pageRecord, pageNo, sortBy, order } = req.query;
+      const queryObject = { search, pageRecord, pageNo, sortBy, order };
       const user = req.user;
       const BlogCatData: {
         totalCount: number;
         records: (Blog | undefined)[];
-      } = await this.blogService.getBlogAdmin(
-        {
-          search,
-          pageRecord,
-          pageNo,
-          sortBy,
-          order,
-        },
-        { user }
-      );
+      } = await this.blogService.getBlogAdmin({
+        queryObject,
+        user,
+      });
       res.status(200).send(BlogCatData);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public updateBlog = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const blogDetails: Request = req.body;
+      const { blogId } = req.params;
+      const user = req.user;
+      const file = req.file;
+      const response: Blog = await this.blogService.updateBlog({
+        blogDetails,
+        file,
+        user,
+        blogId,
+      });
+      res
+        .status(200)
+        .send({ response: response, message: 'Blog Added Successfully' });
     } catch (error) {
       next(error);
     }
