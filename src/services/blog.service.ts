@@ -127,32 +127,13 @@ class BlogService {
     blogDetails.tags?.forEach((element) => {
       tag.push(element);
     });
-    const blogRes = await this.blog.findAll({
-      where: {
-        id: blogId,
-      },
-      include: {
-        model: this.blogTag,
-        through: {},
-      },
+    const blogRes = await this.blog.findByPk(blogId, {
+      include: this.blogTag,
     });
 
-    // await blogRes.removeBlogTags(blogRes[0].BlogTags[0].BlogBlogTag.blogTagId);
-
-    // if (blogDetails.tags) {
-    //   console.log('first');
-    //   const tags = await this.blog.bulkCreate(
-    //     blogDetails.tags.map((tag) => ({ tag })),
-    //     { ignoreDuplicates: true }
-    //   );
-    //   console.log(tags);
-
-    await blogRes.addBlogTags(tag);
-    // }
-
-    if (!blogRes) throw new HttpException(404, 'Blog not found');
+    await blogRes.setBlogTags(tag);
     if (file) {
-      const thumbnailLink = blogRes[0].thumbnail;
+      const thumbnailLink = blogRes.thumbnail;
       const fileName = thumbnailLink.split('/');
       await deleteFromS3(fileName[3]);
     }
