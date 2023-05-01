@@ -25,6 +25,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: 'Pending',
       },
+      isDeleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
     },
     { paranoid: true }
   );

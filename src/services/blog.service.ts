@@ -99,7 +99,6 @@ class BlogService {
         },
         {
           model: this.blogTag,
-          // through: { attributes: [] },
         },
       ],
       limit: pageSize,

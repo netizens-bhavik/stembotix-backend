@@ -782,13 +782,14 @@ class CourseService {
       return {
         ...row.toJSON(),
         isRequested: hasRequest,
+        isApproved: approvalStatus,
         isAcceptedStatus: isAcceptedStatus,
       };
     });
 
     return {
       totalCount: trainerData.rows.length,
-      records: trainerData.rows,
+      records: trainerDataWithRequestStatus,
     };
   }
 

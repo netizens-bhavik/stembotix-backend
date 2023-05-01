@@ -118,6 +118,14 @@ class InstituteInstructorService {
         },
       };
       this.emailService.RejectProposalofInstitute(mailData);
+      await this.instituteInstructor.update(
+        { isDeleted: true },
+        {
+          where: {
+            id: offerId,
+          },
+        }
+      );
     }
     return updateOffer[1][0];
   }
@@ -167,6 +175,7 @@ class InstituteInstructorService {
           as: 'Instructor',
         },
       ],
+      paranoid: false,
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -210,6 +219,8 @@ class InstituteInstructorService {
           }
         ),
       },
+      paranoid: false,
+
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -271,6 +282,7 @@ class InstituteInstructorService {
           as: 'Instructor',
         },
       ],
+      paranoid: false,
 
       limit: pageSize,
       offset: pageNo,
