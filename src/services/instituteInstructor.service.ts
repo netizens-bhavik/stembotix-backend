@@ -175,7 +175,6 @@ class InstituteInstructorService {
           as: 'Instructor',
         },
       ],
-      paranoid: false,
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -219,7 +218,6 @@ class InstituteInstructorService {
           }
         ),
       },
-      paranoid: false,
 
       limit: pageSize,
       offset: pageNo,
@@ -282,7 +280,6 @@ class InstituteInstructorService {
           as: 'Instructor',
         },
       ],
-      paranoid: false,
 
       limit: pageSize,
       offset: pageNo,

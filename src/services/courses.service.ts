@@ -683,6 +683,7 @@ class CourseService {
     const approvalCheck = await this.instituteinstructor.findAll({
       where: DB.Sequelize.and({
         institute_id: trainer.id,
+        isDeleted: false,
       }),
     });
     const trainerData = await this.trainer.findAndCountAll({
@@ -735,7 +736,6 @@ class CourseService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
-
     let allRating = [];
     let allUser = [];
     const allUserResponse = [];
