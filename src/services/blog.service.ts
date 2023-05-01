@@ -123,10 +123,10 @@ class BlogService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // let tag = [];
-    // blogDetails.tags?.forEach((element) => {
-    //   tag.push(element);
-    // });
+    let tag = [];
+    blogDetails.tags?.forEach((element) => {
+      tag.push(element);
+    });
     const blogRes = await this.blog.findAll({
       where: {
         id: blogId,
@@ -147,7 +147,7 @@ class BlogService {
     //   );
     //   console.log(tags);
 
-    //   await blogRes.addBlogTags(tags);
+    await blogRes.addBlogTags(tag);
     // }
 
     if (!blogRes) throw new HttpException(404, 'Blog not found');
