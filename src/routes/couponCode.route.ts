@@ -4,11 +4,7 @@ import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
 import CouponCodeController from '@/controllers/couponCode.controller';
-import {
-  ApplyCouponDto,
-  CouponCodeDto,
-  DiscountCodeDto,
-} from '@/dtos/couponCode.dto';
+import { ApplyCouponDto, CouponCodeDto } from '@/dtos/couponCode.dto';
 
 class CouponCodeRoute implements Routes {
   public path = '/couponcode';
@@ -40,7 +36,6 @@ class CouponCodeRoute implements Routes {
     this.router.post(
       `/coupon`,
       passport.authenticate('jwt', { session: false }),
-      validationMiddleware(DiscountCodeDto, 'body'),
       this.couponcodeController.createCouponByAdmin
     );
     this.router.get(
@@ -58,7 +53,6 @@ class CouponCodeRoute implements Routes {
     this.router.put(
       `/coupon/:id`,
       passport.authenticate('jwt', { session: false }),
-      validationMiddleware(DiscountCodeDto, 'body'),
       this.couponcodeController.updateDiscountCoupon
     );
     this.router.delete(

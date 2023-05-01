@@ -19,9 +19,12 @@ class GalleryService {
     });
     return gallery;
   }
-  public async getGallerybyUser() {
-    const record = await this.gallery.findAll();
-    return record;
+  public async getGallerybyUser(): Promise<{
+    totalCount: number;
+    records: object;
+  }> {
+    const record = await this.gallery.findAndCountAll();
+    return { totalCount: record.count, records: record.rows };
   }
   public async getGallerybyId({ user, galleryId }) {
     if (!this.isAdmin(user)) {
