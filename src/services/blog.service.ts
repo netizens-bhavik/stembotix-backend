@@ -31,7 +31,7 @@ class BlogService {
       userId: user.id,
       thumbnail: file.path,
     });
-    blogData.addBlogTag(tag);
+    blogData.addBlogTags(tag);
     return blogData;
   }
 
@@ -99,7 +99,7 @@ class BlogService {
         },
         {
           model: this.blogTag,
-          through: { attributes: [] },
+          // through: { attributes: [] },
         },
       ],
       limit: pageSize,
@@ -107,6 +107,17 @@ class BlogService {
       order: [[`${sortBy}`, `${order}`]],
     });
     return { totalCount: response.count, records: response.rows };
+  }
+  public async getBlogbyId({ blogId, user }) {
+    const data = await this.blog.findOne({
+      where: {
+        id: blogId,
+      },
+      include: {
+        model: this.blogTag,
+      },
+    });
+    return data;
   }
   public async updateBlog({ blogId, blogDetails, file, user }): Promise<Blog> {
     if (!this.isAdmin(user)) {
@@ -116,14 +127,32 @@ class BlogService {
     blogDetails.tags?.forEach((element) => {
       tag.push(element);
     });
-    const blogRes = await this.blog.findOne({
+    const blogRes = await this.blog.findAll({
       where: {
         id: blogId,
       },
+      include: {
+        model: this.blogTag,
+        through: {},
+      },
     });
-    if (!blogRes) throw new HttpException(404, 'Blog Not Found');
+
+    // await blogRes.removeBlogTags(blogRes[0].BlogTags[0].BlogBlogTag.blogTagId);
+
+    // if (blogDetails.tags) {
+    //   console.log('first');
+    //   const tags = await this.blog.bulkCreate(
+    //     blogDetails.tags.map((tag) => ({ tag })),
+    //     { ignoreDuplicates: true }
+    //   );
+    //   console.log(tags);
+
+    await blogRes.addBlogTags(tag);
+    // }
+
+    if (!blogRes) throw new HttpException(404, 'Blog not found');
     if (file) {
-      const thumbnailLink = blogRes.thumbnail;
+      const thumbnailLink = blogRes[0].thumbnail;
       const fileName = thumbnailLink.split('/');
       await deleteFromS3(fileName[3]);
     }
@@ -144,7 +173,6 @@ class BlogService {
         returning: true,
       }
     );
-    blogData.addBlogUser(tag);
     return blogData;
   }
 

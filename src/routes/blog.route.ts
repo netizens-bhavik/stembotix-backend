@@ -43,6 +43,11 @@ class BlogRoute implements Routes {
       passport.authenticate('jwt', { session: false }),
       this.blogController.getBlogAdmin
     );
+    this.router.get(
+      `${this.path}/:blogId`,
+      passport.authenticate('jwt', { session: false }),
+      this.blogController.getBlogbyId
+    );
     this.router.put(
       `${this.path}/:blogId`,
       passport.authenticate('jwt', { session: false }),
