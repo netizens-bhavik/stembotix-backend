@@ -4,7 +4,23 @@ import UserService from '@services/users.service';
 
 class UsersController {
   public userService = new UserService();
-
+  public createAdminbySuperAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const adminDetail = req.body;
+      const user = req.user;
+      const record = await this.userService.createAdminbySuperAdmin({
+        adminDetail,
+        user,
+      });
+      res.status(200).send(record);
+    } catch (err) {
+      next(err);
+    }
+  };
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;

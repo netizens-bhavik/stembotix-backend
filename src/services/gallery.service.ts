@@ -6,7 +6,7 @@ class GalleryService {
   public gallery = DB.Gallery;
 
   public isAdmin(user): boolean {
-    return user.role === 'Admin';
+    return user.role === 'SuperAdmin';
   }
 
   public async createGallery({ user, file }) {

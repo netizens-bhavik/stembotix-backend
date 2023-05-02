@@ -15,8 +15,8 @@ class AllOrderService {
   public trainer = DB.Trainer;
   public productuser = DB.ProductUser;
 
-  public isAdmin(user): boolean {
-    return user.role === 'Admin';
+  public isSuperAdmin(user): boolean {
+    return user.role === 'SuperAdmin' || user.role === 'Admin';
   }
   public isInstructor(user): boolean {
     return user.role === 'Instructor';
@@ -29,7 +29,8 @@ class AllOrderService {
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Product | undefined)[] }> {
-    if (!this.isAdmin(user)) throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isSuperAdmin(user))
+      throw new HttpException(403, 'Forbidden Resource');
 
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -100,7 +101,8 @@ class AllOrderService {
     user,
     queryObject
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
-    if (!this.isAdmin(user)) throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isSuperAdmin(user))
+      throw new HttpException(403, 'Forbidden Resource');
 
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -168,7 +170,7 @@ class AllOrderService {
     user,
     orderId
   ): Promise<{ orderRes: number }> {
-    if (!this.isAdmin(user)) throw new HttpException(401, 'Unauthorized');
+    if (!this.isSuperAdmin(user)) throw new HttpException(401, 'Unauthorized');
     const orderRecord = await this.orderitem.findOne({
       where: {
         id: orderId,

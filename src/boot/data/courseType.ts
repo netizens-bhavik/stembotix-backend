@@ -1,5 +1,5 @@
 const courseType = {
   course_type: 'Game Development',
-  userId: 'Admin',
+  userId: 'SuperAdmin',
 };
 export default courseType;

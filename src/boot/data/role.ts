@@ -1,4 +1,5 @@
 const rolesData = [
+  { roleName: 'SuperAdmin' },
   { roleName: 'Admin' },
   { roleName: 'Student' },
   { roleName: 'Instructor' },

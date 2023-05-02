@@ -12,7 +12,7 @@ class CreateCourseType {
     try {
       const data = await this.user.findOne({
         where: {
-          role: 'Admin',
+          role: 'SuperAdmin',
         },
       });
       const res = await this.courseType.count();

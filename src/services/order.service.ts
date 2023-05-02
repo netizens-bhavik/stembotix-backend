@@ -22,9 +22,6 @@ class OrderService {
 
   public orderData = new OrderData();
 
-  public isTrainer(user): boolean {
-    return user.role === 'Admin';
-  }
   public async listOrdersByAdmin({ trainer, queryObject }) {
     const OrderData = await this.orderData.getOrderData({
       trainer,

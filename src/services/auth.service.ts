@@ -43,6 +43,7 @@ class AuthService {
     const createUserData: User = await this.users.create({
       ...userData,
       role_id: roleData.id,
+      // credential:userData.password
     });
     if (userData.role.match(/Instructor/i)) {
       await this.trainers.create({
@@ -246,14 +247,6 @@ class AuthService {
     if (!userRecord) throw new HttpException(500, 'Error occurred try again');
     record.destroy();
     return { message: 'Password reset successfully' };
-  }
-  public async checkAccountPassword({ user, userId }) {
-    const userRecord = await this.user.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    return userRecord;
   }
 }
 

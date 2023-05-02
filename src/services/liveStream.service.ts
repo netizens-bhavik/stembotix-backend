@@ -19,7 +19,7 @@ class LiveStreamService {
   public livestreamchatlogs = DB.LiveStreamChatLogs;
 
   public isTrainer(user): boolean {
-    return user.role === 'Instructor' || user.role === 'Admin';
+    return user.role === 'Instructor' || user.role === 'SuperAdmin';
   }
   public isUser(user): boolean {
     return user.role === 'Student';
@@ -56,54 +56,46 @@ class LiveStreamService {
       },
     });
     if (data.count > 0) {
-      const eventsExist = await Promise.all(
-        data.rows.map(async (elem) => {
-          const eventDate = elem.date.toJSON().slice(0, 10);
-          const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
-            'HH:mm'
-          );
-          const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
+      const eventsExist = await data.rows.map(async (elem) => {
+        const eventDate = elem.date.toJSON().slice(0, 10);
+        const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
+          'HH:mm'
+        );
+        const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-          if (date > eventDate) {
+        if (date > eventDate) {
+          return true;
+        }
+        if (date === eventDate) {
+          if (
+            (startTime === eventEndTime || startTime > eventEndTime) &&
+            endTime > eventEndTime
+          ) {
             return true;
           }
-          if (date === eventDate) {
-            if (
-              (startTime === eventEndTime || startTime > eventEndTime) &&
-              endTime > eventEndTime
-            ) {
-              return true;
-            }
-            if (
-              startTime < eventStartTime &&
-              (endTime < eventStartTime || endTime < eventStartTime)
-            ) {
-              return true;
-            }
+          if (startTime < eventStartTime && endTime < eventStartTime) {
+            return true;
           }
-          return false;
-        })
-      );
-
+        }
+        return false;
+      });
       if (!eventsExist.some(Boolean)) {
         throw new HttpException(
           409,
           'Event already exists at the same date & time. Please change the date & time and try again.'
         );
       }
-    } else {
-      const thumbnailPath = `${API_BASE}/media/${file.path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-
-      const liveStream = await this.liveStream.create({
-        ...liveStreamDetails,
-        thumbnail: thumbnailPath,
-        userId: user.id,
-      });
-      return liveStream;
     }
+    const thumbnailPath = `${API_BASE}/media/${file.path
+      .split('/')
+      .splice(-2)
+      .join('/')}`;
+    const liveStream = await this.liveStream.create({
+      ...liveStreamDetails,
+      thumbnail: thumbnailPath,
+      userId: user.id,
+    });
+    return liveStream;
   }
 
   public async viewLiveStream(user): Promise<{
@@ -458,6 +450,9 @@ class LiveStreamService {
     queryObject,
     trainer
   ): Promise<{ totalCount: number; records: LiveStreamUserRecord[] }> {
+    if (!this.isTrainer(trainer)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
     const order = queryObject.order || 'ASC';
 
     // pagination
@@ -467,9 +462,6 @@ class LiveStreamService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    if (!this.isTrainer(trainer)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
 
     const response = await this.livestreamchatlogs.findAndCountAll({
       where: { livestream_id: livestreamId },

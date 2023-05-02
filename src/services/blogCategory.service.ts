@@ -32,11 +32,8 @@ class BlogCategoryService {
     user
   ): Promise<{
     totalCount: number;
-    records: (BlogCategory[] | undefined)[];
+    records: (BlogCategory | undefined)[];
   }> {
-    if (!this.isAdmin(user.user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -47,26 +44,21 @@ class BlogCategoryService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const data: (BlogCategory | undefined)[] =
-      await this.blogCategory.findAndCountAll({
-        where: DB.Sequelize.and({
-          deletedAt: null,
-          cat_name: {
-            [searchCondition]: search,
-          },
-        }),
-        limit: pageSize,
-        offset: pageNo,
-        order: [[`${sortBy}`, `${order}`]],
-      });
+    const data = await this.blogCategory.findAndCountAll({
+      where: DB.Sequelize.and({
+        deletedAt: null,
+        cat_name: {
+          [searchCondition]: search,
+        },
+      }),
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
     return { totalCount: data.count, records: data.rows };
   }
 
   public async getBlogCat({ user }): Promise<BlogCategory[]> {
-    if (!this.isAdmin(user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
-
     const data: (BlogCategory | undefined)[] = await this.blogCategory.findAll({
       where: DB.Sequelize.and({
         deletedAt: null,

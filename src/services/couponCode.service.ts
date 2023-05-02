@@ -74,7 +74,7 @@ class CouponCodeService {
   }
 
   public isAdmin(user): boolean {
-    return user.role === 'Admin';
+    return user.role === 'SuperAdmin';
   }
   public isInstructor(user): boolean {
     return user.role === 'Instructor';
