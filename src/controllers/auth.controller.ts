@@ -5,6 +5,7 @@ import { RequestWithUser } from '@interfaces/auth.interface';
 import AuthService from '@services/auth.service';
 import TokenService from '@/services/token.service';
 import { RefreshToken } from '@/interfaces/refreshToken.interface';
+import { error } from 'console';
 
 class AuthController {
   public authService = new AuthService();
@@ -179,6 +180,17 @@ class AuthController {
       next(error);
     }
   };
+  public checkAccountPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // checkAccountPassword;
 }
 
 export default AuthController;

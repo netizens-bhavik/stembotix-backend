@@ -217,9 +217,10 @@ class LiveStreamService {
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (this.isUser(user) || !user.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
-    const { startTime, endTime, date } = livestreamDetails;
+    const { startTime, endTime } = livestreamDetails;
+    const date = moment(livestreamDetails.date).format('YYYY-MM-DD');
 
-    const currentTime = moment().format('HH:mm');
+    const currentTime = moment().format('HH:mm:ss');
     const currentDate = moment().format('YYYY-MM-DD');
 
     if (startTime === endTime) {
