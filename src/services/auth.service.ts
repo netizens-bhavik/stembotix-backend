@@ -203,8 +203,6 @@ class AuthService {
     });
     if (!emailRecord) throw new HttpException(400, 'Account not found');
     const token = crypto.randomBytes(20).toString('hex');
-    // const expiresAt = new Date();
-    // expiresAt.setMinutes(expiresAt.getMinutes() + 1);
     await this.passwordToken.createToken(token, emailRecord);
 
     const mailData: MailPayload = {
