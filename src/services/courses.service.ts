@@ -2,14 +2,10 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Course } from '@/interfaces/course.interface';
-import { API_BASE } from '@config';
 import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
-import { Op } from 'sequelize';
-
-// const sgMail = require('@sendgrid/mail');
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -683,6 +679,7 @@ class CourseService {
     const approvalCheck = await this.instituteinstructor.findAll({
       where: DB.Sequelize.and({
         institute_id: trainer.id,
+        isDeleted: false,
       }),
     });
     const trainerData = await this.trainer.findAndCountAll({
@@ -735,7 +732,6 @@ class CourseService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
-
     let allRating = [];
     let allUser = [];
     const allUserResponse = [];
@@ -782,13 +778,14 @@ class CourseService {
       return {
         ...row.toJSON(),
         isRequested: hasRequest,
+        isApproved: approvalStatus,
         isAcceptedStatus: isAcceptedStatus,
       };
     });
 
     return {
       totalCount: trainerData.rows.length,
-      records: trainerData.rows,
+      records: trainerDataWithRequestStatus,
     };
   }
 

@@ -14,7 +14,7 @@ class CourseProductStatsService {
     return user.role === 'Institute' || user.role === 'Admin';
   }
 
-  public async courseProductStats(user) {
+  public async courseStatsforInstructor(user) {
     if (!this.isInstructor(user)) throw new HttpException(401, 'Unauthorized');
     const months = [];
     for (let i = 1; i <= 12; i++) {
@@ -39,7 +39,13 @@ class CourseProductStatsService {
         ),
       });
       months.push(courseRecordsPerMonth);
-
+    }
+    return months;
+  }
+  public async productStatsforInstructor(user) {
+    if (!this.isInstructor(user)) throw new HttpException(401, 'Unauthorized');
+    const months = [];
+    for (let i = 1; i <= 12; i++) {
       const productRecordsPerMonth = await this.product.findAndCountAll({
         where: DB.sequelize.and(
           { deletedAt: null },

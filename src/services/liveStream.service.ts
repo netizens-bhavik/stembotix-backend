@@ -49,61 +49,63 @@ class LiveStreamService {
       throw new HttpException(409, 'Past time is not allowed');
     }
 
-    const data = await this.liveStream.findAll({
+    const data = await this.liveStream.findAndCountAll({
       where: {
         userId: user.id,
         deletedAt: null,
       },
     });
+    if (data.count > 0) {
+      const eventsExist = await Promise.all(
+        data.rows.map(async (elem) => {
+          const eventDate = elem.date.toJSON().slice(0, 10);
+          const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
+            'HH:mm'
+          );
+          const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-    const eventsExist = await Promise.all(
-      data.map(async (elem) => {
-        const eventDate = elem.date.toJSON().slice(0, 10);
-        const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
-          'HH:mm'
-        );
-        const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
-
-        if (date > eventDate) {
-          return true;
-        }
-        if (date === eventDate) {
-          if (
-            (startTime === eventEndTime || startTime > eventEndTime) &&
-            endTime > eventEndTime
-          ) {
+          if (date > eventDate) {
             return true;
           }
-          if (
-            startTime < eventStartTime &&
-            (endTime < eventStartTime || endTime < eventStartTime)
-          ) {
-            return true;
+          if (date === eventDate) {
+            if (
+              (startTime === eventEndTime || startTime > eventEndTime) &&
+              endTime > eventEndTime
+            ) {
+              return true;
+            }
+            if (
+              startTime < eventStartTime &&
+              (endTime < eventStartTime || endTime < eventStartTime)
+            ) {
+              return true;
+            }
           }
-        }
-        return false;
-      })
-    );
-
-    if (!eventsExist.some(Boolean)) {
-      throw new HttpException(
-        409,
-        'Event already exists at the same date & time. Please change the date & time and try again.'
+          return false;
+        })
       );
+
+      if (!eventsExist.some(Boolean)) {
+        throw new HttpException(
+          409,
+          'Event already exists at the same date & time. Please change the date & time and try again.'
+        );
+      }
+    } else {
+      const thumbnailPath = `${API_BASE}/media/${file.path
+        .split('/')
+        .splice(-2)
+        .join('/')}`;
+
+      const liveStream = await this.liveStream.create({
+        ...liveStreamDetails,
+        thumbnail: thumbnailPath,
+        userId: user.id,
+      });
+      return liveStream;
     }
-
-    const thumbnailPath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
-
-    const liveStream = await this.liveStream.create({
-      ...liveStreamDetails,
-      thumbnail: thumbnailPath,
-      userId: user.id,
-    });
-    return liveStream;
   }
+
   public async viewLiveStream(user): Promise<{
     totalCount: number;
     records: (LiveStream | undefined)[];
@@ -215,9 +217,10 @@ class LiveStreamService {
   }): Promise<{ count: number; rows: LiveStream[] }> {
     if (this.isUser(user) || !user.isEmailVerified)
       throw new HttpException(403, "You don't have Authority to Update Event");
-    const { startTime, endTime, date } = livestreamDetails;
+    const { startTime, endTime } = livestreamDetails;
+    const date = moment(livestreamDetails.date).format('YYYY-MM-DD');
 
-    const currentTime = moment().format('HH:mm');
+    const currentTime = moment().format('HH:mm:ss');
     const currentDate = moment().format('YYYY-MM-DD');
 
     if (startTime === endTime) {
