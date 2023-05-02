@@ -248,6 +248,14 @@ class AuthService {
     record.destroy();
     return { message: 'Password reset successfully' };
   }
+  public async checkAccountPassword({ user, userId }) {
+    const userRecord = await this.user.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    return userRecord;
+  }
 }
 
 export default AuthService;
