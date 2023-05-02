@@ -118,6 +118,14 @@ class InstituteInstructorService {
         },
       };
       this.emailService.RejectProposalofInstitute(mailData);
+      await this.instituteInstructor.update(
+        { isDeleted: true },
+        {
+          where: {
+            id: offerId,
+          },
+        }
+      );
     }
     return updateOffer[1][0];
   }
@@ -210,6 +218,7 @@ class InstituteInstructorService {
           }
         ),
       },
+
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],

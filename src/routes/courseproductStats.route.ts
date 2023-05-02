@@ -15,10 +15,16 @@ class CourseProductStatsRoute implements Routes {
   }
   private initializeRoutes() {
     this.router.get(
-      `/instructor${this.path}/monthWiseCourseProduct`,
+      `/instructor${this.path}/monthWiseCourse`,
       passport.authenticate('jwt', { session: false }),
-      this.courseproductStats.courseProductStats
+      this.courseproductStats.courseStatsforInstructor
     );
+    this.router.get(
+      `/instructor${this.path}/monthWiseProduct`,
+      passport.authenticate('jwt', { session: false }),
+      this.courseproductStats.productStatsforInstructor
+    );
+
     this.router.get(
       `/institute${this.path}/monthWiseProduct`,
       passport.authenticate('jwt', { session: false }),
