@@ -34,9 +34,6 @@ class BlogCategoryService {
     totalCount: number;
     records: (BlogCategory[] | undefined)[];
   }> {
-    if (!this.isAdmin(user.user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -63,14 +60,10 @@ class BlogCategoryService {
   }
 
   public async getBlogCat({ user }): Promise<BlogCategory[]> {
-    if (!this.isAdmin(user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
-
     const data: (BlogCategory | undefined)[] = await this.blogCategory.findAll({
-      where: DB.Sequelize.and({
+      where: {
         deletedAt: null,
-      }),
+      },
       include: {
         model: this.blog,
       },
@@ -111,17 +104,7 @@ class BlogCategoryService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const data = await this.blogCategory.findAndCountAll({
-    //   where: {
-    //     tag_id: catId,
-    //   },
-    // });
-    // if (data.count !== 0) {
-    //   throw new HttpException(
-    //     409,
-    //     'Category is already in used please change category and try again'
-    //   );
-    // }
+
 
     const res: number = await this.blogCategory.destroy({
       where: {

@@ -36,10 +36,6 @@ class BlogService {
   }
 
   public async getBlog({ user }): Promise<Blog[]> {
-    if (!this.isAdmin(user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
-
     const response = await this.blog.findAll({
       where: {
         deletedAt: null,
@@ -63,9 +59,6 @@ class BlogService {
     queryObject,
     user,
   }): Promise<{ totalCount: number; records: (Blog | undefined)[] }> {
-    if (!this.isAdmin(user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';

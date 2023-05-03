@@ -25,14 +25,9 @@ class BlogTagRoute implements Routes {
     );
     this.router.get(
       `${this.path}/admin`,
-      passport.authenticate('jwt', { session: false }),
       this.blogTagController.getBlogTagsAdmin
     );
-    this.router.get(
-      `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
-      this.blogTagController.getBlogTags
-    );
+    this.router.get(`${this.path}`, this.blogTagController.getBlogTags);
     this.router.put(
       `${this.path}/update/:tagId`,
       passport.authenticate('jwt', { session: false }),
