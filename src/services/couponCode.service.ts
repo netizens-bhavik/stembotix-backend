@@ -51,10 +51,10 @@ function generatePaymentIdAndSignature() {
   };
 }
 
-enum ItemTypes {
-  Product = 'Product',
-  Course = 'Course',
-}
+// enum ItemTypes {
+//   Product = 'Product',
+//   Course = 'Course',
+// }
 
 class CouponCodeService {
   public user = DB.User;
@@ -168,7 +168,7 @@ class CouponCodeService {
       const orderItems = [];
       items.forEach((item) => {
         const obj = {
-          item_type: ItemTypes.Course,
+          item_type: 'Course',
           quantity: item.quantity,
           CourseId: res?.id,
           OrderId: order.id,

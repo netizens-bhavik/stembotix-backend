@@ -17,10 +17,16 @@ class UsersRoute implements Routes {
 
   private initializeRoutes() {
     this.router.post(
-      `${this.path}/createAdmin`,
+      `${this.path}/createUser`,
       passport.authenticate('jwt', { session: false }),
       validationMiddleware(CreateAdminDto, 'body'),
-      this.usersController.createAdminbySuperAdmin
+      this.usersController.createUserbySuperAdmin
+    );
+    this.router.put(
+      `${this.path}/updateUser/:userId`,
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(CreateAdminDto, 'body'),
+      this.usersController.updateUserDetailBySuperAdmin
     );
 
     this.router.get(

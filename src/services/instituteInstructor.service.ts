@@ -10,7 +10,11 @@ class InstituteInstructorService {
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
-    return loggedUser.role === 'Institute' || loggedUser.role === 'SuperAdmin';
+    return (
+      loggedUser.role === 'Institute' ||
+      loggedUser.role === 'SuperAdmin' ||
+      loggedUser.role === 'Admin'
+    );
   }
 
   public isInstructor(loggedUser): boolean {

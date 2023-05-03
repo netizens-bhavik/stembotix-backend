@@ -43,7 +43,6 @@ class AuthService {
     const createUserData: User = await this.users.create({
       ...userData,
       role_id: roleData.id,
-      // credential:userData.password
     });
     if (userData.role.match(/Instructor/i)) {
       await this.trainers.create({

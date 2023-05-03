@@ -1,5 +1,5 @@
-import { Mail } from '@/interfaces/mailPayload.interface';
 import DB from '@databases';
+import { Mail } from '@/interfaces/mailPayload.interface';
 import { RegisterUserDTO } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
@@ -7,7 +7,6 @@ import { isEmpty } from '@utils/util';
 import { Op } from 'sequelize';
 import EmailService from './email.service';
 import moment from 'moment';
-import { create } from 'domain';
 class UserService {
   public users = DB.User;
   public course = DB.Course;
@@ -18,7 +17,10 @@ class UserService {
   public isSuperAdmin(userData): boolean {
     return userData.role === 'SuperAdmin';
   }
-  public async createAdminbySuperAdmin({ adminDetail, user }) {
+  public isAdmin(userData): boolean {
+    return userData.role === 'SuperAdmin' || userData.role === 'Admin';
+  }
+  public async createUserbySuperAdmin({ adminDetail, user }) {
     if (!this.isSuperAdmin(user)) throw new HttpException(401, 'Unauthorized');
     const existEmail = await this.users.findOne({
       where: {
@@ -35,15 +37,54 @@ class UserService {
       ...adminDetail,
       role_id: record.id,
     });
-    return createAdmin;
+    if (createAdmin) {
+      var userUpdate = await this.users.update(
+        { isEmailVerified: true },
+        { where: { id: createAdmin.id }, returning: true }
+      );
+      if (!userUpdate) throw new HttpException(500, 'Please try again');
+    }
+    return {
+      id: userUpdate[1][0].id,
+      fullName: userUpdate[1][0].fullName,
+      firstName: userUpdate[1][0].firstName,
+      lastName: userUpdate[1][0].lastName,
+      email: userUpdate[1][0].email,
+      role: userUpdate[1][0].role,
+    };
+  }
+  public async updateUserDetailBySuperAdmin({ user, userId, userDetail }) {
+    if (!this.isSuperAdmin(user)) throw new HttpException(401, 'Unauthorized');
+    const record = await this.users.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!record) throw new HttpException(409, 'No data found');
+    const data = await this.users.update(
+      { ...userDetail },
+      {
+        where: {
+          id: userId,
+        },
+        returning: true,
+      }
+    );
+    return {
+      id: data[1][0].id,
+      fullName: data[1][0].fullName,
+      firstName: data[1][0].firstName,
+      lastName: data[1][0].lastName,
+      email: data[1][0].email,
+      role: data[1][0].role,
+    };
   }
 
   public async findAllUser(
     loggedUser,
     queryObject
   ): Promise<{ totalCount: number; records: User[] }> {
-    if (!this.isSuperAdmin(loggedUser))
-      throw new HttpException(401, 'Unauthorized');
+    if (!this.isAdmin(loggedUser)) throw new HttpException(401, 'Unauthorized');
     // sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'DESC' ? 'DESC' : 'ASC';
@@ -97,8 +138,6 @@ class UserService {
   ): Promise<User> {
     if (!this.isSuperAdmin(loggedUser))
       throw new HttpException(401, 'Unauthorized');
-    if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
-      throw new HttpException(403, 'Access Forbidden');
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUser: User = await this.users.findByPk(userId);
@@ -111,8 +150,8 @@ class UserService {
   }
 
   public async deleteUser(loggedUser, userId): Promise<User> {
-    if (!(loggedUser.id === userId || loggedUser.role === 'Admin'))
-      throw new HttpException(403, 'Access Forbidden');
+    if (!this.isSuperAdmin(loggedUser))
+      throw new HttpException(401, 'Unauthorized');
     if (isEmpty(userId)) throw new HttpException(400, "User doesn't existId");
 
     const findUser = await this.users.findOne({
@@ -142,7 +181,7 @@ class UserService {
     return findUser;
   }
   public async getAllUserMonthWise(user) {
-    if (!this.isSuperAdmin(user)) throw new HttpException(401, 'Unauthorized');
+    if (!this.isAdmin(user)) throw new HttpException(401, 'Unauthorized');
     const months = [];
     for (let i = 1; i <= 12; i++) {
       const recordsPerMonth = await this.users.findAndCountAll({

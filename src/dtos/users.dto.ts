@@ -44,12 +44,10 @@ export class CreateAdminDto {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Admin'])
+  @IsEnum(['Admin', 'Institute', 'Instructor', 'Student'])
   public role: string;
-
-  @IsBoolean()
-  public isEmailVerified: boolean;
 }
+
 export class RegisterUserDTO {
   @IsString()
   public firstName: string;

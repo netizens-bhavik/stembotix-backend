@@ -21,6 +21,13 @@ class LiveStreamService {
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'SuperAdmin';
   }
+  public isAdmin(user): boolean {
+    return (
+      user.role === 'Instructor' ||
+      user.role === 'SuperAdmin' ||
+      user.role === 'Admin'
+    );
+  }
   public isUser(user): boolean {
     return user.role === 'Student';
   }
@@ -56,29 +63,35 @@ class LiveStreamService {
       },
     });
     if (data.count > 0) {
-      const eventsExist = await data.rows.map(async (elem) => {
-        const eventDate = elem.date.toJSON().slice(0, 10);
-        const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
-          'HH:mm'
-        );
-        const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
+      const eventsExist = await Promise.all(
+        data.rows.map(async (elem) => {
+          const eventDate = elem.date.toJSON().slice(0, 10);
+          const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
+            'HH:mm'
+          );
+          const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-        if (date > eventDate) {
-          return true;
-        }
-        if (date === eventDate) {
-          if (
-            (startTime === eventEndTime || startTime > eventEndTime) &&
-            endTime > eventEndTime
-          ) {
+          if (date > eventDate) {
             return true;
           }
-          if (startTime < eventStartTime && endTime < eventStartTime) {
-            return true;
+          if (date === eventDate) {
+            if (
+              (startTime === eventEndTime || startTime > eventEndTime) &&
+              endTime > eventEndTime
+            ) {
+              return true;
+            }
+            if (
+              startTime < eventStartTime &&
+              (endTime < eventStartTime || endTime < eventStartTime)
+            ) {
+              return true;
+            }
           }
-        }
-        return false;
-      });
+          return false;
+        })
+      );
+
       if (!eventsExist.some(Boolean)) {
         throw new HttpException(
           409,
@@ -86,13 +99,10 @@ class LiveStreamService {
         );
       }
     }
-    const thumbnailPath = `${API_BASE}/media/${file.path
-      .split('/')
-      .splice(-2)
-      .join('/')}`;
+
     const liveStream = await this.liveStream.create({
       ...liveStreamDetails,
-      thumbnail: thumbnailPath,
+      thumbnail: file.path,
       userId: user.id,
     });
     return liveStream;
@@ -450,7 +460,7 @@ class LiveStreamService {
     queryObject,
     trainer
   ): Promise<{ totalCount: number; records: LiveStreamUserRecord[] }> {
-    if (!this.isTrainer(trainer)) {
+    if (!this.isAdmin(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     const order = queryObject.order || 'ASC';
