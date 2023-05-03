@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM } from '@config';
+import { SMTP_USERNAME, SMTP_PASSWORD, SMTP_EMAIL_FROM,SMTP_PORT } from '@config';
 import { Options, MailOptions } from 'nodemailer/lib/smtp-transport';
 import path from 'path';
 import * as ejs from 'ejs';
@@ -11,6 +11,7 @@ import {
 
 const transporterOptions: Options = {
   service: 'gmail',
+  port:SMTP_PORT,
   auth: {
     user: SMTP_USERNAME,
     pass: SMTP_PASSWORD,
