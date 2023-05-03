@@ -25,14 +25,9 @@ class BlogCatRoute implements Routes {
     );
     this.router.get(
       `${this.path}/admin`,
-      passport.authenticate('jwt', { session: false }),
       this.blogCatController.getBlogCatAdmin
     );
-    this.router.get(
-      `${this.path}`,
-      passport.authenticate('jwt', { session: false }),
-      this.blogCatController.getBlogCat
-    );
+    this.router.get(`${this.path}`, this.blogCatController.getBlogCat);
     this.router.put(
       `${this.path}/update/:catId`,
       passport.authenticate('jwt', { session: false }),

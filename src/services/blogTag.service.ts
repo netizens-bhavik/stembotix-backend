@@ -33,9 +33,6 @@ class BlogTagService {
     totalCount: number;
     records: (BlogTag | undefined)[];
   }> {
-    if (!this.isAdmin(user.user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -64,10 +61,6 @@ class BlogTagService {
   }
 
   public async getBlogTags({ user }): Promise<BlogTag[]> {
-    if (!this.isAdmin(user)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
-
     const data: (BlogTag | undefined)[] = await this.blogTag.findAll({
       where: DB.Sequelize.and({
         deletedAt: null,
@@ -112,17 +105,6 @@ class BlogTagService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    // const data = await this.blogTag.findAndCountAll({
-    //   where: {
-    //     tag_id: tagId,
-    //   },
-    // });
-    // if (data.count !== 0) {
-    //   throw new HttpException(
-    //     409,
-    //     'Tags is already in used please change tag and try again'
-    //   );
-    // }
 
     const res: number = await this.blogTag.destroy({
       where: {
