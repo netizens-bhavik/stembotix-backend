@@ -477,9 +477,7 @@ class EmailService {
 
   //Done
   public async forgotPassword(payload: MailPayload) {
-    console.log('payload', payload);
     try {
-      console.log('hello');
       await this.createConnection();
       await this.transporter.verify();
 
@@ -487,9 +485,7 @@ class EmailService {
       const { templateData, mailerData } = payload;
 
       ejs.renderFile(pathToView, templateData, async (err, data) => {
-        console.log('data', data);
         try {
-          console.log('2');
           await this.transporter.sendMail({
             from: `StemBotix: ${SMTP_EMAIL_FROM}`,
             to: mailerData.to,
@@ -505,7 +501,6 @@ class EmailService {
           });
           this.terminateConnection();
         } catch (error) {
-          console.log('error', error);
           return error;
         }
       });
