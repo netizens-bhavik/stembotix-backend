@@ -22,6 +22,9 @@ class ProductService {
   public isAdmin(user): boolean {
     return user.role === 'Admin';
   }
+  public isSuperAdmin(user): boolean {
+    return user.role === 'SuperAdmin';
+  }
 
   public async viewProducts(
     queryObject
@@ -403,7 +406,8 @@ class ProductService {
   }
 
   public async togglePublish({ user, productId }): Promise<{ count: number }> {
-    if (!this.isAdmin(user)) throw new HttpException(403, 'Forbidden Resource');
+    if (!this.isSuperAdmin(user))
+      throw new HttpException(403, 'Forbidden Resource');
     const productRecord = await this.product.findOne({
       where: {
         id: productId,

@@ -44,7 +44,6 @@ class LiveStreamService {
 
     const currentTime = moment().format('HH:mm');
     const currentDate = moment().format('YYYY-MM-DD');
-
     if (startTime === endTime) {
       throw new HttpException(
         409,
@@ -71,28 +70,30 @@ class LiveStreamService {
           );
           const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-          if (date > eventDate) {
-            return true;
+          if (date > eventDate || date < eventDate) {
+            return false;
           }
+
           if (date === eventDate) {
             if (
-              (startTime === eventEndTime || startTime > eventEndTime) &&
+              startTime === eventEndTime ||
+              startTime > eventEndTime ||
+              endTime === eventStartTime ||
               endTime > eventEndTime
             ) {
-              return true;
+              return false;
             }
             if (
               startTime < eventStartTime &&
               (endTime < eventStartTime || endTime < eventStartTime)
             ) {
-              return true;
+              return false;
             }
           }
-          return false;
+          return true;
         })
       );
-
-      if (!eventsExist.some(Boolean)) {
+      if (eventsExist.some(Boolean)) {
         throw new HttpException(
           409,
           'Event already exists at the same date & time. Please change the date & time and try again.'
@@ -243,47 +244,50 @@ class LiveStreamService {
     });
     if (!record) throw new HttpException(404, 'No stream Found');
 
-    const data = await this.liveStream.findAll({
+    const data = await this.liveStream.findAndCountAll({
       where: {
         userId: user.id,
         deletedAt: null,
       },
     });
+    if (data.count > 0) {
+      const eventsExist = await Promise.all(
+        data.rows.map(async (elem) => {
+          const eventDate = elem.date.toJSON().slice(0, 10);
+          const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
+            'HH:mm'
+          );
+          const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-    const eventsExist = await Promise.all(
-      data.map(async (elem) => {
-        const eventDate = elem.date.toJSON().slice(0, 10);
-        const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
-          'HH:mm'
-        );
-        const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
-
-        if (date > eventDate) {
+          if (date > eventDate) {
+            return false;
+          }
+          if (date === eventDate) {
+            if (
+              startTime === eventEndTime ||
+              startTime > eventEndTime ||
+              endTime === eventStartTime ||
+              endTime > eventEndTime
+            ) {
+              return false;
+            }
+            if (
+              startTime < eventStartTime &&
+              (endTime < eventStartTime || endTime < eventStartTime)
+            ) {
+              return false;
+            }
+          }
           return true;
-        }
-        if (date === eventDate) {
-          if (
-            (startTime === eventEndTime || startTime > eventEndTime) &&
-            endTime > eventEndTime
-          ) {
-            return true;
-          }
-          if (
-            startTime < eventStartTime &&
-            (endTime < eventStartTime || endTime < eventStartTime)
-          ) {
-            return true;
-          }
-        }
-        return false;
-      })
-    );
-
-    if (!eventsExist.some(Boolean)) {
-      throw new HttpException(
-        409,
-        'Event already exists at the same date & time. Please change the date & time and try again.'
+        })
       );
+
+      if (eventsExist.some(Boolean)) {
+        throw new HttpException(
+          409,
+          'Event already exists at the same date & time. Please change the date & time and try again.'
+        );
+      }
     }
 
     if (
@@ -515,3 +519,30 @@ class LiveStreamService {
   }
 }
 export default LiveStreamService;
+
+// const time = moment(liveStreamDetails.startTime, 'HH:mm').format(
+//   'HH:mm:ss'
+// );
+// const lastTime = moment(liveStreamDetails.endTime, 'HH:mm').format(
+//   'HH:mm:ss'
+// );
+
+// const event = await this.liveStream.findAndCountAll({
+//   where: {
+//     userId: user.id,
+//     date: date,
+//     startTime: {
+//       [Op.between]: [time, lastTime],
+//     },
+//     endTime: {
+//       [Op.between]: [time, lastTime],
+//     },
+//   },
+// });
+// console.log(event);
+// if (event.count > 0) {
+//   throw new HttpException(
+//     409,
+//     'Event already exists at the same date & time. Please change the date & time and try again.'
+//   );
+// }

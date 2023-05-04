@@ -71,7 +71,7 @@ class BlogService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const response = await this.blog.findAndCountAll({
+    const response = await this.blog.findAll({
       where: {
         deletedAt: null,
       },
@@ -98,7 +98,7 @@ class BlogService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return { totalCount: response.count, records: response.rows };
+    return { totalCount: response.length, records: response };
   }
   public async getBlogbyId({ blogId, user }) {
     const data = await this.blog.findOne({
