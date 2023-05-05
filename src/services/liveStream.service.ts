@@ -140,9 +140,13 @@ class LiveStreamService {
     return { totalCount: data.length, records: data };
   }
 
-  public async viewTodaysEvent(
-    user
-  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+  public async viewTodaysEvent({
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const currentDate = new Date().toJSON().slice(0, 10);
     const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -153,6 +157,8 @@ class LiveStreamService {
         ['date', 'ASC'],
         ['startTime', 'ASC'],
       ],
+      limit: pageSize,
+      offset: pageNo,
     });
     const data = [];
     todaysEvent.rows.map((elem) => {
@@ -167,9 +173,13 @@ class LiveStreamService {
     });
     return { totalCount: data.length, records: data };
   }
-  public async viewUpcommingEvent(
-    user
-  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+  public async viewUpcommingEvent({
+    queryObject,
+  }): Promise<{ totalCount: number; records: object }> {
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const currentDate = new Date().toJSON().slice(0, 10);
     // const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -180,6 +190,8 @@ class LiveStreamService {
         ['date', 'ASC'],
         ['startTime', 'ASC'],
       ],
+      limit: pageSize,
+      offset: pageNo,
     });
     const data = [];
     todaysEvent.rows.map((elem) => {

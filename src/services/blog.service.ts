@@ -10,7 +10,7 @@ class BlogService {
   public user = DB.User;
 
   public isAdmin(user): boolean {
-    return user.role === 'Admin';
+    return user.role === 'SuperAdmin';
   }
 
   public async addBlog({ blogDetails, file, user }): Promise<Blog> {
