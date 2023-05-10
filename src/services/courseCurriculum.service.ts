@@ -39,7 +39,7 @@ class CurriculumSectionService {
       ],
     });
     if (!response) throw new HttpException(403, 'Forbidden Resource');
-    if (user.id !== response.Trainers[0].User.id && user.role !== 'Admin')
+    if (user.id !== response.Trainers[0].User.id && user.role !== 'SuperAdmin')
       throw new HttpException(
         403,
         "You don't have Authority to Add CourseCurriculumn"

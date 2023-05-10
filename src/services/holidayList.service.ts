@@ -16,7 +16,11 @@ class HolidayListService {
   public leaveType = DB.LeaveTypes;
 
   public isInstitute(loggedUser): boolean {
-    return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
+    return (
+      loggedUser.role === 'Institute' ||
+      loggedUser.role === 'Admin' ||
+      loggedUser.role === 'SuperAdmin'
+    );
   }
 
   public async getHolidayList({

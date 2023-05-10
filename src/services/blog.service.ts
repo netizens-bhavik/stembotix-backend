@@ -17,8 +17,10 @@ class BlogService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const tagArray = [...blogDetails.tags];
     let tag = [];
-    blogDetails.tags?.forEach((element) => {
+    console.log('blog', blogDetails);
+    tagArray?.forEach((element) => {
       tag.push(element);
     });
     const blogData = await this.blog.create({

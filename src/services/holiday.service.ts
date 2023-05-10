@@ -20,7 +20,11 @@ class HolidayService {
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
-    return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
+    return (
+      loggedUser.role === 'Institute' ||
+      loggedUser.role === 'Admin' ||
+      loggedUser.role === 'SuperAdmin'
+    );
   }
 
   public async getHolidays({
