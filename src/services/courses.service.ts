@@ -164,8 +164,8 @@ class CourseService {
           courseId: newCourse.id,
         },
         mailData: {
-          from: user.email,
-          to: adminRecord[0].email,
+          from: user?.email,
+          to: adminRecord[0]?.email,
         },
       };
       this.emailService.sendMailPublishCourse(mailData);

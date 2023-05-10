@@ -188,8 +188,8 @@ class OrderService {
           title,
         },
         mailData: {
-          from: adminRecord[0].email,
-          to: orderRecord.User.email,
+          from: adminRecord[0]?.email,
+          to: orderRecord.User?.email,
         },
       };
       this.emailService.sendMailofOrder(mailData);

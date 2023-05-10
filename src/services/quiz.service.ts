@@ -15,7 +15,11 @@ class QuizService {
   public attemptQuizQue = DB.AttemptQuizQue;
 
   public isTrainer(user): boolean {
-    return user.role === 'Instructor' || user.role === 'Admin';
+    return (
+      user.role === 'Instructor' ||
+      user.role === 'Admin' ||
+      user.role === 'SuperAdmin'
+    );
   }
 
   public async createQuiz(quizData: QuizDto, user): Promise<Quiz> {

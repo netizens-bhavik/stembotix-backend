@@ -50,7 +50,7 @@ class CurriculumVideoService {
     }
     if (
       trainer.id !== fetchSection.Course.Trainers[0].User.id &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,
@@ -144,7 +144,7 @@ class CurriculumVideoService {
     });
     if (
       trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,
@@ -209,7 +209,7 @@ class CurriculumVideoService {
     if (!record) throw new HttpException(404, 'No data found');
     if (
       trainer.id !== record.CurriculumSection.Course.Trainers[0].User.id &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,
