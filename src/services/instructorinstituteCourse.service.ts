@@ -135,7 +135,6 @@ class AllCourseForInstituteService {
         offset: pageNo,
         order: [[`${sortBy}`, `${order}`]],
       });
-
       const res = [];
       data.rows.map(function (trainers) {
         trainers.Trainer.Courses.map(function (coursedetails) {
@@ -146,9 +145,8 @@ class AllCourseForInstituteService {
           res.push(customData);
         });
       });
-
       return {
-        totalCount: data.count,
+        totalCount: res.length,
         records: res,
         instituteRecord: response.rows,
       };

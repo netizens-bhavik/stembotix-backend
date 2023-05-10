@@ -10,7 +10,7 @@ class LeaveTypeService {
   public leaveType = DB.LeaveTypes;
 
   public isInstitute(loggedUser): boolean {
-    return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
+    return loggedUser.role === 'Institute' || loggedUser.role === 'SuperAdmin';
   }
 
   public isInstructor(loggedUser): boolean {

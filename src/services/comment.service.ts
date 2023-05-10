@@ -1,4 +1,5 @@
 import { API_BASE } from '@/config';
+import { HttpException } from '@/exceptions/HttpException';
 import { Comment } from '@/interfaces/comment.interface';
 import DB from '@databases';
 import _ from 'lodash';
@@ -16,6 +17,12 @@ class CommentService {
     file,
     courseId,
   }): Promise<Comment> {
+    const data = await this.course.findOne({
+      where: {
+        id: courseId,
+      },
+    });
+    if (!data) throw new HttpException(409, 'No data found');
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
       const thumbnail = file;

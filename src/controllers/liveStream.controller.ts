@@ -49,11 +49,13 @@ class LiveStreamController {
     next: NextFunction
   ) => {
     try {
-      const user = req.user;
+      const { pageRecord, pageNo, search, order, sortBy } = req.query;
+      const queryObject = { pageRecord, pageNo, search, order, sortBy };
+
       const todaysEvent: {
         totalCount: number;
         records: (LiveStream | undefined)[];
-      } = await this.liveStreamService.viewTodaysEvent(user);
+      } = await this.liveStreamService.viewTodaysEvent({ queryObject });
       res.status(200).send(todaysEvent);
     } catch (error) {
       next(error);
@@ -65,11 +67,13 @@ class LiveStreamController {
     next: NextFunction
   ) => {
     try {
-      const user = req.user;
-      const viewUpcommingEvent: {
-        totalCount: number;
-        records: (LiveStream | undefined)[];
-      } = await this.liveStreamService.viewUpcommingEvent(user);
+      const { pageRecord, pageNo, search, order, sortBy } = req.query;
+      const queryObject = { pageRecord, pageNo, search, order, sortBy };
+
+      const viewUpcommingEvent =
+        await this.liveStreamService.viewUpcommingEvent({
+          queryObject,
+        });
       res.status(200).send(viewUpcommingEvent);
     } catch (error) {
       next(error);

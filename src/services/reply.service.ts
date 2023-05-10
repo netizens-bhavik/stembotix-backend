@@ -2,6 +2,7 @@ import DB from '@databases';
 import { API_BASE } from '@/config';
 import { Reply } from '@/interfaces/reply.interface';
 import _ from 'lodash';
+import { HttpException } from '@/exceptions/HttpException';
 
 class ReplyService {
   public reply = DB.Reply;
@@ -14,6 +15,12 @@ class ReplyService {
     user,
     commentId,
   }): Promise<Reply> {
+    const data = await this.comment.findOne({
+      where: {
+        id: commentId,
+      },
+    });
+    if (!data) throw new HttpException(409, 'No data found');
     let thumbnailPath = null;
     if (!_.isEmpty(file)) {
       const thumbnail = file;

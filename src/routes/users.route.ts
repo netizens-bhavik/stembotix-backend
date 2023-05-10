@@ -3,6 +3,8 @@ import UsersController from '@controllers/users.controller';
 import { Routes } from '@interfaces/routes.interface';
 import passport from 'passport';
 import passportConfig from '@/config/passportConfig';
+import validationMiddleware from '@/middlewares/validation.middleware';
+import { CreateAdminDto } from '@/dtos/users.dto';
 class UsersRoute implements Routes {
   public path = '/users';
   public router = Router();
@@ -14,6 +16,19 @@ class UsersRoute implements Routes {
   }
 
   private initializeRoutes() {
+    this.router.post(
+      `${this.path}/createUser`,
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(CreateAdminDto, 'body'),
+      this.usersController.createUserbySuperAdmin
+    );
+    this.router.put(
+      `${this.path}/updateUser/:userId`,
+      passport.authenticate('jwt', { session: false }),
+      validationMiddleware(CreateAdminDto, 'body'),
+      this.usersController.updateUserDetailBySuperAdmin
+    );
+
     this.router.get(
       `${this.path}`,
       passport.authenticate('jwt', { session: false }),

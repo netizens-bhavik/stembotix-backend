@@ -6,6 +6,7 @@ import {
   ValidateIf,
   IsAlphanumeric,
   IsEnum,
+  IsBoolean,
 } from 'class-validator';
 
 export class RegisterUserDto {
@@ -27,6 +28,26 @@ export class RegisterUserDto {
   @IsEnum(['Instructor', 'Institute', 'Student'])
   public role: string;
 }
+export class CreateAdminDto {
+  @IsString()
+  public firstName: string;
+
+  @IsString()
+  public lastName: string;
+
+  @IsEmail()
+  public email: string;
+
+  @IsString()
+  public password: string;
+
+  @IsDateString()
+  public date_of_birth: Date;
+
+  @IsEnum(['Admin', 'Institute', 'Instructor', 'Student'])
+  public role: string;
+}
+
 export class RegisterUserDTO {
   @IsString()
   public firstName: string;

@@ -8,10 +8,7 @@ class CourseTypeService {
   public course = DB.Course;
 
   public isTrainer(user): boolean {
-    return user.role === 'Admin';
-  }
-  public isUser(user): boolean {
-    return user.role === 'Admin' || user.role === 'Instructor';
+    return user.role === 'SuperAdmin';
   }
 
   public async addCourseType(coursetype, user): Promise<Coursetype> {
