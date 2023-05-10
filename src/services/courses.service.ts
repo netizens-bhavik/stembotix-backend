@@ -26,10 +26,10 @@ class CourseService {
   public emailService = new EmailService();
 
   public isTrainer(user): boolean {
-    return user.role === 'Instructor' || user.role === 'Admin';
+    return user.role === 'Instructor' || user.role === 'SuperAdmin';
   }
-  public isAdmin(user): boolean {
-    return user.role === 'Admin';
+  public isSuperAdmin(user): boolean {
+    return user.role === 'SuperAdmin';
   }
   public async viewCourses(
     queryObject
@@ -38,7 +38,7 @@ class CourseService {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
-    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 9;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
@@ -690,7 +690,7 @@ class CourseService {
 
           where: {
             role: {
-              [DB.Sequelize.Op.not]: 'Admin',
+              [DB.Sequelize.Op.not]: 'SuperAdmin',
             },
             [DB.Sequelize.Op.or]: [
               {
@@ -793,7 +793,7 @@ class CourseService {
     trainer,
     courseId,
   }): Promise<{ count: number }> {
-    if (!this.isAdmin(trainer))
+    if (!this.isSuperAdmin(trainer))
       throw new HttpException(403, 'Forbidden Resource');
     const courseRecord = await this.course.findOne({
       where: {

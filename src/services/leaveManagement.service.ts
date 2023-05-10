@@ -23,7 +23,7 @@ class LeaveManagementService {
   }
 
   public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor';
+    return loggedUser.role === 'Instructor' || loggedUser.role === 'Admin';
   }
 
   public isStudent(loggedUser): boolean {
@@ -34,10 +34,7 @@ class LeaveManagementService {
     loggedUser,
     queryObject,
   }): Promise<{ totalCount: number; records: (LeaveData | undefined)[] }> {
-    if (
-      this.isInstructor(loggedUser) ||
-      (this.isStudent(loggedUser) && !this.isInstitute(loggedUser))
-    ) {
+    if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
     const order = queryObject.order || 'DESC';

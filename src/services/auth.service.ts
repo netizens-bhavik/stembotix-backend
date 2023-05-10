@@ -202,8 +202,6 @@ class AuthService {
     });
     if (!emailRecord) throw new HttpException(400, 'Account not found');
     const token = crypto.randomBytes(20).toString('hex');
-    // const expiresAt = new Date();
-    // expiresAt.setMinutes(expiresAt.getMinutes() + 1);
     await this.passwordToken.createToken(token, emailRecord);
 
     const mailData: MailPayload = {
@@ -246,14 +244,6 @@ class AuthService {
     if (!userRecord) throw new HttpException(500, 'Error occurred try again');
     record.destroy();
     return { message: 'Password reset successfully' };
-  }
-  public async checkAccountPassword({ user, userId }) {
-    const userRecord = await this.user.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    return userRecord;
   }
 }
 

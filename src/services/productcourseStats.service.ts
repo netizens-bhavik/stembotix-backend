@@ -11,7 +11,7 @@ class CourseProductStatsService {
     return user.role === 'Instructor';
   }
   public isInstitute(user): boolean {
-    return user.role === 'Institute' || user.role === 'Admin';
+    return user.role === 'Institute';
   }
 
   public async courseStatsforInstructor(user) {

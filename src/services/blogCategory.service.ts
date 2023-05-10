@@ -32,7 +32,7 @@ class BlogCategoryService {
     user
   ): Promise<{
     totalCount: number;
-    records: (BlogCategory[] | undefined)[];
+    records: (BlogCategory | undefined)[];
   }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -44,18 +44,17 @@ class BlogCategoryService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const data: (BlogCategory | undefined)[] =
-      await this.blogCategory.findAndCountAll({
-        where: DB.Sequelize.and({
-          deletedAt: null,
-          cat_name: {
-            [searchCondition]: search,
-          },
-        }),
-        limit: pageSize,
-        offset: pageNo,
-        order: [[`${sortBy}`, `${order}`]],
-      });
+    const data = await this.blogCategory.findAndCountAll({
+      where: DB.Sequelize.and({
+        deletedAt: null,
+        cat_name: {
+          [searchCondition]: search,
+        },
+      }),
+      limit: pageSize,
+      offset: pageNo,
+      order: [[`${sortBy}`, `${order}`]],
+    });
     return { totalCount: data.count, records: data.rows };
   }
 

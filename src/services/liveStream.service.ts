@@ -19,7 +19,14 @@ class LiveStreamService {
   public livestreamchatlogs = DB.LiveStreamChatLogs;
 
   public isTrainer(user): boolean {
-    return user.role === 'Instructor' || user.role === 'Admin';
+    return user.role === 'Instructor' || user.role === 'SuperAdmin';
+  }
+  public isAdmin(user): boolean {
+    return (
+      user.role === 'Instructor' ||
+      user.role === 'SuperAdmin' ||
+      user.role === 'Admin'
+    );
   }
   public isUser(user): boolean {
     return user.role === 'Student';
@@ -37,7 +44,6 @@ class LiveStreamService {
 
     const currentTime = moment().format('HH:mm');
     const currentDate = moment().format('YYYY-MM-DD');
-
     if (startTime === endTime) {
       throw new HttpException(
         409,
@@ -64,46 +70,43 @@ class LiveStreamService {
           );
           const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-          if (date > eventDate) {
-            return true;
+          if (date > eventDate || date < eventDate) {
+            return false;
           }
+
           if (date === eventDate) {
             if (
-              (startTime === eventEndTime || startTime > eventEndTime) &&
+              startTime === eventEndTime ||
+              startTime > eventEndTime ||
+              endTime === eventStartTime ||
               endTime > eventEndTime
             ) {
-              return true;
+              return false;
             }
             if (
               startTime < eventStartTime &&
               (endTime < eventStartTime || endTime < eventStartTime)
             ) {
-              return true;
+              return false;
             }
           }
-          return false;
+          return true;
         })
       );
-
-      if (!eventsExist.some(Boolean)) {
+      if (eventsExist.some(Boolean)) {
         throw new HttpException(
           409,
           'Event already exists at the same date & time. Please change the date & time and try again.'
         );
       }
-    } else {
-      const thumbnailPath = `${API_BASE}/media/${file.path
-        .split('/')
-        .splice(-2)
-        .join('/')}`;
-
-      const liveStream = await this.liveStream.create({
-        ...liveStreamDetails,
-        thumbnail: thumbnailPath,
-        userId: user.id,
-      });
-      return liveStream;
     }
+
+    const liveStream = await this.liveStream.create({
+      ...liveStreamDetails,
+      thumbnail: file.path,
+      userId: user.id,
+    });
+    return liveStream;
   }
 
   public async viewLiveStream(user): Promise<{
@@ -137,9 +140,13 @@ class LiveStreamService {
     return { totalCount: data.length, records: data };
   }
 
-  public async viewTodaysEvent(
-    user
-  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+  public async viewTodaysEvent({
+    queryObject,
+  }): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const currentDate = new Date().toJSON().slice(0, 10);
     const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -150,6 +157,8 @@ class LiveStreamService {
         ['date', 'ASC'],
         ['startTime', 'ASC'],
       ],
+      limit: pageSize,
+      offset: pageNo,
     });
     const data = [];
     todaysEvent.rows.map((elem) => {
@@ -164,9 +173,13 @@ class LiveStreamService {
     });
     return { totalCount: data.length, records: data };
   }
-  public async viewUpcommingEvent(
-    user
-  ): Promise<{ totalCount: number; records: (LiveStream | undefined)[] }> {
+  public async viewUpcommingEvent({
+    queryObject,
+  }): Promise<{ totalCount: number; records: object }> {
+    // pagination
+    const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
+    const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const currentDate = new Date().toJSON().slice(0, 10);
     // const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -177,6 +190,8 @@ class LiveStreamService {
         ['date', 'ASC'],
         ['startTime', 'ASC'],
       ],
+      limit: pageSize,
+      offset: pageNo,
     });
     const data = [];
     todaysEvent.rows.map((elem) => {
@@ -241,47 +256,50 @@ class LiveStreamService {
     });
     if (!record) throw new HttpException(404, 'No stream Found');
 
-    const data = await this.liveStream.findAll({
+    const data = await this.liveStream.findAndCountAll({
       where: {
         userId: user.id,
         deletedAt: null,
       },
     });
+    if (data.count > 0) {
+      const eventsExist = await Promise.all(
+        data.rows.map(async (elem) => {
+          const eventDate = elem.date.toJSON().slice(0, 10);
+          const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
+            'HH:mm'
+          );
+          const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
 
-    const eventsExist = await Promise.all(
-      data.map(async (elem) => {
-        const eventDate = elem.date.toJSON().slice(0, 10);
-        const eventStartTime = moment(elem.startTime, 'HH:mm:ss').format(
-          'HH:mm'
-        );
-        const eventEndTime = moment(elem.endTime, 'HH:mm:ss').format('HH:mm');
-
-        if (date > eventDate) {
+          if (date > eventDate) {
+            return false;
+          }
+          if (date === eventDate) {
+            if (
+              startTime === eventEndTime ||
+              startTime > eventEndTime ||
+              endTime === eventStartTime ||
+              endTime > eventEndTime
+            ) {
+              return false;
+            }
+            if (
+              startTime < eventStartTime &&
+              (endTime < eventStartTime || endTime < eventStartTime)
+            ) {
+              return false;
+            }
+          }
           return true;
-        }
-        if (date === eventDate) {
-          if (
-            (startTime === eventEndTime || startTime > eventEndTime) &&
-            endTime > eventEndTime
-          ) {
-            return true;
-          }
-          if (
-            startTime < eventStartTime &&
-            (endTime < eventStartTime || endTime < eventStartTime)
-          ) {
-            return true;
-          }
-        }
-        return false;
-      })
-    );
-
-    if (!eventsExist.some(Boolean)) {
-      throw new HttpException(
-        409,
-        'Event already exists at the same date & time. Please change the date & time and try again.'
+        })
       );
+
+      if (eventsExist.some(Boolean)) {
+        throw new HttpException(
+          409,
+          'Event already exists at the same date & time. Please change the date & time and try again.'
+        );
+      }
     }
 
     if (
@@ -458,6 +476,9 @@ class LiveStreamService {
     queryObject,
     trainer
   ): Promise<{ totalCount: number; records: LiveStreamUserRecord[] }> {
+    if (!this.isAdmin(trainer)) {
+      throw new HttpException(403, 'Forbidden Resource');
+    }
     const order = queryObject.order || 'ASC';
 
     // pagination
@@ -467,9 +488,6 @@ class LiveStreamService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    if (!this.isTrainer(trainer)) {
-      throw new HttpException(403, 'Forbidden Resource');
-    }
 
     const response = await this.livestreamchatlogs.findAndCountAll({
       where: { livestream_id: livestreamId },
@@ -513,3 +531,30 @@ class LiveStreamService {
   }
 }
 export default LiveStreamService;
+
+// const time = moment(liveStreamDetails.startTime, 'HH:mm').format(
+//   'HH:mm:ss'
+// );
+// const lastTime = moment(liveStreamDetails.endTime, 'HH:mm').format(
+//   'HH:mm:ss'
+// );
+
+// const event = await this.liveStream.findAndCountAll({
+//   where: {
+//     userId: user.id,
+//     date: date,
+//     startTime: {
+//       [Op.between]: [time, lastTime],
+//     },
+//     endTime: {
+//       [Op.between]: [time, lastTime],
+//     },
+//   },
+// });
+// console.log(event);
+// if (event.count > 0) {
+//   throw new HttpException(
+//     409,
+//     'Event already exists at the same date & time. Please change the date & time and try again.'
+//   );
+// }

@@ -10,11 +10,15 @@ class InstituteInstructorService {
   public emailService = new EmailService();
 
   public isInstitute(loggedUser): boolean {
-    return loggedUser.role === 'Institute' || loggedUser.role === 'Admin';
+    return (
+      loggedUser.role === 'Institute' ||
+      loggedUser.role === 'SuperAdmin' ||
+      loggedUser.role === 'Admin'
+    );
   }
 
   public isInstructor(loggedUser): boolean {
-    return loggedUser.role === 'Instructor' || loggedUser.role === 'Admin';
+    return loggedUser.role === 'Instructor' || loggedUser.role === 'SuperAdmin';
   }
 
   public async createInstructorRequest({ loggedUser, instructorDetail }) {

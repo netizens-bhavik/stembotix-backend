@@ -13,7 +13,7 @@ class CurriculumVideoService {
   public courseTrainer = DB.CoursesTrainers;
 
   public isTrainer(user): boolean {
-    return user.role === 'Instructor' || user.role === 'Admin';
+    return user.role === 'Instructor' || user.role === 'SuperAdmin';
   }
   public async addVideo({
     curriculumVideoDetails,

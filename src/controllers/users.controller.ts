@@ -4,7 +4,44 @@ import UserService from '@services/users.service';
 
 class UsersController {
   public userService = new UserService();
-
+  public createUserbySuperAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const adminDetail = req.body;
+      const user = req.user;
+      const record = await this.userService.createUserbySuperAdmin({
+        adminDetail,
+        user,
+      });
+      res
+        .status(200)
+        .send({ record: record, message: 'User created successfully' });
+    } catch (err) {
+      next(err);
+    }
+  };
+  public updateUserDetailBySuperAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = req.user;
+      const { userId } = req.params;
+      const userDetail = req.body;
+      const response = await this.userService.updateUserDetailBySuperAdmin({
+        user,
+        userId,
+        userDetail,
+      });
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const loggedUser = req.user;
