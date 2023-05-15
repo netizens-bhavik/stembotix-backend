@@ -7,7 +7,7 @@ class BlogTagService {
   public blog = DB.Blogs;
 
   public isAdmin(user): boolean {
-    return user.role === 'Admin';
+    return user.role === 'Admin' || user.role === 'SuperAdmin';
   }
 
   public async addBlogTags({ tag, user }): Promise<BlogTag> {

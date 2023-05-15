@@ -26,4 +26,6 @@ export const {
   SMTP_PASSWORD,
   SMTP_EMAIL_FROM,
   SMTP_PORT,
+  REDIS_HOST,
+  REDIS_PORT,
 } = process.env;

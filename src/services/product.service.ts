@@ -217,8 +217,8 @@ class ProductService {
           productName: newProduct.title,
         },
         mailData: {
-          from: user.email,
-          to: adminRecord[0].email,
+          from: user?.email,
+          to: adminRecord[0]?.email,
         },
       };
       this.emailService.sendMailPublishProduct(mailData);
