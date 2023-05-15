@@ -14,14 +14,12 @@ class BlogReviewController {
       const reviewDetails = req.body;
       const user = req.user;
       const { blogId } = req.params;
-      const response: BlogReview = await this.blogReviewService.addReview({
+      const response = await this.blogReviewService.addReview({
         reviewDetails,
         user,
         blogId,
       });
-      res
-        .status(200)
-        .send({ response: response, message: 'Review Added Successfully' });
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }
