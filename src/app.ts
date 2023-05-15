@@ -6,15 +6,7 @@ import hpp from 'hpp';
 import morgan from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import {
-  NODE_ENV,
-  PORT,
-  LOG_FORMAT,
-  ORIGIN,
-  CREDENTIALS,
-  REDIS_HOST,
-  REDIS_PORT,
-} from '@config';
+import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
 import DB from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -26,9 +18,7 @@ import http, { Server } from 'http';
 import https, { Server as SecureServer } from 'https';
 import { readFileSync } from 'fs';
 import socketServer from './socket';
-import redis from 'redis';
-import connectRedis from 'connect-redis';
-import session from 'express-session';
+import { RedisFunctions } from './redis';
 
 class App {
   public app: express.Application;
@@ -38,6 +28,7 @@ class App {
   public socket: any;
   public httpServer: Server;
   public httpsServer: SecureServer;
+  public redisInit = new RedisFunctions();
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
 
   constructor(routes: Routes[]) {
@@ -47,7 +38,6 @@ class App {
     this.app.set('view engine', 'ejs');
     this.app.set('views', path.join(__dirname, '/view'));
     this.connectToDatabase();
-    this.initializeRedis();
     this.initializeSwagger();
     this.initializeMiddlewares();
     this.bootFiles.init();
@@ -55,6 +45,7 @@ class App {
     this.initializeErrorHandling();
     this.httpServer = http.createServer(this.app);
     this.httpsServer = https.createServer(this.getCredentials(), this.app);
+    this.redisInit;
   }
 
   public getCredentials() {
@@ -89,23 +80,6 @@ class App {
       return err;
     });
   }
-
-  // private initializeRedis() {
-  //   const RedisStore = new connectRedis(session);
-  //   const redisClient = redis.createClient({
-  //     DB_HOST: REDIS_HOST,
-  //     DB_PORT: REDIS_PORT,
-  //   });
-
-  //   this.app.use(
-  //     session({
-  //       store: new RedisStore({ client: redisClient }),
-  //       secret: 'your-secret',
-  //       resave: false,
-  //       saveUninitialized: false,
-  //     })
-  //   );
-  // }
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));

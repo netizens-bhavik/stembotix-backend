@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 import { Course } from '@/interfaces/course.interface';
 import sequelize from 'sequelize';
 import moment from 'moment';
+import { RedisFunctions } from '@/redis';
 
 class AllOrderService {
   public product = DB.Product;
@@ -14,6 +15,7 @@ class AllOrderService {
   public course = DB.Course;
   public trainer = DB.Trainer;
   public productuser = DB.ProductUser;
+  private redisFunctions = new RedisFunctions();
 
   public isSuperAdmin(user): boolean {
     return user.role === 'SuperAdmin' || user.role === 'Admin';
@@ -45,6 +47,12 @@ class AllOrderService {
     const orderDate = queryObject.orderDate
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
+
+    const cacheKey = `allProductOrder:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const response = await this.orderitem.findAndCountAll({
       where: {
@@ -93,6 +101,13 @@ class AllOrderService {
         return true;
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
 
     return { totalCount: data.length, records: data };
   }
@@ -118,6 +133,12 @@ class AllOrderService {
     const orderDate = queryObject.orderDate
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
+
+    const cacheKey = `allCourseOrder:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const response = await this.orderitem.findAndCountAll({
       where: {
@@ -162,6 +183,13 @@ class AllOrderService {
         return true;
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
 
     return { totalCount: data.length, records: data };
   }
@@ -213,7 +241,11 @@ class AllOrderService {
     const orderDate = queryObject.orderDate
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
-
+    const cacheKey = `instructorCourse_${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.orderitem.findAndCountAll({
       where: {
         [DB.Sequelize.Op.and]: [
@@ -266,7 +298,13 @@ class AllOrderService {
         return true;
       }
     });
-    if (!data) throw new HttpException(409, 'No data found');
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.length, records: data };
   }
   public async getOrderProductDataByInstructor(
@@ -288,6 +326,12 @@ class AllOrderService {
     const orderDate = queryObject.orderDate
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
+
+    const cacheKey = `instructorProduct_${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const response = await this.orderitem.findAndCountAll({
       where: {
@@ -325,6 +369,7 @@ class AllOrderService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+
     let data = [];
     data = response.rows.filter((record) => {
       if (orderDate) {
@@ -332,10 +377,18 @@ class AllOrderService {
         if (moment(date).format('L') === moment(orderDate).format('L')) {
           return true;
         }
+        const cacheKey = `getBlog:${user.id}`;
       } else {
         return true;
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.length, records: data };
   }
 
@@ -359,6 +412,11 @@ class AllOrderService {
     const orderDate = queryObject.orderDate
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
+    const cacheKey = `instituteProduct_${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const response = await this.orderitem.findAndCountAll({
       where: {
@@ -409,6 +467,13 @@ class AllOrderService {
         return true;
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
 
     return { totalCount: data.length, records: data };
   }

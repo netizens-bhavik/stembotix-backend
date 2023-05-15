@@ -3,7 +3,6 @@ const options: DotenvConfigOptions = {
   path: `.env.${process.env.NODE_ENV || 'development'}.local`,
 };
 config();
-
 export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const {
   NODE_ENV,

@@ -1,10 +1,12 @@
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 import { BlogCategory } from '@interfaces/blogCategory.interface';
 
 class BlogCategoryService {
   public blogCategory = DB.BlogCategory;
   public blog = DB.Blog;
+  private redisFunctions = new RedisFunctions();
 
   public isAdmin(user): boolean {
     return user.role === 'Admin' || user.role === 'SuperAdmin';
@@ -43,6 +45,11 @@ class BlogCategoryService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+    const cacheKey = `blogCat:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const data = await this.blogCategory.findAndCountAll({
       where: DB.Sequelize.and({
@@ -55,10 +62,23 @@ class BlogCategoryService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.count, records: data.rows };
   }
 
-  public async getBlogCat({ user }): Promise<BlogCategory[]> {
+  public async getBlogCat(user): Promise<BlogCategory[]> {
+    const cacheKey = `getBlogCat:${user.id}`;
+
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data: (BlogCategory | undefined)[] = await this.blogCategory.findAll({
       where: {
         deletedAt: null,
@@ -67,6 +87,8 @@ class BlogCategoryService {
         model: this.blog,
       },
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
+
     return data;
   }
 

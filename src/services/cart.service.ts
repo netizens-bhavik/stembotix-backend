@@ -2,6 +2,7 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { CartItem } from '@/interfaces/cart.interface';
 import { QuantityOperation } from '@dtos/cart.dto';
+import { RedisFunctions } from '@/redis';
 enum ItemTypes {
   Product = 'Product',
   Course = 'Course',
@@ -14,6 +15,8 @@ class CartService {
   public cartItem = DB.CartItem;
   public discountCouponMap = DB.DiscountCouponMap;
   public discountCoupon = DB.DiscountCode;
+  private redisFunctions = new RedisFunctions();
+
   public itemType = {};
   public async addProductToCart(
     userId: string,
@@ -114,6 +117,12 @@ class CartService {
     return { message };
   }
   public async viewCart(userId) {
+    const cacheKey = `viewCart:${userId}`;
+
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const cart = await this.cart.findOne({
       where: DB.Sequelize.and({ user_id: userId }),
       include: [
@@ -140,6 +149,8 @@ class CartService {
       ],
       order: [[{ model: this.cartItem, as: 'CartItems' }, 'created_at', 'ASC']],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(cart));
+
     if (!cart) return { message: 'Empty Cart' };
     return cart;
   }

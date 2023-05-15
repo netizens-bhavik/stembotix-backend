@@ -2,6 +2,7 @@ import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { CurriculumSection } from '@/interfaces/curriculumSection.interface';
 import { Course } from '@/interfaces/course.interface';
+import { RedisFunctions } from '@/redis';
 
 class CurriculumSectionService {
   public curriculumSection = DB.CurriculumSection;
@@ -10,6 +11,7 @@ class CurriculumSectionService {
   public trainer = DB.Trainer;
   public user = DB.User;
   public courseTrainer = DB.CoursesTrainers;
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'SuperAdmin';
@@ -22,6 +24,7 @@ class CurriculumSectionService {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+
     const response = await this.course.findOne({
       where: {
         id: curriculumDetails.course_id,
@@ -74,7 +77,11 @@ class CurriculumSectionService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `viewSection:${courseId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const sectionData = await this.curriculumSection.findAndCountAll({
       where: { course_id: courseId },
     });
@@ -101,6 +108,14 @@ class CurriculumSectionService {
         offset: pageNo,
         order: [[`${sortBy}`, `${order}`]],
       });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: sectionData.count,
+        records: data,
+      })
+    );
+
     return { totalCount: sectionData.count, records: data };
   }
   public async updateSection({

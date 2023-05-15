@@ -2,11 +2,13 @@ import DB from '@databases';
 import { Contact } from '@/interfaces/contact.interface';
 import { Mail } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
+import { RedisFunctions } from '@/redis';
 
 class ContactService {
   public contact = DB.Contact;
   public user = DB.User;
   public emailService = new EmailService();
+  private redisFunctions = new RedisFunctions();
 
   public async addContact({ contactDetails, user }): Promise<Contact> {
     const adminRecord = await this.user.findAll({
@@ -46,6 +48,11 @@ class ContactService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getContact:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const contactData = await this.contact.findAndCountAll({
       where: DB.Sequelize.and({ deletedAt: null }),
     });
@@ -61,10 +68,23 @@ class ContactService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: contactData.count,
+        records: data,
+      })
+    );
     return { totalCount: contactData.count, records: data };
   }
 
-  public async getContactById(contactId: string): Promise<Contact> {
+  public async getContactById({ contactId }): Promise<Contact> {
+    const cacheKey = `viewContact:${contactId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
     const response = await this.contact.findOne({
       where: {
         id: contactId,
@@ -73,6 +93,8 @@ class ContactService {
         model: this.user,
       },
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return response;
   }
 

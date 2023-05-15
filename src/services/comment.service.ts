@@ -1,6 +1,7 @@
 import { API_BASE } from '@/config';
 import { HttpException } from '@/exceptions/HttpException';
 import { Comment } from '@/interfaces/comment.interface';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 import _ from 'lodash';
 class CommentService {
@@ -10,6 +11,7 @@ class CommentService {
   public user = DB.User;
   public course = DB.Course;
   public likedislike = DB.LikeDislike;
+  private redisFunctions = new RedisFunctions();
 
   public async addComment({
     commentDetail,
@@ -42,6 +44,11 @@ class CommentService {
   }
 
   public async getCommentById(commentId): Promise<Comment> {
+    const cacheKey = `getComment:${commentId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.comment.findAll({
       where: {
         id: commentId,
@@ -52,6 +59,8 @@ class CommentService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return response;
   }
 
@@ -69,7 +78,11 @@ class CommentService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `allComment:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const commentData = await this.comment.findAndCountAll({
       where: { deleted_at: null },
     });
@@ -101,7 +114,15 @@ class CommentService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    return { totalCount: commentData.count, records: data };
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: commentData.count,
+        records: data,
+      })
+    );
+    const result = { totalCount: commentData.count, records: data };
+    return result;
   }
   public async updateComment({
     commentDetail,

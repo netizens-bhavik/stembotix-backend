@@ -1,4 +1,5 @@
 import { CompleteQuiz } from '@/interfaces/completeQuiz.interface';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 
 export type CompleteQuizType = {
@@ -10,6 +11,7 @@ class CompleteQuizService {
   public user = DB.User;
   public quiz = DB.Quiz;
   public completeQuiz = DB.CompleteQuiz;
+  private redisFunctions = new RedisFunctions();
 
   public async createCompleteQuiz(quizid, user): Promise<CompleteQuiz> {
     const completeData = {
@@ -21,14 +23,21 @@ class CompleteQuizService {
 
     return response;
   }
-  public async getCompleteQuizById(quizid): Promise<CompleteQuizType> {
+  public async getCompleteQuizById(quizId): Promise<CompleteQuizType> {
+    const cacheKey = `completeQuiz:${quizId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     let message = 'This is your Record';
     const record = await this.completeQuiz.findOne({
       where: {
         completeQuiz: true,
-        quiz_id: quizid,
+        quiz_id: quizId,
       },
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(record));
+
     if (!record) message = 'No record found';
     return { record, message };
   }

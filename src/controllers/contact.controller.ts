@@ -52,10 +52,10 @@ class ContactController {
     next: NextFunction
   ) => {
     try {
-      const { contactId } = req.body;
-      const coursesData: Contact = await this.contactService.getContactById(
-        contactId
-      );
+      const { contactId } = req.params;
+      const coursesData: Contact = await this.contactService.getContactById({
+        contactId,
+      });
       res.status(200).send(coursesData);
     } catch (error) {
       next(error);

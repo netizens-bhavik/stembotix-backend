@@ -1,10 +1,12 @@
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 import { BlogReview } from '@interfaces/blogReview.interface';
 class BlogReviewService {
   public blogReview = DB.BlogReview;
   public blog = DB.Blog;
   public user = DB.User;
+  private redisFunctions = new RedisFunctions();
 
   public async addReview({ reviewDetails, user, blogId }): Promise<BlogReview> {
     if (!user) {
@@ -20,10 +22,17 @@ class BlogReviewService {
         userId: user.id,
       },
     });
+
     return reviewData;
   }
 
   public async getBlogReview({ blogId }): Promise<BlogReview[]> {
+    const cacheKey = `getBlogRev:${blogId}`;
+
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.blogReview.findAll({
       where: {
         blogId: blogId,
@@ -35,6 +44,9 @@ class BlogReviewService {
         },
       ],
     });
+    console.log(response);
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return response;
   }
   public async updateBlogReviews({
