@@ -69,6 +69,7 @@ class GalleryService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const cacheKey = `allAllGallery:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
