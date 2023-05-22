@@ -20,10 +20,7 @@ class LiveStreamChatController {
       const liveStreamChatResponse: LiveStreamChat =
         await this.liveStreamchatService.getLiveStreamChatMsg(livestreamId);
 
-      res.status(200).json({
-        message: 'LiveStreamChat messages fetched successfully',
-        data: liveStreamChatResponse,
-      });
+      res.status(200).send(liveStreamChatResponse);
     } catch (err) {
       next(err);
     }

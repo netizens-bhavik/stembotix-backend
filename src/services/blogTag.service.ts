@@ -25,6 +25,7 @@ class BlogTagService {
         userId: user.id,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return tagData;
   }
 
@@ -119,6 +120,7 @@ class BlogTagService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateData[0], rows: updateData[1] };
   }
 
@@ -132,6 +134,7 @@ class BlogTagService {
         id: tagId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'Blog Tag Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');

@@ -112,7 +112,7 @@ class HolidayService {
       ...holidayData,
       instituteId: loggedUser.id,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return createHolidayData;
   }
 
@@ -148,6 +148,7 @@ class HolidayService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return updateHolidayData;
   }
 
@@ -173,6 +174,7 @@ class HolidayService {
     const deleteHolidayData = await this.holiday.destroy({
       where: { id: holidayId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (deleteHolidayData === 1)
       throw new HttpException(200, 'Holiday deleted successfully');
     return { count: deleteHolidayData };

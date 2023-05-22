@@ -10,6 +10,7 @@ import {
 import convertTimeTo12Hour from '@utils/timeStamp/timestamp';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 import moment from 'moment';
+import { RedisFunctions } from '@/redis';
 
 class LiveStreamService {
   public user = DB.User;
@@ -17,6 +18,7 @@ class LiveStreamService {
   public trainer = DB.Trainer;
   public subscribeEvent = DB.SubscribeEvent;
   public livestreamchatlogs = DB.LiveStreamChatLogs;
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'SuperAdmin';
@@ -106,6 +108,7 @@ class LiveStreamService {
       thumbnail: file.path,
       userId: user.id,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return liveStream;
   }
 
@@ -113,6 +116,11 @@ class LiveStreamService {
     totalCount: number;
     records: (LiveStream | undefined)[];
   }> {
+    const cacheKey = `viewLiveStream:${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const currentDate = moment().format('YYYY-MM-DD');
     const currentTime = moment().format('HH:mm:ss');
     const streamData = await this.liveStream.findAndCountAll({
@@ -137,6 +145,13 @@ class LiveStreamService {
         data.push(elem);
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.length, records: data };
   }
 
@@ -147,6 +162,11 @@ class LiveStreamService {
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
 
+    const cacheKey = `viewTodaysEvent:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const currentDate = new Date().toJSON().slice(0, 10);
     const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -171,6 +191,13 @@ class LiveStreamService {
         data.push(elem);
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.length, records: data };
   }
   public async viewUpcommingEvent({
@@ -180,6 +207,11 @@ class LiveStreamService {
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
 
+    const cacheKey = `viewUpcommingEvent:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const currentDate = new Date().toJSON().slice(0, 10);
     // const currentTime = moment().format('HH:mm:ss');
     const todaysEvent = await this.liveStream.findAndCountAll({
@@ -201,10 +233,22 @@ class LiveStreamService {
         data.push(elem);
       }
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.length,
+        records: data,
+      })
+    );
     return { totalCount: data.length, records: data };
   }
 
   public async viewLiveStreambyId(livestreamId): Promise<LiveStream> {
+    const cacheKey = `viewLiveStreambyId:${livestreamId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const streamData = await this.liveStream.findOne({
       where: {
         id: livestreamId,
@@ -222,6 +266,7 @@ class LiveStreamService {
     if (!streamData) throw new HttpException(400, 'No event found');
     streamData.startTime = convertTimeTo12Hour(streamData.startTime);
     streamData.endTime = convertTimeTo12Hour(streamData.endTime);
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(streamData));
     return streamData;
   }
   public async updateLiveStream({
@@ -346,6 +391,7 @@ class LiveStreamService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateLiveStream[0], rows: updateLiveStream[1] };
   }
 
@@ -392,6 +438,7 @@ class LiveStreamService {
     if (res === 1) {
       throw new HttpException(200, 'Event has been deleted');
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
   public async viewLiveStreamByAdmin(
@@ -407,6 +454,12 @@ class LiveStreamService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `viewLiveStreamByAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const liveStreamData = await this.liveStream.findAndCountAll({
       where: DB.Sequelize.and(
         { deletedAt: null },
@@ -423,7 +476,13 @@ class LiveStreamService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: liveStreamData.count,
+        records: liveStreamData.rows,
+      })
+    );
     return { totalCount: liveStreamData.count, records: liveStreamData.rows };
   }
   public async listLiveEvent(
@@ -443,6 +502,11 @@ class LiveStreamService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `listLiveEvent:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const trainerRecord = await this.trainer.findOne({
       where: { user_id: trainer.id },
     });
@@ -466,6 +530,13 @@ class LiveStreamService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: liveStream.count,
+        records: liveStream.rows,
+      })
+    );
     return { totalCount: liveStream.count, records: liveStream.rows };
   }
   public async getUserTimeLogByEventId(
@@ -476,8 +547,9 @@ class LiveStreamService {
     if (!this.isAdmin(trainer)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const order = queryObject.order || 'ASC';
 
+    const order = queryObject.order || 'ASC';
+    
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
@@ -485,6 +557,11 @@ class LiveStreamService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+    const cacheKey = `getUserTimeLogByEventId:${livestreamId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const response = await this.livestreamchatlogs.findAndCountAll({
       where: { livestream_id: livestreamId },
@@ -509,6 +586,13 @@ class LiveStreamService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
   public async deleteUserAttendance(
@@ -520,6 +604,7 @@ class LiveStreamService {
     const record = await this.livestreamchatlogs.destroy({
       where: { id: livestreamchatlogsId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (record === 1)
       throw new HttpException(200, 'Attendence Deleted Successfully');
     if (record === 0) throw new HttpException(404, 'No Data found');

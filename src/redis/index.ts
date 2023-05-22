@@ -4,6 +4,7 @@ import RedisClient from '@redis/client/dist/lib/client';
 
 export class RedisFunctions {
   private client;
+
   constructor() {
     this.redisInit();
   }
@@ -17,7 +18,7 @@ export class RedisFunctions {
           port: REDIS_PORT || '6379',
         },
       });
-      this.client.connect().catch(console.error);
+      await this.client.connect();
     } catch (error) {
       logger.error(error);
     }
@@ -30,14 +31,14 @@ export class RedisFunctions {
 
   public async setKey(key, data) {
     try {
-      await this.client.set(key, data, { NX: true });
+      await this.client.set(key, data, { NX: true, EX: 120 });
     } catch (error) {
       console.log(error);
     }
   }
 
   public async updateKey(key, data) {
-    await this.client.set(key, data, { XX: true });
+    await this.client.set(key, data, { XX: true, EX: 120 });
   }
 
   public async checkIfKeyExists(key: string): Promise<boolean> {
@@ -52,6 +53,7 @@ export class RedisFunctions {
   public async deleteByKey(key: string) {
     await this.client.del(key);
   }
+
   public async disconnectRedis() {
     await this.client.disconnect();
   }

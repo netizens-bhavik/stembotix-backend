@@ -12,6 +12,7 @@ class UserService {
   public course = DB.Course;
   public product = DB.Product;
   public role = DB.Role;
+  public trainer = DB.Trainer;
   public emailService = new EmailService();
 
   public isSuperAdmin(userData): boolean {
@@ -37,6 +38,11 @@ class UserService {
       ...adminDetail,
       role_id: record.id,
     });
+    if (adminDetail.role.match(/Instructor/i)) {
+      await this.trainer.create({
+        user_id: createAdmin.id,
+      });
+    }
     if (createAdmin) {
       var userUpdate = await this.users.update(
         { isEmailVerified: true },

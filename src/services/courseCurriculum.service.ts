@@ -51,6 +51,7 @@ class CurriculumSectionService {
       ...curriculumDetails,
       userId: user.id,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return {
       id: newCurriculum.id,
       title: newCurriculum.title,
@@ -161,7 +162,7 @@ class CurriculumSectionService {
         returning: true,
       }
     );
-
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateSection[0], rows: updateSection[1] };
   }
 
@@ -200,6 +201,7 @@ class CurriculumSectionService {
         id: curriculumId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 }

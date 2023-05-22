@@ -67,7 +67,7 @@ class CurriculumVideoService {
       video_url: file.path,
       curriculum_id: fetchSection.id,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return {
       id: newVideo.id,
       title: newVideo.title,
@@ -181,6 +181,7 @@ class CurriculumVideoService {
           returning: true,
         }
       );
+      await this.redisFunctions.removeDataFromRedis();
       return { count: updateVideo[0], rows: updateVideo[1] };
     }
     const updateVideo = await this.curriculumVideo.update(
@@ -194,6 +195,7 @@ class CurriculumVideoService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateVideo[0], rows: updateVideo[1] };
   }
 
@@ -237,6 +239,7 @@ class CurriculumVideoService {
         id: videoId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'CurriculumnVideo Deleted Successfully');
     return { count: res };

@@ -1,3 +1,4 @@
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 class LeaveTypeService {
@@ -8,6 +9,7 @@ class LeaveTypeService {
   public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
   public leaveType = DB.LeaveTypes;
+  public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
     return loggedUser.role === 'Institute' || loggedUser.role === 'SuperAdmin';
@@ -31,16 +33,40 @@ class LeaveTypeService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getLeaveType:${sortBy}:${order}:${pageSize}:${pageNo}::${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.leaveType.findAndCountAll({
       where: DB.Sequelize.or({ leaveName: { [searchCondition]: search } }),
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
   public async getAllLeaveType(loggedUser) {
+    const cacheKey = `getAllLeaveType:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.leaveType.findAndCountAll();
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -64,6 +90,7 @@ class LeaveTypeService {
     const createLeaveType = await this.leaveType.create({
       ...leaveTypeData,
     });
+    await this.redisFunctions.removeDataFromRedis();
 
     return createLeaveType;
   }
@@ -94,6 +121,8 @@ class LeaveTypeService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
+
     return updateLeaveType;
   }
 
@@ -120,6 +149,8 @@ class LeaveTypeService {
         id: leaveTypeId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
+
     if (deleteLeaveType === 1)
       throw new HttpException(200, 'Leavetype deleted successfully');
     return { count: deleteLeaveType };

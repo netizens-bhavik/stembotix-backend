@@ -96,7 +96,7 @@ class HolidayListService {
     const createHolidayListData: HolidayList = await this.holidayList.create({
       ...holidayListData,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return createHolidayListData;
   }
 
@@ -118,6 +118,7 @@ class HolidayListService {
       { ...holidayListData },
       { where: { id: holidayListId }, returning: true }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateHolidayList[0], rows: updateHolidayList[1] };
   }
 
@@ -137,6 +138,7 @@ class HolidayListService {
     const res = await this.holidayList.destroy({
       where: { id: holidayListId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1) {
       throw new HttpException(200, 'Holiday List has been deleted');
     }

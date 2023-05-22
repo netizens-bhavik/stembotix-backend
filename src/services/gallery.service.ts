@@ -19,6 +19,7 @@ class GalleryService {
     const gallery = await this.gallery.create({
       thumbnail: file.path,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return gallery;
   }
   public async getGallerybyUser(): Promise<{
@@ -120,6 +121,7 @@ class GalleryService {
           returning: true,
         }
       );
+      await this.redisFunctions.removeDataFromRedis();
       return { count: updateGallery[0], rows: updateGallery[1] };
     }
   }
@@ -146,6 +148,7 @@ class GalleryService {
         id: galleryId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 }

@@ -27,6 +27,7 @@ class CourseTypeService {
       ...coursetype,
       userId: user.id,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return courseType;
   }
   public async viewAllCourseType(
@@ -109,6 +110,7 @@ class CourseTypeService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateCourseType[0], rows: updateCourseType[1] };
   }
   public async deleteCourseType(
@@ -135,6 +137,7 @@ class CourseTypeService {
         id: courseTypeId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'CourseType Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');

@@ -1,5 +1,6 @@
 import DB from '@databases';
 import { LikeDislike } from '@/interfaces/likedislike.interface';
+import { RedisFunctions } from '@/redis';
 
 export type LikeDislikeType = {
   record: LikeDislike;
@@ -10,6 +11,7 @@ class LikeDislikeService {
   public comment = DB.Comment;
   public user = DB.User;
   public likedislike = DB.LikeDislike;
+  public redisFunctions = new RedisFunctions();
 
   public async addLikeDislikeOnComment(
     likeDislikeDetails
@@ -36,11 +38,15 @@ class LikeDislikeService {
         paranoid: false,
       });
       message = 'Dislike Successfully';
+      await this.redisFunctions.removeDataFromRedis();
+
       return {
         record: deletedLike,
         message,
       };
     }
+    await this.redisFunctions.removeDataFromRedis();
+
     return { record, message };
   }
 
@@ -68,30 +74,57 @@ class LikeDislikeService {
         },
         paranoid: false,
       });
+
       message = 'Dislike Successfully';
+      await this.redisFunctions.removeDataFromRedis();
       return {
         record: deleteRecord,
         message,
       };
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { record, message };
   }
 
   public async viewLikeonComment(
     comment_id
   ): Promise<{ totalCount: number; likes: (LikeDislike | undefined)[] }> {
+    const cacheKey = `viewLikeonComment:${comment_id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const likeData = await this.likedislike.findAndCountAll({
       where: DB.Sequelize.and({ deletedAt: null }, { comment_id: comment_id }),
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: likeData.count,
+        records: likeData.rows,
+      })
+    );
     return { totalCount: likeData.count, likes: likeData.rows };
   }
 
   public async viewLikeOnReply(
     reply_id
   ): Promise<{ totalCount: number; likes: (LikeDislike | undefined)[] }> {
+    const cacheKey = `viewLikeOnReply:${reply_id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const likeData = await this.likedislike.findAndCountAll({
       where: DB.Sequelize.and({ deletedAt: null }, { reply_id: reply_id }),
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: likeData.count,
+        records: likeData.rows,
+      })
+    );
     return { totalCount: likeData.count, likes: likeData.rows };
   }
 }

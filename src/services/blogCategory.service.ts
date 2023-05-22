@@ -26,6 +26,7 @@ class BlogCategoryService {
         userId: user.id,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return categoryData;
   }
 
@@ -118,6 +119,7 @@ class BlogCategoryService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateData[0], rows: updateData[1] };
   }
 
@@ -131,10 +133,10 @@ class BlogCategoryService {
         id: catId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'Blog Category Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');
-
     return { count: res };
   }
 }

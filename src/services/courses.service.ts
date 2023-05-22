@@ -7,6 +7,7 @@ import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 import { RedisFunctions } from '@/redis';
+
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -182,6 +183,7 @@ class CourseService {
     });
 
     newCourse.addTrainer(trainerRecord);
+    await this.redisFunctions.removeDataFromRedis();
     if (newCourse) {
       const mailData: Mail = {
         templateData: {
@@ -555,6 +557,7 @@ class CourseService {
             returning: true,
           }
         );
+        await this.redisFunctions.removeDataFromRedis();
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
     }
@@ -625,7 +628,7 @@ class CourseService {
     }
     if (
       trainer.id !== courseRecord.Trainers[0].userId &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(403, "You don't have Authority to Delete Course");
 
@@ -681,6 +684,7 @@ class CourseService {
       };
       this.emailService.sendMailDeleteCourse(mailerData);
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
   public async listCourses({
@@ -933,6 +937,7 @@ class CourseService {
     //     where: { course_id: courseId },
     //   });
     // }
+    await this.redisFunctions.removeDataFromRedis();
     return { count };
   }
 }
