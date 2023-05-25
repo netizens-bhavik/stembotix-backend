@@ -88,6 +88,7 @@ class GalleryService {
         records: record,
       })
     );
+    console.log(record);
     return { totalCount: record.count, records: record.rows };
   }
 

@@ -15,7 +15,7 @@ export class RedisFunctions {
         socket: {
           connectTimeout: 10000,
           host: REDIS_HOST || 'localhost',
-          port: REDIS_PORT || '6379',
+          port: parseInt(REDIS_PORT),
         },
       });
       await this.client.connect();

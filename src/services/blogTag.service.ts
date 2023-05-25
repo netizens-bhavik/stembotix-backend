@@ -25,7 +25,7 @@ class BlogTagService {
         userId: user.id,
       },
     });
-    await this.redisFunctions.removeDataFromRedis();
+    // await this.redisFunctions.removeDataFromRedis();
     return tagData;
   }
 
@@ -45,14 +45,11 @@ class BlogTagService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const tagData = await this.blogTag.findAndCountAll({
-      where: DB.Sequelize.and({ deletedAt: null }),
-    });
-    const cacheKey = `allBlogTagAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
-    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `allBlogTagAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
 
     const data = await this.blogTag.findAndCountAll({
       where: DB.Sequelize.and({
@@ -65,14 +62,14 @@ class BlogTagService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    await this.redisFunctions.setKey(
-      cacheKey,
-      JSON.stringify({
-        totalCount: data.length,
-        records: data,
-      })
-    );
-    return { totalCount: data.count, records: data.rows };
+    // await this.redisFunctions.setKey(
+    //   cacheKey,
+    //   JSON.stringify({
+    //     totalCount: data.count,
+    //     records: data,
+    //   })
+    // );
+    return { totalCount: data.count, records: data };
   }
 
   public async getBlogTags(user): Promise<BlogTag[]> {
@@ -134,9 +131,9 @@ class BlogTagService {
         id: tagId,
       },
     });
-    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'Blog Tag Deleted Successfully');
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 0) throw new HttpException(404, 'No data found');
 
     return { count: res };

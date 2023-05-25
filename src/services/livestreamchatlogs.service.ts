@@ -15,55 +15,53 @@ class LiveStreamChatLogsService {
   public emailService = new EmailService();
 
   public async newUserJoined(data) {
-    
-      const { livestreamId, userId, socketId } = data;
+    const { livestreamId, userId, socketId } = data;
 
-      if (isEmpty(livestreamId) || isEmpty(userId))
-        throw new HttpException(400, "LivestreamId or UserId can't be empty");
+    if (isEmpty(livestreamId) || isEmpty(userId))
+      throw new HttpException(400, "LivestreamId or UserId can't be empty");
 
-      const dbLiveStreamCheck = await this.liveStream.findOne({
-        where: { id: livestreamId },
+    const dbLiveStreamCheck = await this.liveStream.findOne({
+      where: { id: livestreamId },
+    });
+
+    if (!dbLiveStreamCheck) {
+      throw new HttpException(404, 'Event Not Found');
+    }
+
+    if (dbLiveStreamCheck.userId !== userId) {
+      const subscribeEvent = await this.subscribeEvent.findOne({
+        where: {
+          livestreamId,
+          userId,
+        },
       });
-
-      if (!dbLiveStreamCheck) {
-        throw new HttpException(404, 'Event Not Found');
-      }
-
-      if (dbLiveStreamCheck.userId !== userId) {
-        const subscribeEvent = await this.subscribeEvent.findOne({
-          where: {
-            livestreamId,
-            userId,
-          },
-        });
-        if (!subscribeEvent) {
-          throw new HttpException(
-            400,
-            'User is not subscribed to this livestream'
-          );
-        }
-        var subscribeEventId = subscribeEvent.id ?? null;
-      }
-
-      const [liveStreamChatLogs, created] =
-        await this.liveStreamChatLogs.findOrCreate({
-          where: { livestreamId, userId },
-          defaults: {
-            livestreamId,
-            userId,
-            socketId,
-            subscribeEventId: subscribeEventId,
-            isOnline: true,
-          },
-        });
-
-      if (!created) {
-        await this.liveStreamChatLogs.update(
-          { isOnline: true, socketId },
-          { where: { livestreamId, userId } }
+      if (!subscribeEvent) {
+        throw new HttpException(
+          400,
+          'User is not subscribed to this livestream'
         );
       }
+      var subscribeEventId = subscribeEvent.id ?? null;
+    }
 
+    const [liveStreamChatLogs, created] =
+      await this.liveStreamChatLogs.findOrCreate({
+        where: { livestreamId, userId },
+        defaults: {
+          livestreamId,
+          userId,
+          socketId,
+          subscribeEventId: subscribeEventId,
+          isOnline: true,
+        },
+      });
+
+    if (!created) {
+      await this.liveStreamChatLogs.update(
+        { isOnline: true, socketId },
+        { where: { livestreamId, userId } }
+      );
+    }
 
     if (created) {
       const liveStream = await this.liveStream.findByPk(livestreamId);

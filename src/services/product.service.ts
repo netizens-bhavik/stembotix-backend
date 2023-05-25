@@ -6,6 +6,7 @@ import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 import { Op } from 'sequelize';
+import { RedisFunctions } from '@/redis';
 
 class ProductService {
   public product = DB.Product;
@@ -18,6 +19,7 @@ class ProductService {
   public cart = DB.Cart;
   public order = DB.Order;
   public review = DB.Review;
+  public redisFunctions = new RedisFunctions();
 
   public isAdmin(user): boolean {
     return user.role === 'Admin';
@@ -39,7 +41,11 @@ class ProductService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `viewProducts:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const productsRecord = await this.product.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -78,7 +84,13 @@ class ProductService {
         },
       ],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: productsRecord.count,
+        records: data,
+      })
+    );
     return { totalCount: productsRecord.count, records: data };
   }
 
@@ -95,7 +107,11 @@ class ProductService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `viewProductsAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const productsRecord = await this.product.findAndCountAll({
       where: { deletedAt: null },
     });
@@ -124,6 +140,13 @@ class ProductService {
         },
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: productsRecord.count,
+        records: data,
+      })
+    );
     return { totalCount: productsRecord.count, records: data };
   }
 
@@ -145,7 +168,11 @@ class ProductService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `listProducts:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const creatorRecord = await this.user.findOne({
       where: { id: user.id },
     });
@@ -181,6 +208,13 @@ class ProductService {
         },
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: count,
+        records: product,
+      })
+    );
     return { totalCount: count, records: product };
   }
 
@@ -211,6 +245,7 @@ class ProductService {
       dimension: productDetails.dimension,
     });
     newProduct.addUser(userRecord);
+    await this.redisFunctions.removeDataFromRedis();
     if (newProduct) {
       const mailData: Mail = {
         templateData: {
@@ -239,6 +274,11 @@ class ProductService {
   }
 
   public async getProductById(productId: string): Promise<Product> {
+    const cacheKey = `getProductById:${productId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response: Product = await this.product.findOne({
       where: {
         id: productId,
@@ -253,6 +293,7 @@ class ProductService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
     return response;
   }
 
@@ -312,6 +353,7 @@ class ProductService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateProduct[0], rows: updateProduct[1] };
   }
 
@@ -402,6 +444,7 @@ class ProductService {
       };
       this.emailService.sendMailDeleteProduct(mailerData);
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 
@@ -423,6 +466,7 @@ class ProductService {
     const status = productRecord.status === 'Drafted' ? 'Published' : 'Drafted';
     const res = await productRecord.update({ status });
     let count = res.status === 'Drafted' ? 0 : 1;
+    await this.redisFunctions.removeDataFromRedis();
     return { count };
   }
 }

@@ -53,7 +53,7 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const cacheKey = `getLeaveByAdmin:${order}:${pageSize}:${pageNo}:${search}`;
@@ -113,7 +113,7 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const cacheKey = `viewLeavebyInstructor:${loggedUser.id}--${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
@@ -540,7 +540,7 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const cacheKey = `getLeaveByInstitute:${loggedUser.id}:${sortBy}:${order}:${pageSize}:${pageNo}`;

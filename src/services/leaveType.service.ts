@@ -30,7 +30,7 @@ class LeaveTypeService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
     const cacheKey = `getLeaveType:${sortBy}:${order}:${pageSize}:${pageNo}::${search}`;

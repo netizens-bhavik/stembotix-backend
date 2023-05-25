@@ -3,11 +3,13 @@ import { API_BASE } from '@/config';
 import { Reply } from '@/interfaces/reply.interface';
 import _ from 'lodash';
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 
 class ReplyService {
   public reply = DB.Reply;
   public trainer = DB.Trainer;
   public comment = DB.Comment;
+  public redisFunctions = new RedisFunctions();
 
   public async addReply({
     replyDetail,
@@ -35,6 +37,7 @@ class ReplyService {
       userId: user.id,
       thumbnail: thumbnailPath,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return newReply;
   }
 
@@ -62,6 +65,7 @@ class ReplyService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateReply[0], rows: updateReply[1] };
   }
   public async deleteReply({
@@ -73,6 +77,7 @@ class ReplyService {
         id: replyId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res, row: res[1] };
   }
 }

@@ -26,7 +26,7 @@ class BlogCategoryService {
         userId: user.id,
       },
     });
-    await this.redisFunctions.removeDataFromRedis();
+    // await this.redisFunctions.removeDataFromRedis();
     return categoryData;
   }
 
@@ -46,11 +46,11 @@ class BlogCategoryService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const cacheKey = `blogCat:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
-    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `blogCat:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
 
     const data = await this.blogCategory.findAndCountAll({
       where: DB.Sequelize.and({
@@ -63,14 +63,14 @@ class BlogCategoryService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    await this.redisFunctions.setKey(
-      cacheKey,
-      JSON.stringify({
-        totalCount: data.length,
-        records: data,
-      })
-    );
-    return { totalCount: data.count, records: data.rows };
+    // await this.redisFunctions.setKey(
+    //   cacheKey,
+    //   JSON.stringify({
+    //     totalCount: data.length,
+    //     records: data,
+    //   })
+    // );
+    return { totalCount: data.count, records: data };
   }
 
   public async getBlogCat(user): Promise<BlogCategory[]> {
