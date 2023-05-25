@@ -49,6 +49,7 @@ class CartService {
     if (!cartItem[1]) throw new HttpException(400, 'Already added to cart');
     res.data = cartItem[0];
     res.message = `${ItemTypes.Product} added to cart successfully`;
+    await this.redisFunctions.removeDataFromRedis();
     return res;
   }
   public async addCourseToCart(userId: string, courseId: string) {
@@ -79,6 +80,7 @@ class CartService {
     if (!cartItem[1]) throw new HttpException(400, 'Already added to cart');
     res.data = cartItem[0];
     res.message = `${ItemTypes.Course} added to cart successfully`;
+    await this.redisFunctions.removeDataFromRedis();
     return res;
   }
   public async itemHandler(
@@ -114,6 +116,7 @@ class CartService {
         message = 'Cart item quantity decreased successfully';
       }
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { message };
   }
   public async viewCart(userId) {
@@ -161,6 +164,7 @@ class CartService {
     if (!cartRecord) throw new HttpException(404, 'Record not found');
     await this.cartItem.destroy({ where: { cart_id: cartRecord.id } });
     await cartRecord.destroy();
+    await this.redisFunctions.removeDataFromRedis();
     return { message: 'Cart cleared successfully' };
   }
   public async removeItem(userId: string, cartItemId: string) {
@@ -175,6 +179,7 @@ class CartService {
     });
     if (!cartItemRecord) throw new HttpException(404, 'Record not found');
     await cartItemRecord.destroy();
+    await this.redisFunctions.removeDataFromRedis();
     return { message: 'Item removed successfully' };
   }
 

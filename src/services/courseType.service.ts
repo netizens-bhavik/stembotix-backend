@@ -1,11 +1,13 @@
 import { HttpException } from '@/exceptions/HttpException';
 import { Coursetype } from '@/interfaces/courseType.interface';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 
 class CourseTypeService {
   public coursetype = DB.CourseType;
   public user = DB.User;
   public course = DB.Course;
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'SuperAdmin';
@@ -25,6 +27,7 @@ class CourseTypeService {
       ...coursetype,
       userId: user.id,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return courseType;
   }
   public async viewAllCourseType(
@@ -43,6 +46,14 @@ class CourseTypeService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `viewAllCourseType:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
     const courseType = await this.coursetype.findAndCountAll({
       where: {
         userId: user.id,
@@ -54,10 +65,25 @@ class CourseTypeService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: courseType.count,
+        records: courseType.rows,
+      })
+    );
     return { totalCount: courseType.count, records: courseType.rows };
   }
   public async listCourseType(user) {
+    const cacheKey = `listCourseType:${user.id}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
     const courseType = await this.coursetype.findAll();
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(courseType));
     return courseType;
   }
   public async updateCourseType(
@@ -84,6 +110,7 @@ class CourseTypeService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateCourseType[0], rows: updateCourseType[1] };
   }
   public async deleteCourseType(
@@ -110,6 +137,7 @@ class CourseTypeService {
         id: courseTypeId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'CourseType Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');
@@ -138,6 +166,14 @@ class CourseTypeService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `viewCourseByCourseTypeIdByAdmin:${courseTypeId}:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
+
     const response = await this.coursetype.findAndCountAll({
       where: {
         id: courseTypeId,
@@ -156,6 +192,7 @@ class CourseTypeService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
     return response;
   }
 
@@ -163,6 +200,14 @@ class CourseTypeService {
     totalCount: number;
     records: (Coursetype | undefined)[];
   }> {
+    const cacheKey = `viewCourseByCourseTypeId:${coursetypeId}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
+
     const response = await this.coursetype.findAndCountAll({
       where: {
         id: coursetypeId,
@@ -171,6 +216,13 @@ class CourseTypeService {
         model: this.course,
       },
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
 }

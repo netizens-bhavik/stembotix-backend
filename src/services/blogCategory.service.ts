@@ -26,6 +26,7 @@ class BlogCategoryService {
         userId: user.id,
       },
     });
+    // await this.redisFunctions.removeDataFromRedis();
     return categoryData;
   }
 
@@ -69,16 +70,16 @@ class BlogCategoryService {
     //     records: data,
     //   })
     // );
-    return { totalCount: data.count, records: data.rows };
+    return { totalCount: data.count, records: data };
   }
 
   public async getBlogCat(user): Promise<BlogCategory[]> {
     const cacheKey = `getBlogCat:${user.id}`;
 
-    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    // if (cachedData) {
-    //   return cachedData;
-    // }
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data: (BlogCategory | undefined)[] = await this.blogCategory.findAll({
       where: {
         deletedAt: null,
@@ -87,7 +88,7 @@ class BlogCategoryService {
         model: this.blog,
       },
     });
-    // await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
 
     return data;
   }
@@ -118,6 +119,7 @@ class BlogCategoryService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateData[0], rows: updateData[1] };
   }
 
@@ -131,10 +133,10 @@ class BlogCategoryService {
         id: catId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'Blog Category Deleted Successfully');
     if (res === 0) throw new HttpException(404, 'No data found');
-
     return { count: res };
   }
 }

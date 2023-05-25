@@ -36,6 +36,7 @@ class BlogService {
       thumbnail: file.path,
     });
     blogData.addBlogTags(tag);
+    await this.redisFunctions.removeDataFromRedis();
     return blogData;
   }
 
@@ -177,6 +178,7 @@ class BlogService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return blogData;
   }
 
@@ -201,6 +203,7 @@ class BlogService {
     if (res === 1) {
       throw new HttpException(200, 'Blog has been deleted');
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 }

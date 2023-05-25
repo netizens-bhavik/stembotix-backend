@@ -183,7 +183,7 @@ class CouponCodeService {
       if (orderRecord.CourseId) {
         isProduct = false;
       }
-
+      await this.redisFunctions.removeDataFromRedis();
       return orderRecord;
     } else {
       throw new HttpException(404, 'Course not found');
@@ -220,6 +220,7 @@ class CouponCodeService {
     if (update[1][0].updatedAt > expirationTime) {
       throw new HttpException(400, 'Coupon has already expired');
     }
+    await this.redisFunctions.removeDataFromRedis();
     return update[1][0];
   }
   public async getCouponCodebyCourseIdbyInstitute({ courseId, user }) {
@@ -297,6 +298,7 @@ class CouponCodeService {
       couponCode: couponCode,
       expirationTime: expirationTime,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return createCoupon;
   }
   public async applyFlatCode({ user, couponDetail }) {
@@ -329,6 +331,7 @@ class CouponCodeService {
       }
     });
     await userRecord.addCouponCodes(data);
+    await this.redisFunctions.removeDataFromRedis();
 
     return { rows: existingUser };
   }
@@ -404,6 +407,7 @@ class CouponCodeService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { totalCount: data[0], records: data[1] };
   }
 
@@ -425,6 +429,7 @@ class CouponCodeService {
         id: discountId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: data };
   }
   public async deleteDiscountCouponUser({
@@ -443,6 +448,7 @@ class CouponCodeService {
         cart_id: cartId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: data };
   }
 
@@ -451,6 +457,11 @@ class CouponCodeService {
     cartId,
   }): Promise<{ rows: object }> {
     const coupon = couponDetail.couponCode;
+    const cacheKey = `getAllCouponCode:${cartId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data = await this.discountCode.findOne({
       where: {
         couponCode: coupon,
@@ -470,6 +481,7 @@ class CouponCodeService {
       cart_id: cartId,
       discountCouponId: data.id,
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
     return { rows: data };
   }
 

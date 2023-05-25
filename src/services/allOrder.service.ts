@@ -219,6 +219,7 @@ class AllOrderService {
     if (resp === 1) {
       throw new HttpException(200, 'Order deleted successfully');
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { orderRes: resp };
   }
 

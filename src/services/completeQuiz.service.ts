@@ -20,7 +20,7 @@ class CompleteQuizService {
       user_id: user.id,
     };
     const response = await this.completeQuiz.create(completeData);
-
+    await this.redisFunctions.removeDataFromRedis();
     return response;
   }
   public async getCompleteQuizById(quizId): Promise<CompleteQuizType> {
@@ -39,6 +39,7 @@ class CompleteQuizService {
     await this.redisFunctions.setKey(cacheKey, JSON.stringify(record));
 
     if (!record) message = 'No record found';
+    await this.redisFunctions.removeDataFromRedis();
     return { record, message };
   }
 }

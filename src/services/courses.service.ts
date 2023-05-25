@@ -6,6 +6,8 @@ import EmailService from './email.service';
 import { Mail, MailPayloads } from '@/interfaces/mailPayload.interface';
 import _ from 'lodash';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
+import { RedisFunctions } from '@/redis';
+
 class CourseService {
   public course = DB.Course;
   public trainer = DB.Trainer;
@@ -24,6 +26,7 @@ class CourseService {
   public quizScore = DB.QuizScore;
   public quizQue = DB.QuizQue;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'SuperAdmin';
@@ -45,6 +48,11 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `viewCourses:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const courseData = await this.course.findAndCountAll({
       where: { status: 'Published' },
     });
@@ -88,6 +96,13 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: courseData.count,
+        records: data,
+      })
+    );
     return { totalCount: courseData.count, records: data };
   }
   public async viewCoursesAdmin(
@@ -104,6 +119,11 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `viewCoursesAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const courseData = await this.course.findAndCountAll({
       where: DB.Sequelize.and({ deletedAt: null }),
     });
@@ -132,6 +152,13 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: courseData.count,
+        records: data,
+      })
+    );
     return { totalCount: courseData.count, records: data };
   }
   public async addCourse({ courseDetails, file, user }): Promise<Course> {
@@ -156,6 +183,7 @@ class CourseService {
     });
 
     newCourse.addTrainer(trainerRecord);
+    await this.redisFunctions.removeDataFromRedis();
     if (newCourse) {
       const mailData: Mail = {
         templateData: {
@@ -188,6 +216,11 @@ class CourseService {
     };
   }
   public async getCourseById(courseId: string): Promise<Course> {
+    const cacheKey = `getCourseById:${courseId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.course.findOne({
       where: {
         id: courseId,
@@ -233,6 +266,7 @@ class CourseService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
     return response;
   }
   public async getCommentByCourseIdAdmin(
@@ -249,6 +283,14 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `getCommentByCourseIdAdmin:${courseId}:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
 
     const response = await this.comment.findAndCountAll({
       where: DB.Sequelize.and(
@@ -284,11 +326,25 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
   public async getCommentByCourseId(
     courseId
   ): Promise<{ totalCount: number; records: (Course | undefined)[] }> {
+    const cacheKey = `getCommentByCourseId:${courseId}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
     const response = await this.comment.findAndCountAll({
       where: { course_id: courseId },
 
@@ -315,6 +371,13 @@ class CourseService {
       ],
       order: [['createdAt', 'DESC']],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
   public async getReplyByCommentIdAdmin(
@@ -334,6 +397,14 @@ class CourseService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `getReplyByCommentIdAdmin:${commentId}:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
 
     const response = await this.reply.findAndCountAll({
       where: DB.Sequelize.and(
@@ -359,6 +430,13 @@ class CourseService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
 
     return { totalCount: response.count, records: response.rows };
   }
@@ -367,6 +445,13 @@ class CourseService {
     totalCount: number;
     records: (Course | undefined)[];
   }> {
+    const cacheKey = `getReplyByCommentId:${commentId}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
     const response = await this.reply.findAndCountAll({
       where: {
         comment_id: commentId,
@@ -382,7 +467,13 @@ class CourseService {
       ],
       order: [['createdAt', 'DESC']],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
   public async updateCourse({
@@ -466,6 +557,7 @@ class CourseService {
             returning: true,
           }
         );
+        await this.redisFunctions.removeDataFromRedis();
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
     }
@@ -536,7 +628,7 @@ class CourseService {
     }
     if (
       trainer.id !== courseRecord.Trainers[0].userId &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(403, "You don't have Authority to Delete Course");
 
@@ -592,6 +684,7 @@ class CourseService {
       };
       this.emailService.sendMailDeleteCourse(mailerData);
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
   public async listCourses({
@@ -612,6 +705,11 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `listCourses:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const trainerRecord = await this.trainer.findOne({
       where: { user_id: trainer.id },
     });
@@ -652,6 +750,13 @@ class CourseService {
         },
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: coursesCount.count,
+        records: courses,
+      })
+    );
     return { totalCount: coursesCount.count, records: courses };
   }
 
@@ -673,6 +778,11 @@ class CourseService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getTrainerDetails:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const trainerRecord = await this.trainer.findAll();
     if (!trainerRecord) throw new HttpException(404, 'Invalid Request');
 
@@ -782,6 +892,13 @@ class CourseService {
         isAcceptedStatus: isAcceptedStatus,
       };
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: trainerData.rows.length,
+        records: trainerDataWithRequestStatus,
+      })
+    );
 
     return {
       totalCount: trainerData.rows.length,
@@ -820,6 +937,7 @@ class CourseService {
     //     where: { course_id: courseId },
     //   });
     // }
+    await this.redisFunctions.removeDataFromRedis();
     return { count };
   }
 }
