@@ -3,6 +3,7 @@ import { CompleteQuiz, Quiz } from '@/interfaces/quiz.interface';
 import { QuizDto } from '@/dtos/quiz.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { Op } from 'sequelize';
+import { RedisFunctions } from '@/redis';
 
 class QuizService {
   public trainer = DB.Trainer;
@@ -13,6 +14,7 @@ class QuizService {
   public quizScore = DB.QuizScore;
   public completeQuiz = DB.CompleteQuiz;
   public attemptQuizQue = DB.AttemptQuizQue;
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return (
@@ -36,6 +38,7 @@ class QuizService {
       throw new HttpException(404, 'Requested trainer details do not exist');
 
     const newQuiz = await this.quiz.create(quizData);
+    await this.redisFunctions.removeDataFromRedis();
     return newQuiz;
   }
 
@@ -56,7 +59,11 @@ class QuizService {
     const quizData = await this.quiz.findAndCountAll({
       where: { curriculum_id: curriculumId },
     });
-
+    const cacheKey = `getQuizBycurriculumId:${curriculumId}:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data: (Quiz | undefined)[] = await this.quiz.findAll({
       where: DB.Sequelize.and(
         { curriculum_id: curriculumId },
@@ -70,6 +77,13 @@ class QuizService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: quizData.count,
+        records: data,
+      })
+    );
     return { totalCount: quizData.count, records: data };
   }
 
@@ -87,7 +101,11 @@ class QuizService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `getQuizByAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const quizData = await this.quizQue.findAndCountAll({
       where: { quiz_id: quizId },
     });
@@ -116,12 +134,24 @@ class QuizService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: quizData.count,
+        records: response,
+      })
+    );
     return { totalCount: quizData.count, records: response };
   }
   public async getQuizById(
     quizId: string,
     user
   ): Promise<{ data: Quiz[] | undefined }> {
+    const cacheKey = `getQuizById:${quizId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const isAttempted = await this.attemptQuizQue.findAll({
       where: {
         userId: user.id,
@@ -176,6 +206,12 @@ class QuizService {
     const allNewQues = response.rows[0].QuizQues.filter(
       (ques) => !allAttemptedQueId.includes(ques.id)
     );
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        data: response.rows[0],
+      })
+    );
 
     return { data: response.rows[0] };
   }
@@ -203,6 +239,7 @@ class QuizService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
 
     return { count: updateQuiz[0], rows: updateQuiz[1] };
   }
@@ -239,6 +276,7 @@ class QuizService {
         id: quizId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 
@@ -255,7 +293,11 @@ class QuizService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `viewQuiz:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const quizData = await this.quiz.findAndCountAll({
       where: { deleted_at: null },
     });
@@ -283,6 +325,13 @@ class QuizService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: quizData.count,
+        records: data,
+      })
+    );
     return { totalCount: quizData.count, records: data };
   }
 
@@ -298,7 +347,7 @@ class QuizService {
       quiz_id: quizId,
       user_id: user.id,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return compleQuizResponse;
   }
 }

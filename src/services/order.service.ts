@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import { OrderData } from '../utils/ruleEngine/orderData.rule';
 import { Mail } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
+import { RedisFunctions } from '@/redis';
 class OrderService {
   public user = DB.User;
   public order = DB.Order;
@@ -19,17 +20,29 @@ class OrderService {
   public trainer = DB.Trainer;
   public coursetype = DB.CourseType;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public orderData = new OrderData();
 
   public async listOrdersByAdmin({ trainer, queryObject }) {
+    const cacheKey = `listOrdersByAdmin:${trainer.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const OrderData = await this.orderData.getOrderData({
       trainer,
       queryObject,
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(OrderData));
     return OrderData;
   }
   public async listOrders(userId: string) {
+    const cacheKey = `listOrders:${userId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data = await this.order.findAll({
       where: { user_id: userId },
       include: {
@@ -67,6 +80,7 @@ class OrderService {
       },
       order: [['createdAt', 'DESC']],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
     if (!data) throw new HttpException(404, 'No order exist');
     return data;
   }
@@ -100,6 +114,8 @@ class OrderService {
     };
     // Generating order
     const order = await this.order.create(orderData);
+    await this.redisFunctions.removeDataFromRedis();
+
     return order;
   }
   public async verifyOrder(userId: string, orderBody: VerifyOrderDTO) {
@@ -199,7 +215,7 @@ class OrderService {
         where: { id: cartItems },
       });
     }
-
+    await this.redisFunctions.removeDataFromRedis();
     return orderCartItems;
   }
 }

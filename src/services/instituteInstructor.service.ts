@@ -3,11 +3,13 @@ import { HttpException } from '@exceptions/HttpException';
 import { InstructorInstitute } from '@/interfaces/instructorInstitute.interface';
 import EmailService from './email.service';
 import { Mail } from '@/interfaces/mailPayload.interface';
+import { RedisFunctions } from '@/redis';
 
 class InstituteInstructorService {
   public user = DB.User;
   public instituteInstructor = DB.InstituteInstructor;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
     return (
@@ -56,6 +58,7 @@ class InstituteInstructorService {
       };
       this.emailService.sendRequestToJoinInstitute(mailData);
     }
+    await this.redisFunctions.removeDataFromRedis();
     return createInstituteInstructor;
   }
 
@@ -131,6 +134,7 @@ class InstituteInstructorService {
         }
       );
     }
+    await this.redisFunctions.removeDataFromRedis();
     return updateOffer[1][0];
   }
 
@@ -152,6 +156,7 @@ class InstituteInstructorService {
     const deleteRequest = await this.instituteInstructor.destroy({
       where: { id: offerId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return deleteRequest;
   }
 
@@ -159,7 +164,6 @@ class InstituteInstructorService {
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(401, 'Unauthorized');
     }
-
     //sorting
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
@@ -170,7 +174,11 @@ class InstituteInstructorService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `getInstituteRequest:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const resposnse = await this.instituteInstructor.findAndCountAll({
       where: { instituteId: loggedUser.id },
       include: [
@@ -183,6 +191,7 @@ class InstituteInstructorService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(resposnse));
     return resposnse;
   }
 
@@ -205,7 +214,11 @@ class InstituteInstructorService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `getReqByInstructor:${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.instituteInstructor.findAndCountAll({
       where: {
         instructor_id: user.id,
@@ -227,6 +240,13 @@ class InstituteInstructorService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.count,
+        records: response.rows,
+      })
+    );
     return { totalCount: response.count, records: response.rows };
   }
   public async getDataByAdmin({ trainer, queryObject }): Promise<{
@@ -247,6 +267,11 @@ class InstituteInstructorService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getDataByAdmin:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const dataCount = await this.instituteInstructor.findAndCountAll({
       include: [
         {
@@ -292,12 +317,23 @@ class InstituteInstructorService {
         [{ model: this.user, as: 'Institute' }, 'lastName', order],
       ],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: dataCount.count,
+        records: dataCount.rows,
+      })
+    );
     return { totalCount: dataCount.count, records: dataCount.rows };
   }
 
   public async viewRequest(user, instructor) {
     if (!user) throw new HttpException(403, 'Unauthorized');
+    const cacheKey = `viewRequest:${instructor.instructorId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.instituteInstructor.findOne({
       where: DB.Sequelize.and(
         {
@@ -308,6 +344,8 @@ class InstituteInstructorService {
         }
       ),
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return (
       response ?? {
         message: 'no data found',
@@ -315,6 +353,11 @@ class InstituteInstructorService {
     );
   }
   public async viewInstituteByInstructor(user) {
+    const cacheKey = `viewInstituteByInstructor:${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data = await this.instituteInstructor.findAll({
       where: {
         instructor_id: user.id,
@@ -328,6 +371,7 @@ class InstituteInstructorService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
     return data;
   }
 }

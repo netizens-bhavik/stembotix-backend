@@ -1,5 +1,6 @@
 import DB from '@databases';
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 
 class AllCourseForInstituteService {
   public course = DB.Course;
@@ -8,12 +9,18 @@ class AllCourseForInstituteService {
   public trainer = DB.Trainer;
   public courseType = DB.CourseType;
   public review = DB.Review;
+  public redisFunctions = new RedisFunctions();
 
   public isInstitute(user): boolean {
     return user.role === 'Institute';
   }
 
   public async getAllCourseForInstitute(loggedUser) {
+    const cacheKey = `getAllCourseForInstitute:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const instituteRecord = await this.instituteInstructor.findAndCountAll({
       where: {
         institute_id: loggedUser.id,
@@ -61,12 +68,28 @@ class AllCourseForInstituteService {
           res.push(customData);
         });
       });
+      await this.redisFunctions.setKey(
+        cacheKey,
+        JSON.stringify({
+          totalCount: data.count,
+          records: res,
+          instituteRecord: instituteRecord.rows[0],
+        })
+      );
       return {
         totalCount: data.count,
         records: res,
         instituteRecord: instituteRecord.rows[0],
       };
     } else {
+      await this.redisFunctions.setKey(
+        cacheKey,
+        JSON.stringify({
+          totalCount: instituteRecord.count,
+          records: instituteRecord.rows,
+          instituteRecord: instituteRecord.count,
+        })
+      );
       return {
         totalCount: instituteRecord.count,
         records: instituteRecord.rows,
@@ -93,6 +116,11 @@ class AllCourseForInstituteService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getAllCoursebyInstitute:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.instituteInstructor.findAndCountAll({
       where: {
         institute_id: loggedUser.id,
@@ -145,12 +173,28 @@ class AllCourseForInstituteService {
           res.push(customData);
         });
       });
+      await this.redisFunctions.setKey(
+        cacheKey,
+        JSON.stringify({
+          totalCount: res.length,
+          records: res,
+          instituteRecord: response.rows,
+        })
+      );
       return {
         totalCount: res.length,
         records: res,
         instituteRecord: response.rows,
       };
     } else {
+      await this.redisFunctions.setKey(
+        cacheKey,
+        JSON.stringify({
+          totalCount: response.count,
+          records: response.rows,
+          instituteRecord: response.count,
+        })
+      );
       return {
         totalCount: response.count,
         records: response.rows,

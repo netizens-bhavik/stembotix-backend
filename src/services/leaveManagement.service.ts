@@ -5,6 +5,7 @@ import EmailService from './email.service';
 import { LeaveData, AddLeaveData } from '@/interfaces/leaveData.interface';
 import { Op } from 'sequelize';
 import { Mail } from '@/interfaces/mailPayload.interface';
+import { RedisFunctions } from '@/redis';
 class LeaveManagementService {
   public user = DB.User;
   public instructor = DB.Instructor;
@@ -15,6 +16,7 @@ class LeaveManagementService {
   public leaveType = DB.LeaveTypes;
   public holidayList = DB.HolidayList;
   public holiday = DB.Holidays;
+  public redisFunctions = new RedisFunctions();
 
   public emailService = new EmailService();
 
@@ -51,8 +53,14 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `getLeaveByAdmin:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
 
     const findLeave = await this.manageLeave.findAndCountAll({
       include: [
@@ -80,6 +88,13 @@ class LeaveManagementService {
         [{ model: this.user }, 'lastName', order],
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -98,9 +113,14 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `viewLeavebyInstructor:${loggedUser.id}--${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.manageLeave.findAndCountAll({
       where: {
         user_id: loggedUser.id,
@@ -122,6 +142,13 @@ class LeaveManagementService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -129,7 +156,11 @@ class LeaveManagementService {
     if (!this.isInstructor(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
+    const cacheKey = `getLeaveTypeforInstructor:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLivestream = await this.livestream.findOne({
       where: {
         id: livestreamId,
@@ -161,7 +192,7 @@ class LeaveManagementService {
         },
       ],
     });
-
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(findLeave));
     return findLeave;
   }
 
@@ -271,7 +302,7 @@ class LeaveManagementService {
         },
       }
     );
-
+    await this.redisFunctions.removeDataFromRedis();
     if (!updateLeaveBalance)
       throw new HttpException(409, 'Leave balance not updated');
 
@@ -283,7 +314,11 @@ class LeaveManagementService {
       throw new HttpException(403, 'Forbidden Resource');
     }
     if (isEmpty(leaveId)) throw new HttpException(400, 'Leave id is empty');
-
+    const cacheKey = `getLeaveById:${leaveId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.manageLeave.findByPk(leaveId, {
       include: [
         {
@@ -294,6 +329,7 @@ class LeaveManagementService {
     });
 
     if (!findLeave) throw new HttpException(409, 'Leave not found');
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(findLeave));
 
     return findLeave;
   }
@@ -348,7 +384,7 @@ class LeaveManagementService {
     );
 
     if (!updateLeave) throw new HttpException(409, 'Leave not updated');
-
+    await this.redisFunctions.removeDataFromRedis();
     return updateLeave;
   }
 
@@ -364,7 +400,7 @@ class LeaveManagementService {
     const deleteLeave = await this.manageLeave.destroy({
       where: { id: leaveId },
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return deleteLeave;
   }
 
@@ -463,9 +499,7 @@ class LeaveManagementService {
       };
       this.emailService.RejectLeave(mailData);
     }
-    // if (isApprovedCount.count === 1) {
-    // }
-
+    await this.redisFunctions.removeDataFromRedis();
     return { count: isApprovedCount.count };
   }
 
@@ -474,7 +508,11 @@ class LeaveManagementService {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
 
     if (isEmpty(date)) throw new HttpException(400, 'Date is empty');
-
+    const cacheKey = `getEventsByDate:${date}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findEvents = await this.livestream.findAll({
       where: DB.Sequelize.and(
         { date: newDate },
@@ -486,17 +524,8 @@ class LeaveManagementService {
         }
       ),
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(findEvents));
     return findEvents;
-    // return findEvents.map((event) => {
-    //   return
-    //   {
-    //     id: event.id,
-    //     date: event.date,
-    //     startTime: event.startTime,
-    //     endTime: event.endTime,
-    //     title: event.title,
-    //   };
-    // });
   }
 
   public async getLeaveByInstitute({ loggedUser, queryObject }) {
@@ -511,9 +540,14 @@ class LeaveManagementService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getLeaveByInstitute:${loggedUser.id}:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const instituteLivestream = await this.livestream.findAll({
       where: {
         instituteId: loggedUser.id,
@@ -545,7 +579,13 @@ class LeaveManagementService {
       limit: pageSize,
       offset: pageNo,
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return {
       count: findLeave.count,
       records: findLeave.rows,

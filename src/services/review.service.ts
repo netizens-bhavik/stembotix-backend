@@ -1,6 +1,7 @@
 import { ReviewDTO } from '@/dtos/review.dto';
 import { HttpException } from '@/exceptions/HttpException';
 import { Review } from '@/interfaces/review.interface';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 
 class ReviewService {
@@ -8,11 +9,13 @@ class ReviewService {
   public course = DB.Course;
   public product = DB.Product;
   public review = DB.Review;
+  public redisFunctions = new RedisFunctions();
 
   public async createReview(reviewDetail, user): Promise<ReviewDTO> {
     const courseData = await this.course.findOne({
       where: { id: reviewDetail.postId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (courseData) {
       const reviewData = await this.review.findOne({
         where: {
@@ -66,7 +69,11 @@ class ReviewService {
     const [user, userCondition] = queryObject.user
       ? [`%${queryObject.user}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `getReviewByAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
@@ -98,6 +105,13 @@ class ReviewService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: reviewData.count,
+        records: reviewData.rows,
+      })
+    );
     return { totalCount: reviewData.count, review: reviewData.rows };
   }
 
@@ -108,7 +122,11 @@ class ReviewService {
     // Pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
+    const cacheKey = `getReviewByAdmin:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const reviewData = await this.review.findAndCountAll({
       where: DB.Sequelize.or(
         {
@@ -127,6 +145,13 @@ class ReviewService {
       offset: pageNo,
       order: [['createdAt', 'DESC']],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: reviewData.count,
+        records: reviewData.rows,
+      })
+    );
     return { totalCount: reviewData.count, review: reviewData.rows };
   }
   public async updateReview(
@@ -144,6 +169,7 @@ class ReviewService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateReview[0], review: updateReview[1] };
   }
   public async deleteReview(reviewId): Promise<{ count: number }> {
@@ -152,7 +178,7 @@ class ReviewService {
         id: reviewId,
       },
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 }
