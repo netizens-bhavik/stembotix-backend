@@ -116,7 +116,7 @@ class LiveStreamService {
     totalCount: number;
     records: (LiveStream | undefined)[];
   }> {
-    const cacheKey = `viewLiveStream:${user.id}`;
+    const cacheKey = `viewLiveStream:${user?.id}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
