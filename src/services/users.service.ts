@@ -7,12 +7,15 @@ import { isEmpty } from '@utils/util';
 import { Op } from 'sequelize';
 import EmailService from './email.service';
 import moment from 'moment';
+import { RedisFunctions } from '@/redis';
 class UserService {
   public users = DB.User;
   public course = DB.Course;
   public product = DB.Product;
   public role = DB.Role;
+  public trainer = DB.Trainer;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public isSuperAdmin(userData): boolean {
     return userData.role === 'SuperAdmin';
@@ -37,6 +40,11 @@ class UserService {
       ...adminDetail,
       role_id: record.id,
     });
+    if (adminDetail.role.match(/Instructor/i)) {
+      await this.trainer.create({
+        user_id: createAdmin.id,
+      });
+    }
     if (createAdmin) {
       var userUpdate = await this.users.update(
         { isEmailVerified: true },
@@ -44,6 +52,7 @@ class UserService {
       );
       if (!userUpdate) throw new HttpException(500, 'Please try again');
     }
+    await this.redisFunctions.removeDataFromRedis();
     return {
       id: userUpdate[1][0].id,
       fullName: userUpdate[1][0].fullName,
@@ -70,6 +79,7 @@ class UserService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return {
       id: data[1][0].id,
       fullName: data[1][0].fullName,
@@ -93,13 +103,17 @@ class UserService {
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
     // Search
     const [search, searchCondition] = queryObject.search
-      ? [`%${queryObject.search}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
     // role filter
     const [role, roleCondition] = queryObject.role
-      ? [`%${queryObject.role}%`, DB.Sequelize.Op.like]
+      ? [`%${queryObject.role}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `findAllUser:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const userCount = await this.users.findAndCountAll({
       where: { role: { [roleCondition]: role } },
     });
@@ -116,6 +130,13 @@ class UserService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: userCount.count,
+        records: allUser,
+      })
+    );
     // const data = await redisFunction('allUsers',allUser)
     return { totalCount: userCount.count, records: allUser };
   }
@@ -123,11 +144,16 @@ class UserService {
   public async findUserById(loggedUser, userId: string): Promise<User> {
     if (!this.isSuperAdmin(loggedUser))
       throw new HttpException(401, 'Unauthorized');
+    const cacheKey = `getProductById:${userId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     if (isEmpty(userId)) throw new HttpException(400, 'UserId is empty');
 
     const findUser: User = await this.users.findByPk(userId);
     if (!findUser) throw new HttpException(409, "User doesn't exist");
-
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(findUser));
     return findUser;
   }
 
@@ -144,7 +170,7 @@ class UserService {
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     await this.users.update(userData, { where: { id: userId } });
-
+    await this.redisFunctions.removeDataFromRedis();
     const updateUser: User = await this.users.findByPk(userId);
     return updateUser;
   }
@@ -177,6 +203,7 @@ class UserService {
       };
       this.emailService.sendMailtoUserforAccountDeletion(mailerData);
     }
+    await this.redisFunctions.removeDataFromRedis();
 
     return findUser;
   }

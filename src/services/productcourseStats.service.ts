@@ -1,11 +1,13 @@
 import DB from '@/databases';
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 import moment from 'moment';
 import { Op } from 'sequelize';
 
 class CourseProductStatsService {
   public course = DB.Course;
   public product = DB.Product;
+  public redisFunctions = new RedisFunctions();
 
   public isInstructor(user): boolean {
     return user.role === 'Instructor';
@@ -15,6 +17,11 @@ class CourseProductStatsService {
   }
 
   public async courseStatsforInstructor(user) {
+    const cacheKey = 'courseStatsforInstructor';
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     if (!this.isInstructor(user)) throw new HttpException(401, 'Unauthorized');
     const months = [];
     for (let i = 1; i <= 12; i++) {
@@ -40,9 +47,15 @@ class CourseProductStatsService {
       });
       months.push(courseRecordsPerMonth);
     }
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(months));
     return months;
   }
   public async productStatsforInstructor(user) {
+    const cacheKey = 'productStatsforInstructor';
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     if (!this.isInstructor(user)) throw new HttpException(401, 'Unauthorized');
     const months = [];
     for (let i = 1; i <= 12; i++) {
@@ -68,10 +81,16 @@ class CourseProductStatsService {
       });
       months.push(productRecordsPerMonth);
     }
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(months));
     return months;
   }
 
   public async getProductStatsPerMonths(user) {
+    const cacheKey = 'getProductStatsPerMonths';
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     if (!this.isInstitute(user)) throw new HttpException(401, 'Unauthorized');
     const months = [];
     for (let i = 1; i <= 12; i++) {
@@ -97,6 +116,7 @@ class CourseProductStatsService {
       });
       months.push(recordsPerMonth);
     }
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(months));
     return months;
   }
 }

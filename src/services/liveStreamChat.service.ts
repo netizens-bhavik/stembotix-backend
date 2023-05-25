@@ -1,20 +1,21 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { LiveStreamChat } from '@/interfaces/liveStramChat.interface';
+import { RedisFunctions } from '@/redis';
 
 class LiveStreamChatService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
   public subscribeEvent = DB.SubscribeEvent;
   public liveStreamChat = DB.LiveStreamChat;
+  public redisFunctions = new RedisFunctions();
 
   public async sendLiveStreamChat(
     livestreamId: string,
     message: string,
     loggedUser
   ): Promise<LiveStreamChat> {
-   
-    const userId=loggedUser.id;
+    const userId = loggedUser.id;
 
     const dbLiveStreamCheck = await this.liveStream.findOne({
       where: { id: livestreamId },
@@ -28,7 +29,7 @@ class LiveStreamChatService {
       const subscribeEvent = await this.subscribeEvent.findOne({
         where: { user_id: loggedUser.id, livestream_id: livestreamId },
       });
-  
+
       if (!subscribeEvent) {
         throw new HttpException(
           400,
@@ -49,6 +50,8 @@ class LiveStreamChatService {
     if (!sendLiveStreamChatMsg) {
       throw new HttpException(500, 'Something went wrong');
     }
+    await this.redisFunctions.removeDataFromRedis();
+
     return {
       message: sendLiveStreamChatMsg.messages,
     };
@@ -76,6 +79,8 @@ class LiveStreamChatService {
     if (!deleteLiveStreamChatMsg) {
       throw new HttpException(500, 'Something went wrong');
     }
+    await this.redisFunctions.removeDataFromRedis();
+
     return {
       message: 'Message deleted successfully',
     };
@@ -83,6 +88,11 @@ class LiveStreamChatService {
   public async getLiveStreamChatMsg(
     livestreamId: string
   ): Promise<LiveStreamChat> {
+    const cacheKey = `getLiveStreamChatMsg:${livestreamId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const getLiveStreamChatMsg = await this.liveStreamChat.findAndCountAll({
       where: { livestreamId: livestreamId, deletedAt: null },
       include: [
@@ -96,6 +106,13 @@ class LiveStreamChatService {
     if (!getLiveStreamChatMsg) {
       throw new HttpException(500, 'Something went wrong');
     }
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: getLiveStreamChatMsg.count,
+        records: getLiveStreamChatMsg.rows,
+      })
+    );
     return {
       message: getLiveStreamChatMsg,
     };

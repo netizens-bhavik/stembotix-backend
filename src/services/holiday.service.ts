@@ -6,6 +6,7 @@ import {
   createHolidayData,
   AllHolidaywithDetails,
 } from '@/interfaces/holiday.interface';
+import { RedisFunctions } from '@/redis';
 
 class HolidayService {
   public user = DB.User;
@@ -18,6 +19,7 @@ class HolidayService {
   public holiday = DB.Holidays;
   public leaveType = DB.LeaveTypes;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
     return (
@@ -41,6 +43,12 @@ class HolidayService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `getAllHoliday:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
     const findLeave = await this.holiday.findAndCountAll({
       attributes: ['id', 'date'],
       include: [
@@ -56,11 +64,22 @@ class HolidayService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
   public async getAllHolidays({ loggedUser }) {
+    const cacheKey = `getHoliday:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.holiday.findAll({
       include: [
         {
@@ -70,6 +89,7 @@ class HolidayService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(findLeave));
 
     return findLeave;
   }
@@ -92,7 +112,7 @@ class HolidayService {
       ...holidayData,
       instituteId: loggedUser.id,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return createHolidayData;
   }
 
@@ -128,6 +148,7 @@ class HolidayService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return updateHolidayData;
   }
 
@@ -153,6 +174,7 @@ class HolidayService {
     const deleteHolidayData = await this.holiday.destroy({
       where: { id: holidayId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (deleteHolidayData === 1)
       throw new HttpException(200, 'Holiday deleted successfully');
     return { count: deleteHolidayData };

@@ -1,6 +1,7 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import EmailService from './email.service';
+import { RedisFunctions } from '@/redis';
 
 class InstructorLeaveService {
   public user = DB.User;
@@ -11,6 +12,7 @@ class InstructorLeaveService {
   public instructorHasLeave = DB.InstructorHasLeave;
   public leaveType = DB.LeaveTypes;
   public emailService = new EmailService();
+  public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
     return (
@@ -38,7 +40,11 @@ class InstructorLeaveService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-
+    const cacheKey = `getInstructorLeave:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const findLeave = await this.instructorHasLeave.findAndCountAll({
       include: [
         {
@@ -70,7 +76,13 @@ class InstructorLeaveService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findLeave.count,
+        records: findLeave.rows,
+      })
+    );
     return { totalCount: findLeave.count, records: findLeave.rows };
   }
 
@@ -106,7 +118,7 @@ class InstructorLeaveService {
     const createLeave = await this.instructorHasLeave.create({
       ...leaveData,
     });
-
+    await this.redisFunctions.removeDataFromRedis();
     return createLeave;
   }
 
@@ -146,6 +158,7 @@ class InstructorLeaveService {
       { ...leaveData },
       { where: { id: intructorLeaveId } }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return updateLeave;
   }
 
@@ -159,6 +172,7 @@ class InstructorLeaveService {
     const deleteLeave = await this.instructorHasLeave.destroy({
       where: { id: intructorLeaveId },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (deleteLeave === 1)
       throw new HttpException(200, 'Leave Deleted Successfully');
 
@@ -171,6 +185,11 @@ class InstructorLeaveService {
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
+    }
+    const cacheKey = `getInstructorsList:${loggedUser.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
     }
     const findInstructor = await this.instituteInstructor.findAndCountAll({
       attributes: ['id'],
@@ -186,6 +205,14 @@ class InstructorLeaveService {
         },
       ],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: findInstructor.count,
+        records: findInstructor.rows,
+      })
+    );
+
     return { totalCount: findInstructor.count, records: findInstructor.rows };
   }
 }

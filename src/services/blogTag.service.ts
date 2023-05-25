@@ -47,11 +47,11 @@ class BlogTagService {
     const tagData = await this.blogTag.findAndCountAll({
       where: DB.Sequelize.and({ deletedAt: null }),
     });
-    const cacheKey = `allBlogTagAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
-    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `allBlogTagAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
 
     const data = await this.blogTag.findAndCountAll({
       where: DB.Sequelize.and({
@@ -64,22 +64,22 @@ class BlogTagService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    await this.redisFunctions.setKey(
-      cacheKey,
-      JSON.stringify({
-        totalCount: data.length,
-        records: data,
-      })
-    );
+    // await this.redisFunctions.setKey(
+    //   cacheKey,
+    //   JSON.stringify({
+    //     totalCount: data.length,
+    //     records: data,
+    //   })
+    // );
     return { totalCount: data.count, records: data.rows };
   }
 
   public async getBlogTags(user): Promise<BlogTag[]> {
-    const cacheKey = `getBlogTag:${user.id}`;
-    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `getBlogTag:${user.id}`;
+    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
     const data: (BlogTag | undefined)[] = await this.blogTag.findAll({
       where: DB.Sequelize.and({
         deletedAt: null,
@@ -88,7 +88,7 @@ class BlogTagService {
       //   model: this.blog,
       // },
     });
-    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
+    // await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
 
     return data;
   }
