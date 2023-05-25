@@ -25,6 +25,7 @@ class BlogTagService {
         userId: user.id,
       },
     });
+    // await this.redisFunctions.removeDataFromRedis();
     return tagData;
   }
 
@@ -44,9 +45,6 @@ class BlogTagService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const tagData = await this.blogTag.findAndCountAll({
-      where: DB.Sequelize.and({ deletedAt: null }),
-    });
     // const cacheKey = `allBlogTagAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
     // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     // if (cachedData) {
@@ -67,19 +65,19 @@ class BlogTagService {
     // await this.redisFunctions.setKey(
     //   cacheKey,
     //   JSON.stringify({
-    //     totalCount: data.length,
+    //     totalCount: data.count,
     //     records: data,
     //   })
     // );
-    return { totalCount: data.count, records: data.rows };
+    return { totalCount: data.count, records: data };
   }
 
   public async getBlogTags(user): Promise<BlogTag[]> {
-    // const cacheKey = `getBlogTag:${user.id}`;
-    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    // if (cachedData) {
-    //   return cachedData;
-    // }
+    const cacheKey = `getBlogTag:${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data: (BlogTag | undefined)[] = await this.blogTag.findAll({
       where: DB.Sequelize.and({
         deletedAt: null,
@@ -88,7 +86,7 @@ class BlogTagService {
       //   model: this.blog,
       // },
     });
-    // await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
 
     return data;
   }
@@ -119,6 +117,7 @@ class BlogTagService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateData[0], rows: updateData[1] };
   }
 
@@ -134,6 +133,7 @@ class BlogTagService {
     });
     if (res === 1)
       throw new HttpException(200, 'Blog Tag Deleted Successfully');
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 0) throw new HttpException(404, 'No data found');
 
     return { count: res };

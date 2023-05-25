@@ -19,6 +19,7 @@ class GalleryService {
     const gallery = await this.gallery.create({
       thumbnail: file.path,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return gallery;
   }
   public async getGallerybyUser(): Promise<{
@@ -69,6 +70,7 @@ class GalleryService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
+
     const cacheKey = `allAllGallery:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
@@ -86,6 +88,7 @@ class GalleryService {
         records: record,
       })
     );
+    console.log(record);
     return { totalCount: record.count, records: record.rows };
   }
 
@@ -119,6 +122,7 @@ class GalleryService {
           returning: true,
         }
       );
+      await this.redisFunctions.removeDataFromRedis();
       return { count: updateGallery[0], rows: updateGallery[1] };
     }
   }
@@ -145,6 +149,7 @@ class GalleryService {
         id: galleryId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res };
   }
 }

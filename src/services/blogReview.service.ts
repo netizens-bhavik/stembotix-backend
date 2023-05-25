@@ -55,6 +55,7 @@ class BlogReviewService {
         message,
       };
     }
+    await this.redisFunctions.removeDataFromRedis();
     return { record, message };
   }
 
@@ -76,7 +77,6 @@ class BlogReviewService {
         },
       ],
     });
-    console.log(response);
     await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
 
     return response;
@@ -103,6 +103,7 @@ class BlogReviewService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateData[0], rows: updateData[1] };
   }
   public async deleteBlogReviews({ reviewId }): Promise<{ count: number }> {
@@ -118,6 +119,7 @@ class BlogReviewService {
         id: reviewId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     if (res === 1)
       throw new HttpException(200, 'Blog Tag Deleted Successfully');
     return { count: res };

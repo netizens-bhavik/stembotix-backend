@@ -32,6 +32,7 @@ class ContactService {
       };
       this.emailService.sendContact(mailData);
     }
+    await this.redisFunctions.removeDataFromRedis();
     return newContact;
   }
 
@@ -104,6 +105,7 @@ class ContactService {
         id: contactId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return response;
   }
 }

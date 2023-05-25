@@ -40,6 +40,7 @@ class CommentService {
       userId: user.id,
       thumbnail: thumbnailPath,
     });
+    await this.redisFunctions.removeDataFromRedis();
     return newComment;
   }
 
@@ -148,7 +149,7 @@ class CommentService {
         returning: true,
       }
     );
-
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateComment[0], rows: updateComment[1] };
   }
 
@@ -161,6 +162,7 @@ class CommentService {
         id: commentId,
       },
     });
+    await this.redisFunctions.removeDataFromRedis();
     return { count: res, row: res[1] };
   }
 }
