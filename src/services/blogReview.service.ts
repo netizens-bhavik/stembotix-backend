@@ -1,16 +1,29 @@
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 import DB from '@databases';
 import { BlogReview } from '@interfaces/blogReview.interface';
+
+export type BlogReviews = {
+  record: BlogReview;
+  message: string;
+};
 class BlogReviewService {
   public blogReview = DB.BlogReview;
   public blog = DB.Blog;
   public user = DB.User;
+  private redisFunctions = new RedisFunctions();
 
-  public async addReview({ reviewDetails, user, blogId }): Promise<BlogReview> {
+  public async addReview({
+    reviewDetails,
+    user,
+    blogId,
+  }): Promise<BlogReviews> {
     if (!user) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-    const reviewData = await this.blogReview.findOrCreate({
+    let message = 'Review Successfully';
+
+    const [record, isCreated] = await this.blogReview.findOrCreate({
       where: {
         userId: user.id,
       },
@@ -18,12 +31,40 @@ class BlogReviewService {
         ...reviewDetails,
         blogId: blogId,
         userId: user.id,
+        sender_name: user.fullName,
+        email: user.email,
       },
     });
-    return reviewData;
+    if (!isCreated) {
+      await this.blogReview.destroy({
+        where: {
+          blogId: blogId,
+          user_id: user.id,
+        },
+      });
+      const deletedReview = await this.blogReview.findOne({
+        where: {
+          blogId: blogId,
+          user_id: user.id,
+        },
+        paranoid: false,
+      });
+      message = 'Unreviewed Successfully';
+      return {
+        record: deletedReview,
+        message,
+      };
+    }
+    return { record, message };
   }
 
   public async getBlogReview({ blogId }): Promise<BlogReview[]> {
+    const cacheKey = `getBlogRev:${blogId}`;
+
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.blogReview.findAll({
       where: {
         blogId: blogId,
@@ -35,6 +76,9 @@ class BlogReviewService {
         },
       ],
     });
+    console.log(response);
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return response;
   }
   public async updateBlogReviews({

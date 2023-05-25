@@ -423,10 +423,7 @@ class LiveStreamService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
-    // liveStreamData.rows.map((elem) => {
-    //   elem.startTime = convertTimeTo12Hour(elem.startTime);
-    //   elem.endTime = convertTimeTo12Hour(elem.endTime);
-    // });
+
     return { totalCount: liveStreamData.count, records: liveStreamData.rows };
   }
   public async listLiveEvent(
@@ -531,30 +528,3 @@ class LiveStreamService {
   }
 }
 export default LiveStreamService;
-
-// const time = moment(liveStreamDetails.startTime, 'HH:mm').format(
-//   'HH:mm:ss'
-// );
-// const lastTime = moment(liveStreamDetails.endTime, 'HH:mm').format(
-//   'HH:mm:ss'
-// );
-
-// const event = await this.liveStream.findAndCountAll({
-//   where: {
-//     userId: user.id,
-//     date: date,
-//     startTime: {
-//       [Op.between]: [time, lastTime],
-//     },
-//     endTime: {
-//       [Op.between]: [time, lastTime],
-//     },
-//   },
-// });
-// console.log(event);
-// if (event.count > 0) {
-//   throw new HttpException(
-//     409,
-//     'Event already exists at the same date & time. Please change the date & time and try again.'
-//   );
-// }

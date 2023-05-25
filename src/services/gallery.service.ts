@@ -1,9 +1,11 @@
 import DB from '@databases';
 import { HttpException } from '@exceptions/HttpException';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
+import { RedisFunctions } from '@/redis';
 
 class GalleryService {
   public gallery = DB.Gallery;
+  public redisFunctions = new RedisFunctions();
 
   public isAdmin(user): boolean {
     return user.role === 'SuperAdmin';
@@ -23,16 +25,35 @@ class GalleryService {
     totalCount: number;
     records: object;
   }> {
+    const cacheKey = 'galleryRecords';
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const record = await this.gallery.findAndCountAll();
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: record.count,
+        records: record.rows,
+      })
+    );
     return { totalCount: record.count, records: record.rows };
   }
   public async getGallerybyId({ user, galleryId }) {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const cacheKey = `getGallery:${galleryId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const record = await this.gallery.findOne({
       where: { id: galleryId },
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(record));
+
     return record;
   }
   public async getGallerybyAdmin({
@@ -48,12 +69,23 @@ class GalleryService {
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
-
+    const cacheKey = `allAllGallery:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const record = await this.gallery.findAndCountAll({
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: record.length,
+        records: record,
+      })
+    );
     return { totalCount: record.count, records: record.rows };
   }
 

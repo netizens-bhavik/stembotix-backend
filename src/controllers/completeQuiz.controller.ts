@@ -27,9 +27,9 @@ class CompleteQuizController {
     next: NextFunction
   ) => {
     try {
-      const { quizid } = req.params;
+      const { quizId } = req.params;
       const response = await this.completeQuizService.getCompleteQuizById(
-        quizid
+        quizId
       );
       res.status(200).send(response);
     } catch (error) {

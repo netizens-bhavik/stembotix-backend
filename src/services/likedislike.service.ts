@@ -14,7 +14,7 @@ class LikeDislikeService {
   public async addLikeDislikeOnComment(
     likeDislikeDetails
   ): Promise<LikeDislikeType> {
-    let message = 'Like Successfuly';
+    let message = 'Like Successfully';
     const [record, isCreated] = await this.likedislike.findOrCreate({
       where: {
         comment_id: likeDislikeDetails.comment_id,
@@ -32,11 +32,10 @@ class LikeDislikeService {
         where: {
           comment_id: likeDislikeDetails.comment_id,
           user_id: likeDislikeDetails.user.id,
-
         },
         paranoid: false,
       });
-      message = 'Dislike Successfuly';
+      message = 'Dislike Successfully';
       return {
         record: deletedLike,
         message,
@@ -48,7 +47,7 @@ class LikeDislikeService {
   public async addLikeDislikeOnReply(
     likeDislikeDetail
   ): Promise<LikeDislikeType> {
-    let message = 'Like Successfuly';
+    let message = 'Like Successfully';
     const [record, isCreated] = await this.likedislike.findOrCreate({
       where: {
         reply_id: likeDislikeDetail.reply_id,
@@ -69,7 +68,7 @@ class LikeDislikeService {
         },
         paranoid: false,
       });
-      message = 'Dislike Successfuly';
+      message = 'Dislike Successfully';
       return {
         record: deleteRecord,
         message,
