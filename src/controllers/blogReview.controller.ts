@@ -11,17 +11,15 @@ class BlogReviewController {
     next: NextFunction
   ) => {
     try {
-      const reviewDetails: Request = req.body;
+      const reviewDetails = req.body;
       const user = req.user;
       const { blogId } = req.params;
-      const response: BlogReview = await this.blogReviewService.addReview({
+      const response = await this.blogReviewService.addReview({
         reviewDetails,
         user,
         blogId,
       });
-      res
-        .status(200)
-        .send({ response: response, message: 'Review Added Successfully' });
+      res.status(200).send(response);
     } catch (error) {
       next(error);
     }
@@ -33,11 +31,9 @@ class BlogReviewController {
   ) => {
     try {
       const { blogId } = req.params;
-      const response: BlogReview[] = await this.blogReviewService.getBlogReview(
-        {
-          blogId,
-        }
-      );
+      const response = await this.blogReviewService.getBlogReview({
+        blogId,
+      });
       res.status(200).send(response);
     } catch (error) {
       next(error);

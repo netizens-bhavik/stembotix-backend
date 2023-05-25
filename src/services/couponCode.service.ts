@@ -3,6 +3,7 @@ import { HttpException } from '@/exceptions/HttpException';
 import Razorpay from 'razorpay';
 import { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } from '@config';
 import crypto from 'crypto';
+import { RedisFunctions } from '@/redis';
 
 function generateCouponCode(length: number): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -51,11 +52,6 @@ function generatePaymentIdAndSignature() {
   };
 }
 
-// enum ItemTypes {
-//   Product = 'Product',
-//   Course = 'Course',
-// }
-
 class CouponCodeService {
   public user = DB.User;
   public course = DB.Course;
@@ -68,6 +64,7 @@ class CouponCodeService {
   public discountCouponMap = DB.DiscountCouponMap;
   public orderItem = DB.OrderItem;
   public product = DB.Product;
+  private redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'Institute';
@@ -229,6 +226,13 @@ class CouponCodeService {
     if (!this.isInstitute(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const cacheKey = `coupon:${courseId}:${user.id}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
 
     const response = await this.couponCode.findAll({
       where: {
@@ -236,18 +240,34 @@ class CouponCodeService {
         instituteId: user.id,
       },
     });
+    if (!ifCacheKeyAlreadyExists) {
+      await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+    }
     return response;
   }
+
   public async getCouponCodebyCourseIdbyInstructor({ courseId, user }) {
     if (!this.isInstructor(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const cacheKey = `coupon:${courseId}:${user.id}`;
+    const ifCacheKeyAlreadyExists = await this.redisFunctions.checkIfKeyExists(
+      cacheKey
+    );
+    if (ifCacheKeyAlreadyExists) {
+      return await this.redisFunctions.getRedisKey(cacheKey);
+    }
+
     const response = await this.couponCode.findAll({
       where: {
         course_id: courseId,
         instructorId: user.id,
       },
     });
+
+    if (!ifCacheKeyAlreadyExists) {
+      await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+    }
     return response;
   }
 
@@ -330,6 +350,13 @@ class CouponCodeService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+
+    const cacheKey = `discountCoupon:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
     const data = await this.discountCode.findAndCountAll({
       where: {
         discount: {
@@ -340,6 +367,13 @@ class CouponCodeService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: data.count,
+        records: data.rows,
+      })
+    );
 
     return { totalCount: data.count, records: data.rows };
   }
@@ -417,7 +451,6 @@ class CouponCodeService {
     cartId,
   }): Promise<{ rows: object }> {
     const coupon = couponDetail.couponCode;
-
     const data = await this.discountCode.findOne({
       where: {
         couponCode: coupon,
@@ -437,11 +470,15 @@ class CouponCodeService {
       cart_id: cartId,
       discountCouponId: data.id,
     });
-
     return { rows: data };
   }
 
   public async getAllUserAppliedCoupon({ user }) {
+    const cacheKey = `userAppliedCoupon:${user.id}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const record = await this.couponCode.findAndCountAll({
       where: DB.Sequelize.or(
         { instructorId: user.id },
@@ -466,6 +503,7 @@ class CouponCodeService {
         data.push(...response);
       })
     );
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
     return data;
   }
 }

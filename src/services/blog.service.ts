@@ -1,4 +1,5 @@
 import { HttpException } from '@/exceptions/HttpException';
+import { RedisFunctions } from '@/redis';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
 import DB from '@databases';
 import { Blog } from '@interfaces/blog.interface';
@@ -8,6 +9,7 @@ class BlogService {
   public blogCategory = DB.BlogCategory;
   public blogTag = DB.BlogTags;
   public user = DB.User;
+  private redisFunctions = new RedisFunctions();
 
   public isAdmin(user): boolean {
     return user.role === 'SuperAdmin';
@@ -37,7 +39,13 @@ class BlogService {
     return blogData;
   }
 
-  public async getBlog({ user }): Promise<Blog[]> {
+  public async getBlog(user): Promise<Blog[]> {
+    const cacheKey = `getBlog:${user.id}`;
+
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.blog.findAll({
       where: {
         deletedAt: null,
@@ -55,6 +63,8 @@ class BlogService {
         },
       ],
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(response));
+
     return response;
   }
   public async getBlogAdmin({
@@ -73,6 +83,11 @@ class BlogService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
+    const cacheKey = `allBlogAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const response = await this.blog.findAll({
       where: {
         deletedAt: null,
@@ -100,9 +115,22 @@ class BlogService {
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
     });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: response.length,
+        records: response,
+      })
+    );
+
     return { totalCount: response.length, records: response };
   }
   public async getBlogbyId({ blogId, user }) {
+    const cacheKey = `coupon:${blogId}`;
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const data = await this.blog.findOne({
       where: {
         id: blogId,
@@ -111,6 +139,7 @@ class BlogService {
         model: this.blogTag,
       },
     });
+    await this.redisFunctions.setKey(cacheKey, JSON.stringify(data));
     return data;
   }
   public async updateBlog({ blogId, blogDetails, file, user }): Promise<Blog> {

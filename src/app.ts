@@ -18,6 +18,8 @@ import http, { Server } from 'http';
 import https, { Server as SecureServer } from 'https';
 import { readFileSync } from 'fs';
 import socketServer from './socket';
+import { RedisFunctions } from './redis';
+
 class App {
   public app: express.Application;
   public env: string;
@@ -26,6 +28,7 @@ class App {
   public socket: any;
   public httpServer: Server;
   public httpsServer: SecureServer;
+  public redisInit = new RedisFunctions();
   private credentials: { key: string; cert: string } = { key: '', cert: '' };
 
   constructor(routes: Routes[]) {
@@ -42,7 +45,9 @@ class App {
     this.initializeErrorHandling();
     this.httpServer = http.createServer(this.app);
     this.httpsServer = https.createServer(this.getCredentials(), this.app);
+    this.redisInit;
   }
+
   public getCredentials() {
     this.credentials.key = readFileSync(
       path.join(__dirname, '/cert/key.pem'),

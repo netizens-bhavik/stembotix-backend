@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/HttpException';
 import { CurriCulumVideo } from '@/interfaces/curriculumVideo.interface';
 import { API_BASE } from '@/config';
 import { deleteFromS3 } from '@/utils/s3/s3Uploads';
+import { RedisFunctions } from '@/redis';
 
 class CurriculumVideoService {
   public curriculumVideo = DB.CurriCulumVideo;
@@ -11,6 +12,7 @@ class CurriculumVideoService {
   public trainer = DB.Trainer;
   public user = DB.User;
   public courseTrainer = DB.CoursesTrainers;
+  public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
     return user.role === 'Instructor' || user.role === 'SuperAdmin';
@@ -87,7 +89,12 @@ class CurriculumVideoService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
+    const cacheKey = `getBlog:${sectionId}`;
 
+    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
     const videoData = await this.curriculumVideo.findAndCountAll({
       where: { curriculum_id: sectionId },
     });
@@ -110,6 +117,13 @@ class CurriculumVideoService {
         offset: pageNo,
         order: [[`${sortBy}`, `${order}`]],
       });
+    await this.redisFunctions.setKey(
+      cacheKey,
+      JSON.stringify({
+        totalCount: videoData.count,
+        records: data,
+      })
+    );
     return { totalCount: videoData.count, records: data };
   }
 

@@ -20,12 +20,14 @@ class BlogReviewRoute {
     this.router.post(
       `${this.path}/:blogId`,
       passport.authenticate('jwt', { session: false }),
+      validationMiddleware(BlogReviewDto, 'body'),
       this.blogReview.addBlogReview
     );
     this.router.get(`${this.path}/:blogId`, this.blogReview.getBlogReview);
     this.router.put(
       `${this.path}/:reviewId`,
       passport.authenticate('jwt', { session: false }),
+      validationMiddleware(BlogReviewDto, 'body'),
       this.blogReview.updateBlogReview
     );
     this.router.delete(
