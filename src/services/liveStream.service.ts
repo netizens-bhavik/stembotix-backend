@@ -116,7 +116,7 @@ class LiveStreamService {
     totalCount: number;
     records: (LiveStream | undefined)[];
   }> {
-    const cacheKey = `viewLiveStream:${user.id}`;
+    const cacheKey = `viewLiveStream:${user?.id}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -124,7 +124,7 @@ class LiveStreamService {
     const currentDate = moment().format('YYYY-MM-DD');
     const currentTime = moment().format('HH:mm:ss');
     const streamData = await this.liveStream.findAndCountAll({
-      where: {},
+      where: { deletedAt: null },
       include: {
         model: this.user,
       },
@@ -549,7 +549,7 @@ class LiveStreamService {
     }
 
     const order = queryObject.order || 'ASC';
-    
+
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;
