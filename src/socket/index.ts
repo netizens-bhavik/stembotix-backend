@@ -80,6 +80,18 @@ const initEvents = (io: Server) => {
       //   );
       // }
     });
+      socket.on('disconnect', async () => {
+      console.log('🔥: A user disconnected');
+      const livestreamId = await liveStreamchatlogsService.userDisconnected({
+        socketId: socket.id,
+      });
+      if (livestreamId) {
+        io.emit(
+          'latestActiveUsers',
+          await fetchActiveLiveStreamUsers(livestreamId)
+        );
+      }
+    });
   });
 };
 
