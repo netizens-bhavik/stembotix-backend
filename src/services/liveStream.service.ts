@@ -348,8 +348,9 @@ class LiveStreamService {
     }
 
     if (
-      user.id !== record.userId &&
-      user.id !== record.instituteId &&
+      (user.id !== record.userId &&
+        user.id !== record.instituteId &&
+        user.role !== 'SuperAdmin') ||
       user.role !== 'Admin'
     )
       throw new HttpException(403, "You don't have Authority to Update Event");
@@ -370,6 +371,7 @@ class LiveStreamService {
           returning: true,
         }
       );
+      await this.redisFunctions.removeDataFromRedis();
       return { count: updateLiveStream[0], rows: updateLiveStream[1] };
     }
     // const thumbnail = file;

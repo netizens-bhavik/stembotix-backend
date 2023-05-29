@@ -315,7 +315,7 @@ class ProductService {
     if (!record) throw new HttpException(403, 'Forbidden Resource');
     if (
       user.id !== record.Products[0].ProductUser.userId &&
-      user.role !== 'Admin'
+      user.role !== 'SuperAdmin'
     )
       throw new HttpException(403, "You don't have Authority to Edit Product");
     if (file) {
@@ -340,6 +340,7 @@ class ProductService {
           returning: true,
         }
       );
+      await this.redisFunctions.removeDataFromRedis();
       return { count: updateProduct[0], rows: updateProduct[1] };
     }
     const updateProduct = await this.product.update(
@@ -373,7 +374,7 @@ class ProductService {
     });
 
     if (!productRecord) throw new HttpException(403, 'Forbidden Resource');
-    if (user.id !== productRecord.Users[0].id && user.role !== 'Admin')
+    if (user.id !== productRecord.Users[0].id && user.role !== 'SuperAdmin')
       throw new HttpException(
         403,
         "You don't have Authority to Delete Product"
