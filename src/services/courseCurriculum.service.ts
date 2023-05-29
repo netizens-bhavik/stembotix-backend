@@ -145,7 +145,7 @@ class CurriculumSectionService {
     });
     if (
       trainer.id !== record.Course.Trainers[0].User.id &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,
@@ -189,7 +189,7 @@ class CurriculumSectionService {
     });
     if (
       trainer.id !== record.Course.Trainers[0].User.id &&
-      trainer.role !== 'Admin'
+      trainer.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,

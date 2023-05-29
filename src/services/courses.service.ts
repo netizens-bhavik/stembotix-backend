@@ -493,7 +493,7 @@ class CourseService {
       },
     });
     if (!record) throw new HttpException(404, 'No Data Found');
-    if (trainer.id !== record.user_id && trainer.role !== 'Admin')
+    if (trainer.id !== record.user_id && trainer.role !== 'SuperAdmin')
       throw new HttpException(403, "You don't have Authority to Update Course");
 
     if (file) {
@@ -519,6 +519,7 @@ class CourseService {
             returning: true,
           }
         );
+        await this.redisFunctions.removeDataFromRedis();
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
       if (file['trailer']) {
@@ -537,6 +538,7 @@ class CourseService {
             returning: true,
           }
         );
+        await this.redisFunctions.removeDataFromRedis();
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
       if (file['thumbnail']) {
@@ -561,24 +563,6 @@ class CourseService {
         return { count: updateCourse[0], rows: updateCourse[1] };
       }
     }
-
-    // const { trailer, thumbnail } = file;
-
-    // if (trailer) {
-    //   const trailerPath = `${API_BASE}/media/${trailer[0].path
-    //     .split('/')
-    //     .splice(-2)
-    //     .join('/')}`;
-    //   courseDetails.trailer = trailerPath;
-    // }
-    // if (thumbnail) {
-    //   const thumbnailPath = `${API_BASE}/media/${thumbnail[0].path
-    //     .split('/')
-    //     .splice(-2)
-    //     .join('/')}`;
-    //   courseDetails.thumbnail = thumbnailPath;
-    // }
-
     const updateCourse = await this.course.update(
       {
         ...courseDetails,
@@ -590,6 +574,7 @@ class CourseService {
         returning: true,
       }
     );
+    await this.redisFunctions.removeDataFromRedis();
     return { count: updateCourse[0], rows: updateCourse[1] };
   }
 

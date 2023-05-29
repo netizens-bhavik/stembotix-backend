@@ -24,18 +24,21 @@ const initEvents = (io: Server) => {
 
           socket.join(data.roomId);
 
-          io.emit(
+          io.to(data.roomId).emit(
             'latestActiveUsers',
             await fetchActiveLiveStreamUsers(data.roomId)
           );
 
-          io.emit(
+          io.to(data.roomId).emit(
             'messageResponse',
             await liveStreamchatService.getLiveStreamChatMsg(data.roomId)
           );
         }
       } catch (err) {
-        io.emit('errMessage', { message: err.message, type: 'error' });
+        io.to(data.roomId).emit('errMessage', {
+          message: err.message,
+          type: 'error',
+        });
         // console.log('join', err.message);
       }
     });
@@ -47,12 +50,15 @@ const initEvents = (io: Server) => {
           data.loggedUser
         );
 
-        io.emit(
+        io.to(data.livestreamId).emit(
           'messageResponse',
           await liveStreamchatService.getLiveStreamChatMsg(data.livestreamId)
         );
       } catch (err) {
-        io.emit('errMessage', { message: err.message, type: 'error' });
+        io.to(data.livestreamId).emit('errMessage', {
+          message: err.message,
+          type: 'error',
+        });
         // console.log('join', err.message);
       }
     });
@@ -80,13 +86,15 @@ const initEvents = (io: Server) => {
       //   );
       // }
     });
-      socket.on('disconnect', async () => {
+    // change user status to offline when user disconnect
+    socket.on('disconnect', async () => {
       console.log('🔥: A user disconnected');
       const livestreamId = await liveStreamchatlogsService.userDisconnected({
         socketId: socket.id,
       });
+      console.log();
       if (livestreamId) {
-        io.emit(
+        io.to(livestreamId).emit(
           'latestActiveUsers',
           await fetchActiveLiveStreamUsers(livestreamId)
         );

@@ -137,7 +137,7 @@ class HolidayService {
       throw new HttpException(409, `Holiday already exists`);
     if (
       loggedUser.id !== findHoliday.instituteId &&
-      loggedUser.role !== 'Admin'
+      loggedUser.role !== 'SuperAdmin'
     )
       throw new HttpException(403, "You don't have Authority to Edit Holiday");
 
@@ -164,7 +164,7 @@ class HolidayService {
 
     if (
       loggedUser.id !== findHoliday.instituteId &&
-      loggedUser.role !== 'Admin'
+      loggedUser.role !== 'SuperAdmin'
     )
       throw new HttpException(
         403,
