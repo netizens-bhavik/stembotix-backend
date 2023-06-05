@@ -30,14 +30,14 @@ export class RedisFunctions {
 
   public async setKey(key, data) {
     try {
-      await this.client.set(key, data, { NX: true });
+      await this.client.set(key, data, { NX: true,EX: 120 });
     } catch (error) {
       console.log(error);
     }
   }
 
   public async updateKey(key, data) {
-    await this.client.set(key, data, { XX: true });
+    await this.client.set(key, data, { XX: true, EX: 120 });
   }
 
   public async checkIfKeyExists(key: string): Promise<boolean> {
