@@ -401,7 +401,7 @@ class LiveStreamService {
     user,
     livestreamId,
   }): Promise<{ count: number }> {
-    if (this.isTrainer(user))
+    if (this.isUser(user))
       throw new HttpException(401, "You don't have Authority to Delete Event");
 
     let record = await this.liveStream.findOne({
@@ -416,12 +416,12 @@ class LiveStreamService {
     });
     if (!record) throw new HttpException(404, 'No Record Found');
 
-    if (
-      user.id !== record.userId &&
-      user.id !== record.instituteId &&
-      user.role !== 'Admin'
-    )
-      throw new HttpException(403, "You don't have Authority to Delete Event");
+    // if (
+    //   user.id !== record.userId &&
+    //   user.id !== record.instituteId &&
+    //   user.role !== 'Admin'
+    // )
+    //   throw new HttpException(403, "You don't have Authority to Delete Event");
 
     const thumbnailLink = record.thumbnail;
     const fileName = thumbnailLink.split('/');
