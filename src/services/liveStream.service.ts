@@ -401,7 +401,7 @@ class LiveStreamService {
     user,
     livestreamId,
   }): Promise<{ count: number }> {
-    if (this.isUser(user))
+    if (this.isTrainer(user))
       throw new HttpException(401, "You don't have Authority to Delete Event");
 
     let record = await this.liveStream.findOne({
