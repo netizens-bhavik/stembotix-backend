@@ -25,7 +25,7 @@ export class RegisterUserDto {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Instructor', 'Institute', 'Student'])
+  @IsString()
   public role: string;
 }
 export class CreateAdminDto {
@@ -44,8 +44,8 @@ export class CreateAdminDto {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Admin', 'Institute', 'Instructor', 'Student'])
-  public role: string;
+  @IsString()
+  public role_id: string;
 }
 
 export class RegisterUserDTO {
@@ -64,7 +64,7 @@ export class RegisterUserDTO {
   @IsDateString()
   public date_of_birth: Date;
 
-  @IsEnum(['Instructor', 'Institute', 'Student', 'Admin'])
+  @IsString()
   public role: string;
 }
 

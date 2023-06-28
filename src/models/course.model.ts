@@ -15,18 +15,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      level: {
-        type: Sequelize.ENUM([
-          'Beginner',
-          'Intermediate',
-          'Advanced',
-          'All levels',
-        ]),
-        defaultValue: 'All levels',
-      },
-      language: {
-        type: Sequelize.STRING,
-      },
       status: {
         type: Sequelize.ENUM(['Drafted', 'Published']),
         defaultValue: 'Drafted',
@@ -77,6 +65,14 @@ module.exports = (sequelize, Sequelize) => {
     });
     Course.hasMany(models.CouponCode, {
       foreignKey: 'course_id',
+      targetKey: 'id',
+    });
+    Course.belongsTo(models.CourseLevel, {
+      foreignKey: 'courseLevelId',
+      targetKey: 'id',
+    });
+    Course.belongsTo(models.CourseLanguage, {
+      foreignKey: 'courseLanguageId',
       targetKey: 'id',
     });
   };

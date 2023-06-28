@@ -17,7 +17,7 @@ export class LiveStreamDTO {
   public subscriptionPrice: number;
 
   @IsString()
-  public categories: string;
+  public categoryId: string;
 
   @IsString()
   public description: string;

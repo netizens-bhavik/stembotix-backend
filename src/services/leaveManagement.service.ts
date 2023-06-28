@@ -520,10 +520,11 @@ class LeaveManagementService {
           userId: loggedUser.id,
         },
         {
-          instituteId: { [Op.ne]: null },
+          instituteId: null,
         }
       ),
     });
+    console.log('findEvents', findEvents);
     await this.redisFunctions.setKey(cacheKey, JSON.stringify(findEvents));
     return findEvents;
   }

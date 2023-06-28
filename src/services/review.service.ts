@@ -55,7 +55,7 @@ class ReviewService {
   public async getReviewByAdmin(
     queryObject,
     postId
-  ): Promise<{ totalCount: number; review: (Review | undefined)[] }> {
+  ): Promise<{ totalCount: number; records: (Review | undefined)[] }> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order || 'DESC';
     // pagination
@@ -66,10 +66,7 @@ class ReviewService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const [user, userCondition] = queryObject.user
-      ? [`%${queryObject.user}%`, DB.Sequelize.Op.iLike]
-      : ['', DB.Sequelize.Op.ne];
-    const cacheKey = `getReviewByAdmin:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cacheKey = `getReviewByAdmin:${postId}:${search}:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -112,7 +109,7 @@ class ReviewService {
         records: reviewData.rows,
       })
     );
-    return { totalCount: reviewData.count, review: reviewData.rows };
+    return { totalCount: reviewData.count, records: reviewData.rows };
   }
 
   public async getReview(

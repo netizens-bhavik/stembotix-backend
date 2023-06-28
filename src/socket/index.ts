@@ -117,7 +117,7 @@ const init = (server: httpServer) => {
   const io = new Server(server, {
     maxHttpBufferSize: 10e6,
     pingTimeout: 30000,
-    transports: ['websocket','polling'],
+    transports: ['websocket', 'polling'],
     cors: {
       origin: '*',
       credentials: true,

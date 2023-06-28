@@ -9,7 +9,7 @@ export class ProductDto {
   public price: number;
 
   @IsString()
-  public category: string;
+  public categoryId: string;
 
   @IsString()
   public sku: string;

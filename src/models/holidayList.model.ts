@@ -15,17 +15,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      type: {
-        type: Sequelize.ENUM,
-        values: [
-          'Public Holiday',
-          'Private Holiday',
-          'Restricted Holiday',
-          'Other Holiday',
-        ],
-        allowNull: false,
-        defaultValue: 'Public Holiday',
-      },
     },
     { paranoid: true }
   );
@@ -33,6 +22,10 @@ module.exports = (sequelize, Sequelize) => {
     HolidayList.hasMany(models.Holidays, {
       foreignKey: 'holidayListId',
       as: 'holidays',
+    });
+    HolidayList.belongsTo(models.HolidayType, {
+      foreignKey: 'typeId',
+      sourceKey: 'id',
     });
   };
   return HolidayList;

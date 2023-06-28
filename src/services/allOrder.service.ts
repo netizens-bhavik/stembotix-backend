@@ -134,11 +134,11 @@ class AllOrderService {
       ? moment(queryObject.orderDate, 'DD-MM-YYYY')
       : null;
 
-    const cacheKey = `allCourseOrder:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
-    const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    // const cacheKey = `allCourseOrder:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    // const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
+    // if (cachedData) {
+    //   return cachedData;
+    // }
 
     const response = await this.orderitem.findAndCountAll({
       where: {
@@ -183,13 +183,13 @@ class AllOrderService {
         return true;
       }
     });
-    await this.redisFunctions.setKey(
-      cacheKey,
-      JSON.stringify({
-        totalCount: data.length,
-        records: data,
-      })
-    );
+    // await this.redisFunctions.setKey(
+    //   cacheKey,
+    //   JSON.stringify({
+    //     totalCount: data.length,
+    //     records: data,
+    //   })
+    // );
 
     return { totalCount: data.length, records: data };
   }

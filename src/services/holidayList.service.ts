@@ -15,6 +15,7 @@ class HolidayListService {
   public instructorHasLeave = DB.InstructorHasLeave;
   public holidayList = DB.HolidayList;
   public leaveType = DB.LeaveTypes;
+  public holidayType = DB.HolidayType;
   public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
@@ -25,10 +26,7 @@ class HolidayListService {
     );
   }
 
-  public async getHolidayList({
-    loggedUser,
-    queryObject,
-  }): Promise<AllHolidayList> {
+  public async getHolidayList({ queryObject }): Promise<AllHolidayList> {
     const sortBy = queryObject.sortBy ? queryObject.sortBy : 'createdAt';
     const order = queryObject.order === 'ASC' ? 'ASC' : 'DESC';
     // pagination
@@ -39,18 +37,24 @@ class HolidayListService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const cacheKey = `getAllHolidayList:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cacheKey = `getAllHolidayList:${search}:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
     }
 
     const findLeave = await this.holidayList.findAndCountAll({
-      attributes: ['id', 'name', 'description', 'type'],
+      attributes: ['id', 'name', 'description'],
       where: DB.Sequelize.or(
         { name: { [searchCondition]: search } },
         { description: { [searchCondition]: search } }
       ),
+      include: [
+        {
+          model: this.holidayType,
+          attributes: ['id', 'type'],
+        },
+      ],
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -73,7 +77,10 @@ class HolidayListService {
       return cachedData;
     }
     const findLeave = await this.holidayList.findAll({
-      attributes: ['id', 'name', 'description', 'type'],
+      attributes: ['id', 'name', 'description'],
+      include: {
+        model: this.holidayType,
+      },
     });
     await this.redisFunctions.setKey(cacheKey, JSON.stringify(findLeave));
 
@@ -95,6 +102,7 @@ class HolidayListService {
 
     const createHolidayListData: HolidayList = await this.holidayList.create({
       ...holidayListData,
+      type_id: holidayListData.typeId,
     });
     await this.redisFunctions.removeDataFromRedis();
     return createHolidayListData;

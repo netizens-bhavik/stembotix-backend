@@ -18,10 +18,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      category: {
-        type: Sequelize.ENUM(['Uncategorized', 'Mechanical']),
-        defaultValue: 'Uncategorized',
-      },
       sku: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -64,6 +60,10 @@ module.exports = (sequelize, Sequelize) => {
     });
     Product.hasOne(models.CartItem);
     Product.hasMany(models.OrderItem);
+    Product.belongsTo(models.ProductCategory, {
+      foreignKey: 'categoryId',
+      targetKey: 'id',
+    });
   };
   return Product;
 };

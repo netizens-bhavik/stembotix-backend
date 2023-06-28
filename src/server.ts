@@ -40,6 +40,16 @@ import BlogCatRoute from './routes/blogCategory.route';
 import BlogRoute from './routes/blog.route';
 import BlogReviewRoute from './routes/blogReview.route';
 import GalleryRoute from './routes/gallery.route';
+import TermsAndConditionRoute from './routes/terms&condition.route';
+import CourseLevelRoute from './routes/courseLevel.route';
+import CourseLangugeRoute from './routes/courseLanguage.route';
+import ProductCatRoute from './routes/productCat.dto';
+import LeaveOptionRoute from './routes/leaveOption.route';
+import HolidayTypeRoute from './routes/holidayType.route';
+import PrivacyPolicyRoute from './routes/privacy-policy.route';
+import RoleRoute from './routes/role.route';
+import PaymentGatewayRoute from './routes/paymentGateway.route';
+import LiveStreamCatRoute from './routes/liveStreamCat.route';
 
 validateEnv();
 
@@ -84,5 +94,15 @@ const app = new App([
   new BlogRoute(),
   new BlogReviewRoute(),
   new GalleryRoute(),
+  new TermsAndConditionRoute(),
+  new CourseLevelRoute(),
+  new CourseLangugeRoute(),
+  new ProductCatRoute(),
+  new LeaveOptionRoute(),
+  new HolidayTypeRoute(),
+  new PrivacyPolicyRoute(),
+  new RoleRoute(),
+  new PaymentGatewayRoute(),
+  new LiveStreamCatRoute(),
 ]);
 app.listen();

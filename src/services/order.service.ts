@@ -8,6 +8,8 @@ import { OrderData } from '../utils/ruleEngine/orderData.rule';
 import { Mail } from '@/interfaces/mailPayload.interface';
 import EmailService from './email.service';
 import { RedisFunctions } from '@/redis';
+import PaymentGatewayService from './paymentGateway.service';
+import Stripe from 'stripe';
 class OrderService {
   public user = DB.User;
   public order = DB.Order;
@@ -20,6 +22,7 @@ class OrderService {
   public trainer = DB.Trainer;
   public coursetype = DB.CourseType;
   public emailService = new EmailService();
+  public paymentGatewayService = new PaymentGatewayService();
   public redisFunctions = new RedisFunctions();
 
   public orderData = new OrderData();
@@ -85,39 +88,113 @@ class OrderService {
     return data;
   }
 
+  // public async addOrder(user, amount) {
+  //   const activePaymetGateway =
+  //     await this.paymentGatewayService.getActivePaymentGateways(user);
+
+  //   // Razorpay Instance
+  //   const instance = new Razorpay({
+  //     key_id: RAZORPAY_KEY_ID,
+  //     key_secret: RAZORPAY_KEY_SECRET,
+  //   });
+
+  //   const restrictedUser = await this.user.findOne({
+  //     where: DB.Sequelize.and(
+  //       {
+  //         id: user.id,
+  //       },
+  //       {
+  //         is_email_verified: false,
+  //       }
+  //     ),
+  //   });
+  //   if (restrictedUser) throw new HttpException(403, 'Forbidden Recources');
+  //   // Call to order endpoint
+  //   const responseFromOrderAPI = await instance.orders.create({
+  //     amount,
+  //     currency: 'INR',
+  //   });
+  //   const orderData = {
+  //     amount,
+  //     razorpay_order_id: responseFromOrderAPI.id,
+  //     userId: user.id,
+  //   };
+  //   // Generating order
+  //   const order = await this.order.create(orderData);
+  //   await this.redisFunctions.removeDataFromRedis();
+
+  //   return order;
+  // }
+
   public async addOrder(user, amount) {
-    // Razorpay Instance
-    const instance = new Razorpay({
-      key_id: RAZORPAY_KEY_ID,
-      key_secret: RAZORPAY_KEY_SECRET,
-    });
+    const activePaymentGateway =
+      await this.paymentGatewayService.getActivePaymentGateways(user);
     const restrictedUser = await this.user.findOne({
       where: DB.Sequelize.and(
         {
           id: user.id,
         },
         {
-          is_email_verified: false,
+          isEmailVerified: false,
         }
       ),
     });
-    if (restrictedUser) throw new HttpException(403, 'Forbidden Recources');
-    // Call to order endpoint
-    const responseFromOrderAPI = await instance.orders.create({
-      amount,
-      currency: 'INR',
-    });
-    const orderData = {
-      amount,
-      razorpay_order_id: responseFromOrderAPI.id,
-      userId: user.id,
-    };
-    // Generating order
-    const order = await this.order.create(orderData);
-    await this.redisFunctions.removeDataFromRedis();
 
+    if (restrictedUser) {
+      throw new HttpException(403, 'Forbidden Resources');
+    }
+
+    let orderData;
+    let order;
+
+    if (activePaymentGateway.name === 'Stripe') {
+      // Add order using Stripe
+      const stripe = new Stripe(activePaymentGateway.meta.secret_key, {
+        apiVersion: '2022-11-15',
+      });
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: 'INR',
+        payment_method_types: ['card'],
+      });
+
+      orderData = {
+        amount,
+        payment_gateway_id: activePaymentGateway.id,
+        payment_intent_id: paymentIntent.id,
+        userId: user.id,
+      };
+
+      order = await this.order.create(orderData);
+    } else if (activePaymentGateway.name === 'Razorpay') {
+      // Add order using Razorpay
+      const instance = new Razorpay({
+        key_id: activePaymentGateway.meta.public_key,
+        key_secret: activePaymentGateway.meta.secret_key,
+      });
+
+      const responseFromOrderAPI = await instance.orders.create({
+        amount,
+        currency: 'INR',
+      });
+
+      orderData = {
+        amount,
+        razorpay_order_id: responseFromOrderAPI.id,
+        payment_gateway_id: activePaymentGateway.id,
+        userId: user.id,
+      };
+
+      order = await this.order.create(orderData);
+    } else {
+      throw new HttpException(400, 'Invalid Payment Gateway');
+    }
+
+    await this.redisFunctions.removeDataFromRedis();
     return order;
   }
+
   public async verifyOrder(userId: string, orderBody: VerifyOrderDTO) {
     const orderRecord = await this.order.findOne({
       where: DB.Sequelize.and({

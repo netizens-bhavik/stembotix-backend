@@ -15,6 +15,7 @@ import { RedisFunctions } from '@/redis';
 class LiveStreamService {
   public user = DB.User;
   public liveStream = DB.LiveStream;
+  public liveStreamCat = DB.LiveStreamCat;
   public trainer = DB.Trainer;
   public subscribeEvent = DB.SubscribeEvent;
   public livestreamchatlogs = DB.LiveStreamChatLogs;
@@ -346,14 +347,13 @@ class LiveStreamService {
         );
       }
     }
-
-    if (
-      (user.id !== record.userId &&
-        user.id !== record.instituteId &&
-        user.role !== 'SuperAdmin') ||
-      user.role !== 'Admin'
-    )
-      throw new HttpException(403, "You don't have Authority to Update Event");
+    // if (
+    //   user.id !== record.userId ||
+    //   // user.id !== record.instituteId ||
+    //   user.role !== 'SuperAdmin' ||
+    //   user.role !== 'Admin'
+    // )
+    //   throw new HttpException(409, "You don't have Authority to Update Event");
     if (file) {
       const thumbnailLink = record.thumbnail;
       const fileName = thumbnailLink.split('/');
@@ -473,6 +473,9 @@ class LiveStreamService {
           model: this.user,
           as: 'Institute',
         },
+        {
+          model: this.liveStreamCat,
+        },
       ],
       limit: pageSize,
       offset: pageNo,
@@ -527,6 +530,9 @@ class LiveStreamService {
           model: this.user,
           as: 'Institute',
         },
+        {
+          model: this.liveStreamCat,
+        },
       ],
       limit: pageSize,
       offset: pageNo,
@@ -551,7 +557,7 @@ class LiveStreamService {
     }
 
     const order = queryObject.order || 'ASC';
-    
+
     // pagination
     const pageSize = queryObject.pageRecord ? queryObject.pageRecord : 10;
     const pageNo = queryObject.pageNo ? (queryObject.pageNo - 1) * pageSize : 0;

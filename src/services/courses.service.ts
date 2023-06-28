@@ -22,6 +22,8 @@ class CourseService {
   public cart = DB.Cart;
   public order = DB.Order;
   public coursetype = DB.CourseType;
+  public courseLevel = DB.CourseLevel;
+  public courseLanguage = DB.CourseLanguage;
   public instituteinstructor = DB.InstituteInstructor;
   public quizScore = DB.QuizScore;
   public quizQue = DB.QuizQue;
@@ -66,6 +68,12 @@ class CourseService {
       include: [
         {
           model: this.coursetype,
+        },
+        {
+          model: this.courseLevel,
+        },
+        {
+          model: this.courseLanguage,
         },
         {
           model: this.trainer,
@@ -124,10 +132,10 @@ class CourseService {
     if (cachedData) {
       return cachedData;
     }
-    const courseData = await this.course.findAndCountAll({
-      where: DB.Sequelize.and({ deletedAt: null }),
-    });
-    const data: (Course | undefined)[] = await this.course.findAll({
+    // const courseData = await this.course.findAndCountAll({
+    //   where: DB.Sequelize.and({ deletedAt: null }),
+    // });
+    const data: (Course | undefined)[] = await this.course.findAndCountAll({
       where: DB.Sequelize.and({
         deletedAt: null,
         title: {
@@ -146,6 +154,12 @@ class CourseService {
             },
           ],
         },
+        {
+          model: this.courseLevel,
+        },
+        {
+          model: this.courseLanguage,
+        },
       ],
 
       limit: pageSize,
@@ -155,11 +169,11 @@ class CourseService {
     await this.redisFunctions.setKey(
       cacheKey,
       JSON.stringify({
-        totalCount: courseData.count,
-        records: data,
+        totalCount: data.count,
+        records: data.rows,
       })
     );
-    return { totalCount: courseData.count, records: data };
+    return { totalCount: data.count, records: data.rows };
   }
   public async addCourse({ courseDetails, file, user }): Promise<Course> {
     if (!this.isTrainer(user)) {
@@ -202,9 +216,11 @@ class CourseService {
       id: newCourse.id,
       status: newCourse.status,
       title: newCourse.title,
-      level: newCourse.level,
+      // level: newCourse.level,
+      courseLevelId: newCourse.courseLevelId,
+      courseLanguageId: newCourse.courseLanguageId,
       price: newCourse.price,
-      language: newCourse.language,
+      // language: newCourse.language,
       description: newCourse.description,
       thumbnail: file['thumbnail'][0].path,
       // @ts-ignore
@@ -228,6 +244,12 @@ class CourseService {
       include: [
         {
           model: this.coursetype,
+        },
+        {
+          model: this.courseLevel,
+        },
+        {
+          model: this.courseLanguage,
         },
         {
           model: this.trainer,
@@ -711,8 +733,8 @@ class CourseService {
     });
     const courses = await this.course.findAll({
       where: DB.Sequelize.or(
-        { title: { [searchCondition]: search } },
-        { language: { [searchCondition]: search } }
+        { title: { [searchCondition]: search } }
+        // { language: { [searchCondition]: search } }
       ),
       limit: pageSize,
       offset: pageNo,
@@ -720,6 +742,12 @@ class CourseService {
       include: [
         {
           model: this.coursetype,
+        },
+        {
+          model: this.courseLevel,
+        },
+        {
+          model: this.courseLanguage,
         },
         {
           model: this.trainer,

@@ -4,13 +4,8 @@ export class HolidayListDTO {
   @IsString()
   public name: string;
 
-  @IsEnum([
-    'Public Holiday',
-    'Private Holiday',
-    'Restricted Holiday',
-    'Other Holiday',
-  ])
-  public type: string;
+  @IsString()
+  public typeId: string;
 
   @IsString()
   public description: string;

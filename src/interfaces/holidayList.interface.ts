@@ -2,7 +2,7 @@ export interface HolidayList {
   id: string;
   name: string;
   description: string;
-  type: string;
+  type_id: string;
 }
 
 export interface AllHolidayList {

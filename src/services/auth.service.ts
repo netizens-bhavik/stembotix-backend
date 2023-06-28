@@ -38,13 +38,14 @@ class AuthService {
       );
 
     const roleData: Role = await this.roles.findOne({
-      where: { role_name: userData.role },
+      where: { id: userData.role },
     });
     const createUserData: User = await this.users.create({
       ...userData,
       role_id: roleData.id,
+      role: roleData.roleName,
     });
-    if (userData.role.match(/Instructor/i)) {
+    if (roleData.roleName.match(/Instructor/i)) {
       await this.trainers.create({
         user_id: createUserData.id,
       });
@@ -108,20 +109,20 @@ class AuthService {
       userData.password,
       findUser.password
     );
-    if (!isPasswordMatching) {
-      this.attempts++;
-      if (this.attempts >= this.ATTEMPTS_LIMIT) {
-        setTimeout(() => {
-          this.attempts = 0;
-        }, 300000);
+    // if (!isPasswordMatching) {
+    //   // this.attempts++;
+    //   // if (this.attempts >= this.ATTEMPTS_LIMIT) {
+    //   //   setTimeout(() => {
+    //   //     this.attempts = 0;
+    //   //   }, 300000);
 
-        throw new HttpException(
-          429,
-          'Your account has been temporary disable because of too many wrong attempt please try again after sometime or click on forgotten password to reset password'
-        );
-      }
-      throw new HttpException(409, 'Wrong Password');
-    }
+    //   //   throw new HttpException(
+    //   //     429,
+    //   //     'Your account has been temporary disable because of too many wrong attempt please try again after sometime or click on forgotten password to reset password'
+    //   //   );
+    //   // }
+    //   throw new HttpException(409, 'Wrong Password');
+    // }
 
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
       expiresIn: this.accessTokenExpiry,

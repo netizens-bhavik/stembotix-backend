@@ -9,11 +9,11 @@ export class AddCourseDTO {
   public price: number;
 
   @IsString()
-  public level: string;
+  public courseLevelId: string;
 
   @IsOptional()
   @IsString()
-  public language?: string;
+  public courseLanguageId?: string;
 
   @IsString()
   public description: string;

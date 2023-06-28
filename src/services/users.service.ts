@@ -33,14 +33,15 @@ class UserService {
     if (existEmail) throw new HttpException(409, 'Email already exist');
     const record = await this.role.findOne({
       where: {
-        role_name: adminDetail.role,
+        id: adminDetail.role_id,
       },
     });
     const createAdmin = await this.users.create({
       ...adminDetail,
       role_id: record.id,
+      role: record.roleName,
     });
-    if (adminDetail.role.match(/Instructor/i)) {
+    if (record.roleName.match(/Instructor/i)) {
       await this.trainer.create({
         user_id: createAdmin.id,
       });
@@ -109,15 +110,12 @@ class UserService {
     const [role, roleCondition] = queryObject.role
       ? [`%${queryObject.role}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const cacheKey = `findAllUser:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
+    const cacheKey = `findAllUser:${role}:${sortBy}:${order}:${pageSize}:${pageNo}:${search}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
     }
-    const userCount = await this.users.findAndCountAll({
-      where: { role: { [roleCondition]: role } },
-    });
-    const allUser: User[] = await this.users.findAll({
+    const allUser: User[] = await this.users.findAndCountAll({
       where: DB.Sequelize.and(
         DB.Sequelize.or(
           { firstName: { [searchCondition]: search } },
@@ -133,12 +131,12 @@ class UserService {
     await this.redisFunctions.setKey(
       cacheKey,
       JSON.stringify({
-        totalCount: userCount.count,
-        records: allUser,
+        totalCount: allUser.count,
+        records: allUser.rows,
       })
     );
     // const data = await redisFunction('allUsers',allUser)
-    return { totalCount: userCount.count, records: allUser };
+    return { totalCount: allUser.count, records: allUser.rows };
   }
 
   public async findUserById(loggedUser, userId: string): Promise<User> {
@@ -157,19 +155,23 @@ class UserService {
     return findUser;
   }
 
-  public async updateUser(
-    loggedUser,
-    userId: string,
-    userData: RegisterUserDTO
-  ): Promise<User> {
+  public async updateUser(loggedUser, userId: string, userData): Promise<User> {
     if (!this.isSuperAdmin(loggedUser))
       throw new HttpException(401, 'Unauthorized');
     if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
     const findUser: User = await this.users.findByPk(userId);
     if (!findUser) throw new HttpException(409, "User doesn't exist");
+    const record = await this.role.findOne({
+      where: {
+        id: userData.role_id,
+      },
+    });
 
-    await this.users.update(userData, { where: { id: userId } });
+    await this.users.update(
+      { ...userData, role_id: record.id, role: record.roleName },
+      { where: { id: userId } }
+    );
     await this.redisFunctions.removeDataFromRedis();
     const updateUser: User = await this.users.findByPk(userId);
     return updateUser;

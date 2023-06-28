@@ -21,7 +21,6 @@ class BlogService {
     }
     const tagArray = [...blogDetails.tags];
     let tag = [];
-    console.log('blog', blogDetails);
     tagArray?.forEach((element) => {
       tag.push(element);
     });
@@ -31,7 +30,7 @@ class BlogService {
         quote: blogDetails.quote,
         author: blogDetails.author,
       },
-      blogCatId: blogDetails.blog_cat_id,
+      blogCatId: blogDetails.blogCatId,
       userId: user.id,
       thumbnail: file.path,
     });
@@ -168,7 +167,7 @@ class BlogService {
           quote: blogDetails.quote,
           author: blogDetails.author,
         },
-        blogCatId: blogDetails.blog_cat_id,
+        blogCatId: blogDetails.blogCatId,
         thumbnail: file?.path,
       },
       {
