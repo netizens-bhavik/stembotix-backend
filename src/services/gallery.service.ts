@@ -84,11 +84,10 @@ class GalleryService {
     await this.redisFunctions.setKey(
       cacheKey,
       JSON.stringify({
-        totalCount: record.length,
-        records: record,
+        totalCount: record.count,
+        records: record.rows,
       })
     );
-    console.log(record);
     return { totalCount: record.count, records: record.rows };
   }
 

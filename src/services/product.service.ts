@@ -10,6 +10,7 @@ import { RedisFunctions } from '@/redis';
 
 class ProductService {
   public product = DB.Product;
+  public productCat = DB.ProductCategory;
   public user = DB.User;
   public productTag = DB.ProductTagMap;
   public productDimension = DB.ProductDimensionMap;
@@ -82,6 +83,9 @@ class ProductService {
         {
           model: this.review,
         },
+        {
+          model: this.productCat,
+        },
       ],
     });
     await this.redisFunctions.setKey(
@@ -115,7 +119,7 @@ class ProductService {
     const productsRecord = await this.product.findAndCountAll({
       where: { deletedAt: null },
     });
-    const data: (Product | undefined)[] = await this.product.findAll({
+    const data: (Product | undefined)[] = await this.product.findAndCountAll({
       where: DB.Sequelize.and({ title: { [searchCondition]: search } }),
       limit: pageSize,
       offset: pageNo,
@@ -138,16 +142,19 @@ class ProductService {
         {
           model: this.productDimension,
         },
+        {
+          model: this.productCat,
+        },
       ],
     });
     await this.redisFunctions.setKey(
       cacheKey,
       JSON.stringify({
-        totalCount: productsRecord.count,
-        records: data,
+        totalCount: data.count,
+        records: data.rows,
       })
     );
-    return { totalCount: productsRecord.count, records: data };
+    return { totalCount: data.count, records: data.rows };
   }
 
   public async listProduct({
@@ -206,6 +213,9 @@ class ProductService {
         {
           model: this.productDimension,
         },
+        {
+          model: this.productCat,
+        },
       ],
     });
     await this.redisFunctions.setKey(
@@ -262,7 +272,8 @@ class ProductService {
       id: newProduct.id,
       title: newProduct.title,
       price: newProduct.price,
-      category: newProduct.category,
+      // category: newProduct.category,
+      categoryId: newProduct.categoryId,
       description: newProduct.description,
       status: newProduct.status,
       // thumbnail: `${API_BASE}/media/${newProduct.thumbnail}`,
@@ -290,6 +301,9 @@ class ProductService {
         },
         {
           model: this.productDimension,
+        },
+        {
+          model: this.productCat,
         },
       ],
     });
@@ -340,6 +354,19 @@ class ProductService {
           returning: true,
         }
       );
+      await this.productDimension.update(
+        {
+          product_id: productDetails.id,
+          weight: productDetails.weight,
+          dimension: productDetails.dimension,
+        },
+        {
+          where: {
+            product_id: productDetails.id,
+          },
+          returning: true,
+        }
+      );
       await this.redisFunctions.removeDataFromRedis();
       return { count: updateProduct[0], rows: updateProduct[1] };
     }
@@ -350,6 +377,18 @@ class ProductService {
       {
         where: {
           id: productDetails.id,
+        },
+        returning: true,
+      }
+    );
+    await this.productDimension.update(
+      {
+        weight: productDetails.weight,
+        dimension: productDetails.dimension,
+      },
+      {
+        where: {
+          product_id: productDetails.id,
         },
         returning: true,
       }

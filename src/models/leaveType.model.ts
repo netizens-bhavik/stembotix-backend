@@ -15,10 +15,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      type: {
-        type: Sequelize.ENUM('Sick', 'Paid', 'Unpaid'),
-        allowNull: false,
-      },
     },
     { paranoid: true }
   );
@@ -29,6 +25,10 @@ module.exports = (sequelize, Sequelize) => {
     });
     LeaveTypes.hasMany(models.ManageLeaves, {
       foreignKey: 'leaveTypeId',
+      sourceKey: 'id',
+    });
+    LeaveTypes.belongsTo(models.LeaveOption, {
+      foreignKey: 'leaveOptionId',
       sourceKey: 'id',
     });
   };

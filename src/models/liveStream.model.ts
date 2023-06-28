@@ -35,10 +35,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      categories: {
-        type: Sequelize.TEXT,
-        allowNull: false,
-      },
       is_active: {
         type: Sequelize.BOOLEAN,
       },
@@ -72,6 +68,10 @@ module.exports = (sequelize, Sequelize) => {
     });
     Livestream.hasMany(models.ManageLeaves, {
       foreignKey: 'livestreamId',
+      targetKey: 'id',
+    });
+    Livestream.belongsTo(models.LiveStreamCat, {
+      foreignKey: 'categoryId',
       targetKey: 'id',
     });
   };

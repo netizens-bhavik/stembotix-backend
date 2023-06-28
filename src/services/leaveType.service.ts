@@ -9,6 +9,7 @@ class LeaveTypeService {
   public instituteInstructor = DB.InstituteInstructor;
   public instrucorHasLeave = DB.InstructorHasLeave;
   public leaveType = DB.LeaveTypes;
+  public leaveOption = DB.LeaveOption;
   public redisFunctions = new RedisFunctions();
 
   public isInstitute(loggedUser): boolean {
@@ -40,6 +41,9 @@ class LeaveTypeService {
     }
     const findLeave = await this.leaveType.findAndCountAll({
       where: DB.Sequelize.or({ leaveName: { [searchCondition]: search } }),
+      include: {
+        model: this.leaveOption,
+      },
       limit: pageSize,
       offset: pageNo,
       order: [[`${sortBy}`, `${order}`]],
@@ -71,6 +75,7 @@ class LeaveTypeService {
   }
 
   public async addLeaveType({ loggedUser, leaveTypeData }) {
+    console.log('leave', leaveTypeData);
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');
@@ -79,7 +84,7 @@ class LeaveTypeService {
     const findLeaveType = await this.leaveType.findOne({
       where: {
         leaveName: leaveTypeData.leaveName,
-        type: leaveTypeData.type,
+        leave_option_id: leaveTypeData.leaveOptionId,
       },
     });
 
@@ -89,6 +94,7 @@ class LeaveTypeService {
 
     const createLeaveType = await this.leaveType.create({
       ...leaveTypeData,
+      leave_option_id: leaveTypeData.leaveOptionId,
     });
     await this.redisFunctions.removeDataFromRedis();
 

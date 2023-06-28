@@ -7,6 +7,6 @@ export class LeaveTypeDTO {
   @IsString()
   public leaveDescription: string;
 
-  @IsEnum(['Sick', 'Paid', 'Unpaid'])
-  public type: string;
+  @IsString()
+  public leaveOptionId: string;
 }

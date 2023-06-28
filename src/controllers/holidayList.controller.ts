@@ -20,7 +20,6 @@ class HolidayListController {
 
       const holidayList: AllHolidayList =
         await this.holidayListService.getHolidayList({
-          loggedUser,
           queryObject,
         });
 

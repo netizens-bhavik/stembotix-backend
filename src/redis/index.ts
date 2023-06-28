@@ -30,7 +30,7 @@ export class RedisFunctions {
 
   public async setKey(key, data) {
     try {
-      await this.client.set(key, data, { NX: true,EX: 120 });
+      await this.client.set(key, data, { NX: true, EX: 120 });
     } catch (error) {
       console.log(error);
     }
