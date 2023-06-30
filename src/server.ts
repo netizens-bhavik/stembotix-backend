@@ -50,6 +50,7 @@ import PrivacyPolicyRoute from './routes/privacy-policy.route';
 import RoleRoute from './routes/role.route';
 import PaymentGatewayRoute from './routes/paymentGateway.route';
 import LiveStreamCatRoute from './routes/liveStreamCat.route';
+import UserSubscribeRoute from './routes/userSubsribe.route';
 
 validateEnv();
 
@@ -104,5 +105,6 @@ const app = new App([
   new RoleRoute(),
   new PaymentGatewayRoute(),
   new LiveStreamCatRoute(),
+  new UserSubscribeRoute(),
 ]);
 app.listen();

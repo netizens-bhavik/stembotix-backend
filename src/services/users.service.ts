@@ -14,6 +14,7 @@ class UserService {
   public product = DB.Product;
   public role = DB.Role;
   public trainer = DB.Trainer;
+  public liveStream = DB.LiveStream;
   public emailService = new EmailService();
   public redisFunctions = new RedisFunctions();
 
@@ -233,6 +234,24 @@ class UserService {
       months.push(recordsPerMonth);
     }
     return months;
+  }
+
+  public async homeCounter(): Promise<{
+    userCount: number;
+    courseCount: number;
+    productCount: number;
+    eventCount: number;
+  }> {
+    const Userres = await this.users.findAndCountAll();
+    const Courserres = await this.course.findAndCountAll();
+    const Productrres = await this.product.findAndCountAll();
+    const Eventres = await this.liveStream.findAndCountAll();
+    return {
+      userCount: Userres?.count,
+      courseCount: Courserres?.count,
+      productCount: Productrres?.count,
+      eventCount: Eventres?.count,
+    };
   }
 }
 

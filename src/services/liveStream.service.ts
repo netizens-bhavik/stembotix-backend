@@ -126,9 +126,14 @@ class LiveStreamService {
     const currentTime = moment().format('HH:mm:ss');
     const streamData = await this.liveStream.findAndCountAll({
       where: {},
-      include: {
-        model: this.user,
-      },
+      include: [
+        {
+          model: this.user,
+        },
+        {
+          model: this.liveStreamCat,
+        },
+      ],
       order: [
         ['date', 'ASC'],
         ['startTime', 'ASC'],
@@ -261,6 +266,9 @@ class LiveStreamService {
         {
           model: this.user,
           as: 'Institute',
+        },
+        {
+          model: this.liveStreamCat,
         },
       ],
     });
