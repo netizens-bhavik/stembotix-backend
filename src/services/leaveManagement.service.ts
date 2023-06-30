@@ -524,7 +524,6 @@ class LeaveManagementService {
         }
       ),
     });
-    console.log('findEvents', findEvents);
     await this.redisFunctions.setKey(cacheKey, JSON.stringify(findEvents));
     return findEvents;
   }

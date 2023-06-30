@@ -26,7 +26,7 @@ const fileStorage = multer.diskStorage({
 export const uploadFiles = multer({
   storage: fileStorage,
   limits: {
-    fileSize: 50 * 1024 * 1024,
+    fileSize: 500 * 1024 * 1024,
   },
   fileFilter(req: Request, file: Express.Multer.File, cb: FileNameCallback) {
     filePath = req.url.slice(1);
@@ -41,4 +41,4 @@ export const uploadFiles = multer({
     cb(undefined, true);
   },
 });
-export default uploadFiles
+export default uploadFiles;

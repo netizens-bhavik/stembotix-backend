@@ -75,7 +75,6 @@ class LeaveTypeService {
   }
 
   public async addLeaveType({ loggedUser, leaveTypeData }) {
-    console.log('leave', leaveTypeData);
     if (!loggedUser) throw new HttpException(401, 'Unauthorized');
     if (!this.isInstitute(loggedUser)) {
       throw new HttpException(403, 'Forbidden Resource');

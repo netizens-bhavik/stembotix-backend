@@ -127,6 +127,19 @@ class UsersController {
       next(err);
     }
   };
+
+  public homeCounter = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const response = await this.userService.homeCounter();
+      res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 export default UsersController;

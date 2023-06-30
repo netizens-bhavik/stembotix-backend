@@ -16,6 +16,10 @@ class UsersRoute implements Routes {
   }
 
   private initializeRoutes() {
+    this.router.get(
+      `${this.path}/home-count`,
+      this.usersController.homeCounter
+    );
     this.router.post(
       `${this.path}/createUser`,
       passport.authenticate('jwt', { session: false }),
