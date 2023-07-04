@@ -5,6 +5,7 @@ import DB from '@databases';
 
 class LeaveOptionService {
   public leaveOption = DB.LeaveOption;
+  public leaveType = DB.LeaveTypes;
   public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
@@ -115,6 +116,17 @@ class LeaveOptionService {
   ): Promise<{ count: number }> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
+    }
+    const data = await this.leaveType.findAndCountAll({
+      where: {
+        leaveOptionId: leaveOptionId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Leave options is already in used please change leave option in leave type and try again'
+      );
     }
 
     const res: number = await this.leaveOption.destroy({

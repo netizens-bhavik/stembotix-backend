@@ -5,6 +5,7 @@ import DB from '@databases';
 
 class ProductcCatService {
   public productCat = DB.ProductCategory;
+  public product = DB.Product;
   public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
@@ -115,6 +116,17 @@ class ProductcCatService {
   public async deleteProductCat(catId, user): Promise<{ count: number }> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
+    }
+    const data = await this.product.findAndCountAll({
+      where: {
+        categoryId: catId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Product category is already in used please change product category in product and try again'
+      );
     }
 
     const res: number = await this.productCat.destroy({

@@ -5,6 +5,7 @@ import DB from '@databases';
 
 class HolidayTypeService {
   public holidayType = DB.HolidayType;
+  public holidayList = DB.HolidayList;
   public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
@@ -115,6 +116,17 @@ class HolidayTypeService {
   ): Promise<{ count: number }> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
+    }
+    const data = await this.holidayList.findAndCountAll({
+      where: {
+        typeId: holidayTypeId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Holiday type is already in used please change holiday type in holiday and try again'
+      );
     }
 
     const res: number = await this.holidayType.destroy({
