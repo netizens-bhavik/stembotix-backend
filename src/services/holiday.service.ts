@@ -18,7 +18,6 @@ class HolidayService {
   public holidayList = DB.HolidayList;
   public holiday = DB.Holidays;
   public leaveType = DB.LeaveTypes;
-  public holidayType = DB.HolidayType;
   public emailService = new EmailService();
   public redisFunctions = new RedisFunctions();
 
@@ -59,9 +58,6 @@ class HolidayService {
           as: 'holidayList',
           where: { name: { [searchCondition]: search } },
         },
-        {
-          model: this.holidayType,
-        },
       ],
 
       limit: pageSize,
@@ -90,9 +86,6 @@ class HolidayService {
           model: this.holidayList,
           attributes: ['id', 'name', 'description'],
           as: 'holidayList',
-        },
-        {
-          model: this.holidayType,
         },
       ],
     });
