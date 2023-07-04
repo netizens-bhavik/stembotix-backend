@@ -117,6 +117,17 @@ class CourseLanguageService {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const data = await this.course.findAndCountAll({
+      where: {
+        courseLanguageId: languageId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Course language is already in used please change course language in course and try again'
+      );
+    }
 
     const res: number = await this.courselanguage.destroy({
       where: {

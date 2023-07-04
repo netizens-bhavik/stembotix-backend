@@ -114,7 +114,17 @@ class CourseLevelService {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
-
+    const data = await this.course.findAndCountAll({
+      where: {
+        courseLevelId: levelId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Course level is already in used please change course level in course and try again'
+      );
+    }
     const res: number = await this.courselevel.destroy({
       where: {
         id: levelId,

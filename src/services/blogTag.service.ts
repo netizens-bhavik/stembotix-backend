@@ -125,6 +125,26 @@ class BlogTagService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    // const data = await this.blogTag.findAndCountAll({
+    //   where: {
+    //     id: tagId,
+    //   },
+    //   include: {
+    //     model: DB.Blog,
+    //     through: {
+    //       model: DB.BlogBlogTag,
+    //       where: {
+    //         blogTagId: tagId,
+    //       },
+    //     },
+    //   },
+    // });
+    // if (data.count !== 0) {
+    //   throw new HttpException(
+    //     409,
+    //     'Blog tag is already in used please change blog tag in blog and try again'
+    //   );
+    // }
 
     const res: number = await this.blogTag.destroy({
       where: {

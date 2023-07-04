@@ -5,6 +5,7 @@ import DB from '@databases';
 
 class LiveStreamCatService {
   public liveStreamCat = DB.LiveStreamCat;
+  public liveStream = DB.LiveStream;
   public redisFunctions = new RedisFunctions();
 
   public isTrainer(user): boolean {
@@ -124,6 +125,17 @@ class LiveStreamCatService {
   public async deleteLiveStreamCat(catId, user): Promise<{ count: number }> {
     if (!this.isTrainer(user)) {
       throw new HttpException(403, 'Forbidden Resource');
+    }
+    const data = await this.liveStream.findAndCountAll({
+      where: {
+        categoryId: catId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Category is already in used please change category in event and try again'
+      );
     }
 
     const res: number = await this.liveStreamCat.destroy({

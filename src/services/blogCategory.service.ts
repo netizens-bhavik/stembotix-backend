@@ -127,6 +127,17 @@ class BlogCategoryService {
     if (!this.isAdmin(user)) {
       throw new HttpException(403, 'Forbidden Resource');
     }
+    const data = await this.blog.findAndCountAll({
+      where: {
+        blogCatId: catId,
+      },
+    });
+    if (data.count !== 0) {
+      throw new HttpException(
+        409,
+        'Blog category is already in used please change blog category in blog and try again'
+      );
+    }
 
     const res: number = await this.blogCategory.destroy({
       where: {
