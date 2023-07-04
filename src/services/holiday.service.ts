@@ -18,6 +18,7 @@ class HolidayService {
   public holidayList = DB.HolidayList;
   public holiday = DB.Holidays;
   public leaveType = DB.LeaveTypes;
+  public holidayType = DB.HolidayType;
   public emailService = new EmailService();
   public redisFunctions = new RedisFunctions();
 
@@ -43,7 +44,7 @@ class HolidayService {
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
 
-    const cacheKey = `getAllHoliday:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cacheKey = `getAllHoliday:${search}:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -54,9 +55,12 @@ class HolidayService {
       include: [
         {
           model: this.holidayList,
-          attributes: ['id', 'name', 'description', 'type'],
+          attributes: ['id', 'name', 'description'],
           as: 'holidayList',
           where: { name: { [searchCondition]: search } },
+        },
+        {
+          model: this.holidayType,
         },
       ],
 
@@ -84,8 +88,11 @@ class HolidayService {
       include: [
         {
           model: this.holidayList,
-          attributes: ['id', 'name', 'description', 'type'],
+          attributes: ['id', 'name', 'description'],
           as: 'holidayList',
+        },
+        {
+          model: this.holidayType,
         },
       ],
     });
