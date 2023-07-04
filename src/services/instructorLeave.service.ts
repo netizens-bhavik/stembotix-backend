@@ -40,7 +40,7 @@ class InstructorLeaveService {
     const [search, searchCondition] = queryObject.search
       ? [`%${queryObject.search}%`, DB.Sequelize.Op.iLike]
       : ['', DB.Sequelize.Op.ne];
-    const cacheKey = `getInstructorLeave:${sortBy}:${order}:${pageSize}:${pageNo}`;
+    const cacheKey = `getInstructorLeave:${search}:${sortBy}:${order}:${pageSize}:${pageNo}`;
     const cachedData = await this.redisFunctions.getRedisKey(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -49,7 +49,7 @@ class InstructorLeaveService {
       include: [
         {
           model: this.leaveType,
-          attributes: ['id', 'leaveName', 'leaveDescription', 'type'],
+          attributes: ['id', 'leaveName', 'leaveDescription'],
         },
         {
           model: this.instituteInstructor,
