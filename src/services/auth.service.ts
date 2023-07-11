@@ -109,20 +109,20 @@ class AuthService {
       userData.password,
       findUser.password
     );
-    // if (!isPasswordMatching) {
-    //   // this.attempts++;
-    //   // if (this.attempts >= this.ATTEMPTS_LIMIT) {
-    //   //   setTimeout(() => {
-    //   //     this.attempts = 0;
-    //   //   }, 300000);
+    if (!isPasswordMatching) {
+      this.attempts++;
+      if (this.attempts >= this.ATTEMPTS_LIMIT) {
+        setTimeout(() => {
+          this.attempts = 0;
+        }, 300000);
 
-    //   //   throw new HttpException(
-    //   //     429,
-    //   //     'Your account has been temporary disable because of too many wrong attempt please try again after sometime or click on forgotten password to reset password'
-    //   //   );
-    //   // }
-    //   throw new HttpException(409, 'Wrong Password');
-    // }
+        throw new HttpException(
+          429,
+          'Your account has been temporary disable because of too many wrong attempt please try again after sometime or click on forgotten password to reset password'
+        );
+      }
+      throw new HttpException(409, 'Wrong Password');
+    }
 
     const token = jwt.sign({ id: findUser.id }, SECRET_KEY, {
       expiresIn: this.accessTokenExpiry,
